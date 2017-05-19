@@ -1,0 +1,11 @@
+{
+  "name": "honey5",
+  "dependencies": {
+    "immutable": "registry:npm/immutable#3.7.6+20160411060006",
+    "react-tap-event-plugin": "registry:dt/react-tap-event-plugin#0.0.0+20160726072212"
+  },
+  "globalDependencies": {
+    "material-ui": "registry:dt/material-ui#0.16.0+20170323194905",
+    "object-assign": "registry:dt/object-assign#4.0.1+20161119044246"
+  }
+}
