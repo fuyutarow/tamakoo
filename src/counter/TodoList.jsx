@@ -1,23 +1,28 @@
 import * as React from 'react';
 import Todo from './Todo';
-import { Honey5State, ActionDispatcher, Task } from './module';
+import { ActionDispatcher, Task } from './module';
 
 interface Tasks{
   tasks: Task[];
 }
 
 export default class TodoList extends React.Component<Tasks,{}> {
+  constructor(props){
+    super();
+    this.tasks = props;
+  }
+
   render() {
-    const tasks : any[] = this.props.tasks
+    const tasks : any[] = this.tasks.tasks
       .map( a =>
           <Todo
             id={a.id}
             name={a.name}
           /> )
     return (
-      <div>
+      <p>
         {tasks}
-      </div>
+      </p>
     );
   }
 }

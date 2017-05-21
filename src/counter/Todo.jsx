@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Honey5State, ActionDispatcher, Task } from './module';
+import { ActionDispatcher, Task } from './module';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
   AppBar, MenuItem,
