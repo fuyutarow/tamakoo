@@ -7,25 +7,34 @@ import {
   Checkbox
   } from 'material-ui';
 
+
+const styles = {
+  block: {
+    maxWidth: 250,
+  },
+  text: {
+    fontSize: '1.8em',
+
+  },
+  checkbox: {
+    marginBottom: 16,
+  },
+};
+
 export default class Todo extends React.Component<Task,{}> {
   render() {
-    const styles = {
-      block: {
-        maxWidth: 250,
-      },
-      checkbox: {
-        marginBottom: 16,
-      },
-    };
+
+    console.log(this.props.name.split("\n"))
     return (
       <MuiThemeProvider>
         <p><Card>
-          <CardHeader
-            title={this.props.id}
-          >okok
+          <CardHeader title={this.props.id}>
+            okok
           </CardHeader>
-          <CardText>
-            <a>{this.props.name}</a>
+          <CardText style={styles.text}>{
+            this.props.name.split("\n")
+              .map( m => (<p>{m}</p>) )
+          }
           </CardText>
           <CardActions>
           <Checkbox

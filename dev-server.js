@@ -9,7 +9,6 @@ app.get('/api/count', (req, res) => {
   res.contentType('application/json')
   let text = "good";
   text = execSync('ls -l ./').toString();
-  console.log(text);
   const obj = {
     "amount": 100,
     "text": text,
@@ -19,7 +18,7 @@ app.get('/api/count', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
+  res.sendFile(path.join(__dirname, '/dist/index.html'))
 })
 
 app.listen(3000, (err) => {

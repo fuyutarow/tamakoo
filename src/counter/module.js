@@ -8,7 +8,6 @@ type FETCH_REQUEST_START_TYPE = typeof FETCH_REQUEST_START_NAME
 const FETCH_REQUEST_FINISH_NAME = 'counter/fetch_request_finish'
 type FETCH_REQUEST_FINISH_TYPE = typeof FETCH_REQUEST_FINISH_NAME
 
-
 export type Task = {
   id: number;
   name: string;
@@ -83,7 +82,14 @@ export default function reducer (
     }
     case ADD_TASK:
       const newTasks = state.tasks;
-      newTasks.push({id:state.tasks.length, name:action.text});
+      let lis = action.text.split("-");
+      let out = lis[0]
+      lis.slice(1)
+        .map( a => { out+=a[0].toUpperCase()+a.slice(1) })
+      out = out
+        .replace(/: /g, ":").replace(/:/g, ": '")
+        .replace(/ ;/g, ";").replace(/;/g, "',")
+      newTasks.push({id:state.tasks.length, name:out});
       return Object.assign({}, state, { tasks:newTasks });
     default:
       return state
