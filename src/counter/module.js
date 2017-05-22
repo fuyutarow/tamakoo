@@ -96,6 +96,7 @@ export default function reducer (
   }
 }
 
+
 export class ActionDispatcher {
   dispatch: Dispatch<ReduxAction>
 
@@ -118,17 +119,35 @@ export class ActionDispatcher {
     this.dispatch(decrementAmount(amount));
   }
 
-  addTask( text: string ){
-    this.dispatch({ type:ADD_TASK, text:text });
+  async addTask( text: string ): Promise<void> {
+    this.dispatch({ type: FETCH_REQUEST_START_NAME, isLoading: true });
+
+    const url = '/api/count?text='+encodeURI(text)
+    try {
+      const response: Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount: number} = await response.json();
+        this.dispatch({ type:ADD_TASK, text:json.text });
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type: FETCH_REQUEST_FINISH_NAME, isLoading: false });
+    }
   }
+
 
   async asyncAdd(): Promise<void> {
     this.dispatch({ type: FETCH_REQUEST_START_NAME, isLoading: true });
-
     try {
       const response: Response = await fetch('/api/count', {
         method: 'GET',
-        headers: this.myHeaders
+        headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
         const json: {amount: number} = await response.json();

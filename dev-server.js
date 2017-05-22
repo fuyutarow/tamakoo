@@ -8,7 +8,7 @@ app.use('/dist', express.static('dist'))
 app.get('/api/count', (req, res) => {
   res.contentType('application/json')
   let text = "good";
-  text = execSync('ls -l ./').toString();
+  text = execSync("echo '"+decodeURI(req.query.text)+"' | mecab -Owakati").toString();
   const obj = {
     "amount": 100,
     "text": text,
