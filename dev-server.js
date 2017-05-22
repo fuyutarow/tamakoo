@@ -18,12 +18,12 @@ app.get('/api/count', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '/dist/index.html'))
+  res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-app.listen(3000, (err) => {
+app.listen(3341, (err) => {
   if (err) {
     console.log(err)
   }
-  console.log("server start at port 3000")
+  console.log("server start at port 3341")
 })

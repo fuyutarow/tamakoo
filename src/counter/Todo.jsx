@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { ActionDispatcher, Task } from './module';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
   AppBar, MenuItem,
   Card, CardHeader, CardText, CardActions,
@@ -23,10 +22,7 @@ const styles = {
 
 export default class Todo extends React.Component<Task,{}> {
   render() {
-
-    console.log(this.props.name.split("\n"))
     return (
-      <MuiThemeProvider>
         <p><Card>
           <CardHeader title={this.props.id}>
             okok
@@ -43,8 +39,6 @@ export default class Todo extends React.Component<Task,{}> {
           />
           </CardActions>
         </Card></p>
-
-      </MuiThemeProvider>
     );
   }
 }
