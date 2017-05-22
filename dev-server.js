@@ -7,8 +7,14 @@ app.use('/dist', express.static('dist'))
 
 app.get('/api/count', (req, res) => {
   res.contentType('application/json')
-  let text = "good";
-  text = execSync("echo '"+decodeURI(req.query.text)+"' | mecab -Owakati").toString();
+  let text;
+
+  try {
+    text = execSync("echo '"+decodeURI(req.query.text)+"' | /usr/local/bin/mecab -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/ -Owakati").toString();
+  } catch(err){
+    text = decodeURI(req.query.text)
+  }
+
   const obj = {
     "amount": 100,
     "text": text,
