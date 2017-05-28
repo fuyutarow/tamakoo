@@ -8216,7 +8216,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
 
                 _context3.prev = 1;
                 _context3.next = 4;
-                return fetch('/api/count', {
+                return fetch('localhost:58946/api/counter', {
                   method: 'GET',
                   headers: this.myHeaders
                 });

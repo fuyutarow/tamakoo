@@ -166,7 +166,7 @@ export class ActionDispatcher {
     this.dispatch({ type: FETCH_REQUEST_START_NAME, isLoading: true });
 
     try {
-      const response: Response = await fetch('/api/count', {
+      const response: Response = await fetch('localhost:58946/api/counter', {
         method: 'GET',
         headers: this.myHeaders
       })

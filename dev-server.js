@@ -10,7 +10,8 @@ app.get('/api/count', (req, res) => {
   let text;
 
   try {
-    text = execSync("echo '"+decodeURI(req.query.text)+"' | /usr/local/bin/mecab -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/ -Owakati").toString();
+    //text = execSync("echo '"+decodeURI(req.query.text)+"' | /usr/local/bin/mecab -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/ -Owakati").toString();
+    text = execSync("python echo.py -s '"+decodeURI(req.query.text)+"'").toString();
   } catch(err){
     text = decodeURI(req.query.text)
   }
@@ -27,9 +28,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-app.listen(3341, (err) => {
+var port = 3000;
+app.listen(port , (err) => {
   if (err) {
     console.log(err)
   }
-  console.log("server start at port 3341")
+  console.log("server start at port "+port)
 })
