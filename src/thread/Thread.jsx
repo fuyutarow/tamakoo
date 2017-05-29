@@ -6,6 +6,7 @@ import TodoList from './TodoList';
 import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import {Link, Route} from 'react-router-dom';
 
 interface Props {
   value: CounterState;
@@ -58,7 +59,7 @@ const styles = {
   },
 }
 
-export class Counter extends React.Component<void, Props, void> {
+export class Thread extends React.Component<void, Props, void> {
   addTask() {
     const task = (ReactDOM.findDOMNode(this.refs.task)).value;
     if( task=="" ) return;
@@ -71,18 +72,14 @@ export class Counter extends React.Component<void, Props, void> {
       <div>
         <div style={styles.timeline}>
           {(this.props.value.loadingCount === 0) ? null : <p>loading</p>}
-          <p>{`score: ${this.props.value.num}`}</p>
-          <button onClick={() => this.props.actions.increment(3)}>Increment 3</button>
-          <button onClick={() => this.props.actions.decrement(2)}>Decrement 2</button>
-          <button onClick={() => this.props.actions.asyncIncrement()}>async Increment 100</button>
           <TodoList tasks={this.props.value.tasks} />
         </div>
         <div style={styles.bar}>
-          <FloatingActionButton secondary={true} style={styles.newTab} target="_brank" href="tamakoo.com">
+          <FloatingActionButton secondary={true} style={styles.newTab}
+            target='_blank' href='/'>
             <ContentAdd />
           </FloatingActionButton>
         </div>
-
       </div>
     )
   }
