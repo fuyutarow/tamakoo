@@ -2,7 +2,8 @@
 import "./polyfill"
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Counter from './counter/Container'
+import Face from './counter/Container'
+import Thread from './counter/Thread'
 import {Provider} from "react-redux"
 import store from "./Store"
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -14,10 +15,10 @@ const wallpaper = {
 }
 
 ReactDOM.render(
-  <Provider store={store}>
-      <MuiThemeProvider>
-    <Counter content="hello world" style={wallpaper}/>
-        </MuiThemeProvider>
-  </Provider>
+<Provider store={store}>
+  <MuiThemeProvider>
+      <Face />
+  </MuiThemeProvider>
+</Provider>
   , document.getElementById('app')
 )

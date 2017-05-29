@@ -58,15 +58,16 @@ const styles = {
   },
 }
 
-export class Counter extends React.Component<void, Props, void> {
-  addTask() {
+export class Face extends React.Component<void, Props, void> {
+  toot() {
     const task = (ReactDOM.findDOMNode(this.refs.task)).value;
     if( task=="" ) return;
-    this.props.actions.addTask(task);
+    this.props.actions.toot(task);
     (ReactDOM.findDOMNode(this.refs.task)).value = "";
   }
 
   render() {
+    console.log(this.props.value)
     return (
       <div>
         <div style={styles.timeline}>
@@ -79,11 +80,10 @@ export class Counter extends React.Component<void, Props, void> {
         </div>
         <div style={styles.post}>
           <textarea style={styles.textarea}type='text' ref='task' />
-          <button style={styles.button} onClick={()=>this.addTask()} >add</button>
-          <button style={styles.button} onClick={() => this.props.actions.asyncAdd()}>async add task</button>
+          <button style={styles.button} onClick={()=>this.toot()} >add</button>
         </div>
         <div style={styles.bar}>
-          <FloatingActionButton secondary={true} style={styles.newTab} target="_brank" href="http://localhost:3000/">
+          <FloatingActionButton secondary={true} style={styles.newTab} target="_brank" href="tamakoo.com">
             <ContentAdd />
           </FloatingActionButton>
         </div>
@@ -95,7 +95,7 @@ export class Counter extends React.Component<void, Props, void> {
   componentDidMount() {
     document.onkeydown = e => {
       if( e.key=='Enter' && e.ctrlKey ){
-        this.addTask();
+        this.toot();
       }
     }
   }
