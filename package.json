@@ -4,15 +4,19 @@
   "scripts": {
     "build": "webpack --config ./webpack.config.dev.js",
     "build:prod": "webpack --config ./webpack.config.prod.js",
+    "go": "webpack --config ./webpack.config.prod.js; node dev-server.js",
+    "echo": "python echo.d.py -d toots &",
     "flow": "flow",
     "flow-typed": "flow-typed install",
     "test:unit": "mocha --compilers js:babel-register ./src/polyfill.js",
     "test:all": "mocha --compilers js:babel-register ./src/polyfill.js ./polyfill.js **/*.spec.js",
     "start": "webpack-dev-server --inline --hot --colors --port 3341 ./webpack.config.dev.js",
-    "server": "node dev-server.js"
+    "server": "node dev-server.js",
+    "server:prod": "node prod-server.js; python echo.d.py -d toots &"
   },
   "license": "MIT",
   "dependencies": {
+    "date-utils": "^1.2.21",
     "material-ui": "^0.18.1",
     "react": "15.5.4",
     "react-dom": "15.5.4",
