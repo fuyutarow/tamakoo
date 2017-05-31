@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "webpack --config ./webpack.config.dev.js",
+    "dev": "webpack --config ./webpack.config.dev.js; node dev-server.js",
     "build:prod": "webpack --config ./webpack.config.prod.js",
     "go": "webpack --config ./webpack.config.prod.js; node dev-server.js",
     "echo": "python echo.d.py -d toots &",
@@ -47,6 +48,7 @@
     "power-assert": "1.4.2",
     "react-test-renderer": "15.5.4",
     "sinon": "2.1.0",
+    "svg-url-loader": "^2.0.2",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.4.5"
   }

@@ -5,38 +5,24 @@ import {
   Card, CardHeader, CardText, CardActions,
   Checkbox
   } from 'material-ui';
+import { styleOn } from './css';
 
-
-const styles = {
-  block: {
-    maxWidth: 250,
-  },
-  text: {
-    fontSize: '1.4em',
-
-  },
-  checkbox: {
-    marginBottom: 16,
-  },
-};
 
 export default class Todo extends React.Component<Task,{}> {
   render() {
+    const styles = styleOn(screen.width);
+
     return (
         <p><Card>
-          <CardHeader title={this.props.id}>
-            okok
-          </CardHeader>
-          <CardText style={styles.text}>{
+          <CardText style={styles.timeline}>
+           <p>{this.props.id}</p>
+           {
             this.props.name.split("\n")
               .map( m => (<p>{m}</p>) )
           }
           </CardText>
-          <CardActions>
-          <Checkbox
-            label="Simple"
-            style={styles.checkbox}
-          />
+          <CardActions style={styles.timeline}>
+            <Checkbox label="+1" />
           </CardActions>
         </Card></p>
     );
