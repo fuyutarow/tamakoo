@@ -5,3 +5,6 @@ dist/
 npm-debug.log
 toots/
 tamakoo_model/
+secure.py
+nohup.out
+__pycache__/
