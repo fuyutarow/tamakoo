@@ -21,7 +21,12 @@ export class Face extends React.Component<void, Props, void> {
   }
 
   render() {
+    console.log("window width: ",window.innerWidth)
+    console.log("screen width: ",screen.width)
+    console.log("client width: ",document.documentElement.clientWidth)
+
     const styles = styleOn(screen.width);
+
     return (
       <div style={styles.wall}>
         <textarea style={styles.textarea} type='text' ref='task'

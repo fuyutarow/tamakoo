@@ -1,6 +1,5 @@
 export const styleOn = (windowWidth) =>  {
   //if( windowWidth < 480 ){
-  console.log("windowWidth",windowWidth)
   if( windowWidth < 720 ){
     return {
       wall: {

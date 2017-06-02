@@ -20,16 +20,17 @@ def bundle():
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
     now=datetime.now().strftime("%Y%m%dT%H%M%S")
-    gdb.nodes.create(text=args.sentence, when=now, who="test_user")
+    gdb.nodes.create(text=toot_text, when=now, who="test_user")
 
     from gensim.models import doc2vec
     import numpy as np
     from sklearn.metrics.pairwise import cosine_similarity
-    #s2w = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), min_len=1)
-    s2w = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
+    import MeCab
+    mecab = MeCab.Tagger('-Owakati -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/')    
+    
+    s2w = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), min_len=1)
     doc = open("toots/oz_wakatiall.txt", 'r').read().split('\n')
-    #doc_vecs = [ model.infer_vector(s2w(mecab.parse(line))) for line in doc]
-    doc_vecs = [ model.infer_vector(s2w(line)) for line in doc]
+    doc_vecs = [ model.infer_vector(s2w(mecab.parse(line))) for line in doc]
     vec = model.infer_vector(s2w(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]

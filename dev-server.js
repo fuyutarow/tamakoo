@@ -11,7 +11,7 @@ app.get('/api/count', (req, res) => {
 
   try {
     //text = execSync("echo '"+decodeURI(req.query.text)+"' | /usr/local/bin/mecab -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/ -Owakati").toString();
-    text = execSync("python neo4j-echo.py -n 100 -s '"+decodeURI(req.query.text)+"'").toString();
+    text = execSync("python echo.py -n 100 -s '"+decodeURI(req.query.text)+"'").toString();
   } catch(err){
     text = decodeURI(req.query.text)
   }
