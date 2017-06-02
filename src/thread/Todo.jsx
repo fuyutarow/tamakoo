@@ -6,6 +6,7 @@ import {
   Checkbox
   } from 'material-ui';
 import { styleOn } from './css';
+import { Link, Route } from 'react-router-dom';
 
 
 export default class Todo extends React.Component<Task,{}> {
@@ -13,7 +14,8 @@ export default class Todo extends React.Component<Task,{}> {
     const styles = styleOn(screen.width);
 
     return (
-        <p><Card>
+        <Link to='http://ncode.syosetu.com/n9735cv/'>
+        <Card>
           <CardText style={styles.timeline}>
            <p>{this.props.id}</p>
            {
@@ -24,7 +26,8 @@ export default class Todo extends React.Component<Task,{}> {
           <CardActions style={styles.timeline}>
             <Checkbox label="+1" />
           </CardActions>
-        </Card></p>
+        </Card>
+        </Link>
     );
   }
 }

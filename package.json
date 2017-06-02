@@ -10,7 +10,8 @@
     "test:unit": "mocha --compilers js:babel-register ./src/polyfill.js",
     "test:all": "mocha --compilers js:babel-register ./src/polyfill.js ./polyfill.js **/*.spec.js",
     "start": "webpack-dev-server --inline --hot --colors --port 3341 ./webpack.config.dev.js",
-    "server": "node dev-server.js"
+    "server": "python dev-server.py",
+    "server:prod": "python server.py"
   },
   "license": "MIT",
   "dependencies": {
