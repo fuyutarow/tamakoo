@@ -15,7 +15,7 @@ injectTapEventPlugin();
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import store from "./Store";
-import Face from './counter/Container';
+import Face from './face/Container';
 import Thread from './thread/Container';
 
 const wallpaper = {

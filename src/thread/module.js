@@ -103,7 +103,7 @@ export class ActionDispatcher {
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
 
-    const url = '/api/count?text='+encodeURI(text)
+    const url = '/api/toot/'+encodeURI(text)
     try {
       const response: Response = await fetch(url, {
         method: 'GET',

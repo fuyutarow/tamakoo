@@ -17,14 +17,14 @@ interface Props {
 
 export class Thread extends React.Component<void, Props, void> {
   render() {
+    console.log("window width", window.innerWidth)
+    console.log("screen width", screen.width)
+    console.log("client width", document.documentElement.clientWidth)
+
     const styles = styleOn(screen.width);
 
     return (
       <div style={styles.wall}>
-        <p>window width: {window.innerWidth}</p>
-        <p>screen width: {screen.width}</p>
-        <p>client width: {document.documentElement.clientWidth}</p>.
-
         <div style={styles.timeline}>
           {(this.props.value.loadingCount === 0) ? null : <p>loading</p>}
           <TodoList tasks={this.props.value.tasks} />

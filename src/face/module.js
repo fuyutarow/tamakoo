@@ -103,12 +103,14 @@ export class ActionDispatcher {
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
 
-    const url = '/api/count?text='+encodeURI(text)
+    const url = '/api/toot/'+encodeURI(text)
+    console.log('>>',url)
     try {
       const response: Response = await fetch(url, {
         method: 'GET',
         headers: this.myHeaders,
       })
+      console.log('<<',response)
       if (response.status === 200) { //2xx
         const json: {amount: number} = await response.json();
         this.dispatch({ type: TOOT, text: json.text });
