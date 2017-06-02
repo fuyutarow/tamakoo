@@ -35,8 +35,6 @@ export class Thread extends React.Component<void, Props, void> {
   }
 
   componentDidMount() {
-    console.log(">>>",window.innerWidth)
-
     document.onkeydown = e => {
       if( e.key=='Enter' && e.ctrlKey ){
         this.addTask();

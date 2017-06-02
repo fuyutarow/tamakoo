@@ -30328,8 +30328,6 @@ var Thread = exports.Thread = function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      console.log(">>>", window.innerWidth);
-
       document.onkeydown = function (e) {
         if (e.key == 'Enter' && e.ctrlKey) {
           _this2.addTask();
@@ -30386,37 +30384,50 @@ var Todo = function (_React$Component) {
   _createClass(Todo, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       var styles = (0, _css.styleOn)(screen.width);
 
       return React.createElement(
-        _reactRouterDom.Link,
-        { to: 'http://ncode.syosetu.com/n9735cv/' },
+        _materialUi.Card,
+        {
+          onTouchStart: function onTouchStart(e) {
+            _this2.x = e.changedTouches[0].pageX;
+          },
+          onTouchMove: function onTouchMove(e) {
+            if (_this2.x - e.changedTouches[0].pageX > 70) {
+              window.open('http://ncode.syosetu.com/n9735cv/', '_blank');
+            }
+          }
+        },
         React.createElement(
-          _materialUi.Card,
-          null,
-          React.createElement(
-            _materialUi.CardText,
-            { style: styles.timeline },
-            React.createElement(
+          _materialUi.CardText,
+          { style: styles.timeline },
+          this.props.name.split("\n").map(function (m) {
+            return React.createElement(
               'p',
               null,
-              this.props.id
-            ),
-            this.props.name.split("\n").map(function (m) {
-              return React.createElement(
-                'p',
-                null,
-                m
-              );
-            })
-          ),
-          React.createElement(
-            _materialUi.CardActions,
-            { style: styles.timeline },
-            React.createElement(_materialUi.Checkbox, { label: '+1' })
-          )
+              m
+            );
+          })
+        ),
+        React.createElement(
+          _materialUi.CardActions,
+          { style: styles.timeline },
+          React.createElement(_materialUi.Checkbox, { label: '+1' })
         )
       );
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this3 = this;
+
+      document.onkeydown = function (e) {
+        if (e.key == 'Enter' && e.ctrlKey) {
+          _this3.addTask();
+        }
+      };
     }
   }]);
 
