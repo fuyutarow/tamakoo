@@ -30382,6 +30382,11 @@ var Todo = function (_React$Component) {
   }
 
   _createClass(Todo, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.linkDisabled = false;
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -30395,8 +30400,18 @@ var Todo = function (_React$Component) {
             _this2.x = e.changedTouches[0].pageX;
           },
           onTouchMove: function onTouchMove(e) {
-            if (_this2.x - e.changedTouches[0].pageX > 70) {
+            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
               window.open('http://ncode.syosetu.com/n9735cv/', '_blank');
+            }
+          },
+          onTouchEnd: function onTouchEnd(e) {
+            if (_this2.linkDisabeld) {
+              e.preventDefault();
+            } else {
+              _this2.linkDisabled = true;
+              setTimeout(function () {
+                _this2.linkDisabled = false;
+              }, 500);
             }
           }
         },
@@ -30428,6 +30443,12 @@ var Todo = function (_React$Component) {
           _this3.addTask();
         }
       };
+
+      if (this.linkDisabled) {
+        setTimeout(function () {
+          _this3.linkDisabled = false;
+        }, 500);
+      }
     }
   }]);
 
