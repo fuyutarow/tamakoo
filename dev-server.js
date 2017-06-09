@@ -5,13 +5,13 @@ const execSync = require('child_process').execSync;
 
 app.use('/dist', express.static('dist'))
 
-app.get('/api/count', (req, res) => {
+app.get('/api/toot', (req, res) => {
   res.contentType('application/json')
   let text;
 
+  console.log(decodeURI(req.query.text))
   try {
-    //text = execSync("echo '"+decodeURI(req.query.text)+"' | /usr/local/bin/mecab -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/ -Owakati").toString();
-    text = execSync("python echo.py -n 100 -s '"+decodeURI(req.query.text)+"'").toString();
+    text = execSync("python echo-dev.py -n 100 -s '"+decodeURI(req.query.text)+"'").toString();
   } catch(err){
     text = decodeURI(req.query.text)
   }

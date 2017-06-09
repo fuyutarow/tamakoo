@@ -9,16 +9,17 @@ api = Flask(__name__)
 
 @api.route('/')
 def index():
-    return open('index.html').read()
+    return open('index.html', encoding='utf-8').read()
 
 @api.route('/dist/bundle.js')
 def bundle():
-    return open('dist/bundle.js').read()
+    return open('dist/bundle.js', encoding='utf-8').read()
 
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
+    print(toot_text)
     s2w = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
-    doc = open("toots/oz_wakatiall.txt", 'r').read().split('\n')
+    doc = open('toots/oz_wakatiall.txt', 'r', encoding='utf-8').read().split('\n')
     doc_vecs = [ model.infer_vector(s2w(line)) for line in doc]
     vec = model.infer_vector(s2w(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
