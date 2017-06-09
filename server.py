@@ -29,7 +29,10 @@ def bundle():
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
     now = datetime.now().strftime("%Y%m%dT%H%M%S")
-    gdb.nodes.create(text=toot_text, when=now, who="test_user")
+    gdb.query('\
+        MATCH (a:User) WHERE ID(a)=46245\
+        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s"})'\
+        %(now,toot_text), data_contents=True)
 
     s2w = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), min_len=1)
     doc = open("toots/oz_wakatiall.txt", 'r').read().split('\n')
@@ -52,5 +55,7 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
-    model = gensim.models.Doc2Vec.load("tamakoo_model/oz_doc2vec170529.model")
+    #model_name = 'tamakoo_model/oz_doc2vec170529.model'
+    model_name = 'tamakoo_model/dataall.love170605.doc.model'
+    model = gensim.models.Doc2Vec.load(model_name)
     api.run(host='0.0.0.0', port=3000)
