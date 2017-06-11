@@ -4,6 +4,8 @@ import numpy as np
 import gensim
 from gensim.models import doc2vec
 from sklearn.metrics.pairwise import cosine_similarity
+wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
+
 
 api = Flask(__name__)
 
@@ -17,16 +19,10 @@ def bundle():
 
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
-    print(toot_text)
-    s2w = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
-    doc = open('toots/oz_wakatiall.txt', 'r', encoding='utf-8').read().split('\n')
-    doc_vecs = [ model.infer_vector(s2w(line)) for line in doc]
-    vec = model.infer_vector(s2w(toot_text))
+    vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    res_text = ''
-    for i in range(100):
-        res_text += ''.join(doc[index[i]].split(' '))+'\n'
+    res_text = '\n'.join([ ''.join(doc[index[i]].split(' ')) for i in range(100)])
     result = {
         'text': res_text
         }
@@ -39,5 +35,11 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
-    model = gensim.models.Doc2Vec.load("tamakoo_model/oz_doc2vec170529.model")
+    model_name = 'echo_model/doc2vec.20170611T223642.model'
+    toots_fname = 'dump/tamakoo.20170611T220442.test.csv'
+
+    model = gensim.models.Doc2Vec.load(model_name)
+    doc = open(toots_fname, encoding='utf-8').readlines()
+    doc_vecs = [ model.infer_vector(wakati(line.split(',')[4])) for line in doc ]
+
     api.run(host='0.0.0.0', port=3000)

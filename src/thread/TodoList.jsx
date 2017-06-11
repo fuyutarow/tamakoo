@@ -17,7 +17,8 @@ export default class TodoList extends React.Component<Tasks,{}> {
       .map( a =>
           <Todo
             id={a.id}
-            name={a.name}
+            text={a.text}
+            url={a.url}
           /> )
     return (
       <p>

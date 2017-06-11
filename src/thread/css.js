@@ -9,7 +9,30 @@ export const styleOn = (windowWidth) =>  {
       timeline: {
         backgroundColor: '#fffff9',
         height: '60%',
-        fontSize: '18px',
+        fontSize: '16px',
+        padding: '0px',
+      },
+      card: {
+        padding: '0px',
+        display: 'flex',
+      },
+      text: {
+        width: '99%',
+        listStyle: 'none',
+      },
+      linkOn: {
+        width: '1%',
+        backgroundColor: '#ddd',
+        listStyle: 'none',
+      },
+      linkOff: {
+        width: '1%',
+        backgroundColor: '#fff',
+        listStyle: 'none',
+      },
+      ln: {
+        padding: '5px',
+        margin: '0px',
       },
       bar: {
         color: 'rgba(0, 0, 0, 0.87)',
@@ -29,6 +52,7 @@ export const styleOn = (windowWidth) =>  {
         bottom: 0,
         overflow: 'hidden',
       },
+
       newTab: {
         width: '30px',
         height: '30px',

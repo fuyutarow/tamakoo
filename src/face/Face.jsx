@@ -30,7 +30,7 @@ export class Face extends React.Component<void, Props, void> {
     return (
       <div style={styles.wall}>
         <textarea style={styles.textarea} type='text' ref='task'
-         placeholder="toot to open tamaKoo"/>
+          placeholder="toot to open tamaKoo"/>
         <Link to='/thread'>
           <button style={styles.button} onClick={()=>this.toot()} >
             echo

@@ -19,16 +19,24 @@ export default class Todo extends React.Component<Task,{}> {
 
   render() {
     const styles = styleOn(screen.width);
-
+    const linkStyle = this.props.url=='None'?
+      styles.linkOff : styles.linkOn;
     return (
-        <Card
-          onTouchStart={ e => { this.x=e.changedTouches[0].pageX }}
-          onTouchMove={ e => {
+
+        <div
+          style={styles.card}
+          ref='card'
+          onTouchStart = { e => {
+            this.x=e.changedTouches[0].pageX
+            console.log(this.x)
+          }}
+          onTouchMove = { e => {
             if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
-              window.open('http://ncode.syosetu.com/n9735cv/','_blank');
+              if( this.props.url=='None') return;
+              window.open(this.props.url,'_blank');
             }
           }}
-          onTouchEnd={ e => {
+          onTouchEnd = { e => {
             if(this.linkDisabeld){
               e.preventDefault()
             }else{
@@ -37,23 +45,18 @@ export default class Todo extends React.Component<Task,{}> {
             }
           }}
         >
-          <CardText style={styles.timeline}>
-            {this.props.name.split("\n")
-              .map( m => (<p>{m}</p>) )}
-          </CardText>
-          <CardActions style={styles.timeline}>
-            <Checkbox label="+1" />
-          </CardActions>
-        </Card>
+        <p style={styles.text}>
+            {this.props.text.split('\n')
+              .map( m => (<p style={styles.ln}>{m}</p>) )}
+        </p>
+        <p style={linkStyle}></p>
+        </div>
     );
   }
 
+
   componentDidMount() {
-    document.onkeydown = e => {
-      if( e.key=='Enter' && e.ctrlKey ){
-        this.addTask();
-      }
-    }
+    const card = this.refs.card;
 
     if( this.linkDisabled ){
       setTimeout(() => {this.linkDisabled = false }, 500);

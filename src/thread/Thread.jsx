@@ -25,9 +25,12 @@ export class Thread extends React.Component<void, Props, void> {
           {(this.props.value.loadingCount === 0) ? null : <p>loading</p>}
           <TodoList tasks={this.props.value.tasks} />
         </div>
+
         <div style={styles.bar}>
-          <Link to='/'>
-          <img style={styles.newTab} src={AddButtonSVG} />
+          <Link to='/' onClick={e=>{
+            this.props.actions.movePage()
+          }}>
+            <img style={styles.newTab} src={AddButtonSVG} />
           </Link>
         </div>
       </div>

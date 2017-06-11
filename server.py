@@ -38,9 +38,7 @@ def api_toot(toot_text):
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    res_text = ''
-    for i in range(100):
-        res_text += ''.join(doc[index[i]].split(' '))+'\n'
+    res_text = '\n'.join([ ''.join(doc[index[i]].split(' ')) for i in range(100)])
     result = {
         'text': res_text
         }
