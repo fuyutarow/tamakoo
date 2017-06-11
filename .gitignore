@@ -8,3 +8,5 @@ tamakoo_model/
 secure.py
 nohup.out
 __pycache__/
+echo_model
+dump
