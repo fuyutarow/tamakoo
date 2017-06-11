@@ -12,6 +12,9 @@ export const styleOn = (windowWidth) =>  {
         fontSize: '16px',
         padding: '0px',
       },
+      nowToot: {
+        backgroundColor: '#ffff50',
+      },
       card: {
         padding: '0px',
         display: 'flex',

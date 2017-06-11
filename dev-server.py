@@ -6,6 +6,10 @@ from gensim.models import doc2vec
 from sklearn.metrics.pairwise import cosine_similarity
 wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
 
+import secure
+from neo4jrestclient.client import GraphDatabase
+url = secure.url
+gdb = GraphDatabase(url)
 
 api = Flask(__name__)
 
@@ -22,13 +26,54 @@ def api_toot(toot_text):
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    res_text = '\n'.join([ ''.join(doc[index[i]].split(' ')) for i in range(100)])
+    res_text = ''.join([ ''.join(doc[index[i]].split(' ')) for i in range(100)])
     result = {
         'text': res_text
         }
     return make_response(jsonify(result))
-    # Unicodeにしたくない場合は↓
-    # return make_response(json.dumps(result, ensure_ascii=False))
+
+@api.route('/api/catchCard/<int:card_id>', methods=['GET'])
+def api_cardlines(card_id):
+    now_id = card_id
+
+    pre_id = now_id
+    pre_lines = []
+    for i in range(100):
+        try:
+            user_id, user_name, when, pre_id, pre_text, pre_url = gdb.query('\
+                MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
+                RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
+                '.format(pre_id))[0]
+            line = ','.join([str(user_id), user_name, when,str(pre_id), pre_text, pre_url])
+            pre_lines.append(line)
+        except:
+            break
+
+    next_id = now_id
+    next_lines = []
+    for i in range(100):
+        try:
+            user_id, user_name, when, next_id, next_text, next_url = gdb.query('\
+                MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\
+                RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
+                '.format(next_id))[0]
+            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, next_url])
+            next_lines.append(line)
+        except:
+            break
+
+    user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
+        MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
+        RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
+        '.format(now_id))[0]
+    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, card_url, 'true'])
+
+    lines = pre_lines[::-1] + [now_line] + next_lines
+    res_text = '\n'.join(lines)
+    result = {
+        'text': res_text
+        }
+    return make_response(jsonify(result))
 
 @api.errorhandler(404)
 def not_found(error):

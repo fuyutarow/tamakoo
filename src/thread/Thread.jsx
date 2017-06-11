@@ -18,12 +18,11 @@ interface Props {
 export class Thread extends React.Component<void, Props, void> {
   render() {
     const styles = styleOn(screen.width);
-
     return (
       <div style={styles.wall}>
         <div style={styles.timeline}>
           {(this.props.value.loadingCount === 0) ? null : <p>loading</p>}
-          <TodoList tasks={this.props.value.tasks} />
+          <TodoList value={this.props.value} actions={this.props.actions} />
         </div>
 
         <div style={styles.bar}>

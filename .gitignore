@@ -9,4 +9,4 @@ secure.py
 nohup.out
 __pycache__/
 echo_model
-dump
+dump/

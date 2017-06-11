@@ -2,23 +2,15 @@ import * as React from 'react';
 import Todo from './Todo';
 import { ActionDispatcher, Task } from './module';
 
-interface Tasks{
-  tasks: Task[];
-}
-
-export default class TodoList extends React.Component<Tasks,{}> {
-  constructor(props){
-    super();
-    this.tasks = props;
-  }
-
+export default class TodoList extends React.Component<Props,{}> {
   render() {
-    const tasks : any[] = this.tasks.tasks
+    this.props.value.tasks
+      .map( a => { console.log(a) })
+    const tasks = this.props.value.tasks
       .map( a =>
           <Todo
-            id={a.id}
-            text={a.text}
-            url={a.url}
+            task={a}
+            actions={this.props.actions}
           /> )
     return (
       <p>

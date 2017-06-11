@@ -1,6 +1,8 @@
 from neo4jrestclient.client import GraphDatabase
-url = "http://neo4j:}apTap{ov3@localhost:7474/db/data/"
+import secure
+url = secure.url
 gdb = GraphDatabase(url)
+
 from datetime import datetime
 
 now = datetime.now().strftime("%Y%m%dT%H%M%S")

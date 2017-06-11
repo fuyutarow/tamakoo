@@ -10798,7 +10798,7 @@ var FETCH_REQUEST_FINISH = 'counter/fetch_request_finish';
 var initialState = {
   num: 0,
   loadingCount: 0,
-  tasks: [{ id: 0, text: '', url: 'None' }],
+  tasks: [{ card_id: 0, text: '', url: 'None' }],
   text: "over",
   isLoading: false,
   title: 'welcom',
@@ -10829,13 +10829,13 @@ function reducer() {
         out += a[0].toUpperCase() + a.slice(1);
       });
       out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',");
-      newTasks.push({ id: state.tasks.length, text: out });
+      newTasks.push({ id: state.tasks.length, text: out, url: 'Noen', nowToot: true });
       return Object.assign({}, state, { tasks: newTasks });
 
     case TOOT:
       var nextTasks = state.tasks;
-      action.text.split('\n\n').slice(0, self.length - 1).map(function (a) {
-        nextTasks.push({ id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5] });
+      action.text.split('\n').slice(0, self.length - 1).map(function (a) {
+        nextTasks.push({ card_id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5], nowToot: a.split(',')[6] });
       });
       return Object.assign({}, state, { tasks: nextTasks });
 
@@ -10873,60 +10873,60 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                //this.dispatch({ type:ADD_TASK, text:text })
+                this.dispatch({ type: ADD_TASK, text: text });
                 this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
 
                 url = '/api/toot/' + encodeURI(text);
-                _context.prev = 2;
-                _context.next = 5;
+                _context.prev = 3;
+                _context.next = 6;
                 return fetch(url, {
                   method: 'GET',
                   headers: this.myHeaders
                 });
 
-              case 5:
+              case 6:
                 response = _context.sent;
 
                 if (!(response.status === 200)) {
-                  _context.next = 13;
+                  _context.next = 14;
                   break;
                 }
 
-                _context.next = 9;
+                _context.next = 10;
                 return response.json();
 
-              case 9:
+              case 10:
                 json = _context.sent;
 
                 this.dispatch({ type: TOOT, text: json.text });
-                _context.next = 14;
+                _context.next = 15;
                 break;
-
-              case 13:
-                throw new Error('illegal status code: ' + response.status);
 
               case 14:
-                _context.next = 19;
+                throw new Error('illegal status code: ' + response.status);
+
+              case 15:
+                _context.next = 20;
                 break;
 
-              case 16:
-                _context.prev = 16;
-                _context.t0 = _context['catch'](2);
+              case 17:
+                _context.prev = 17;
+                _context.t0 = _context['catch'](3);
 
                 console.error(_context.t0);
 
-              case 19:
-                _context.prev = 19;
+              case 20:
+                _context.prev = 20;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
-                return _context.finish(19);
+                return _context.finish(20);
 
-              case 22:
+              case 23:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[2, 16, 19, 22]]);
+        }, _callee, this, [[3, 17, 20, 23]]);
       }));
 
       function toot(_x2) {
@@ -10934,6 +10934,77 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
       }
 
       return toot;
+    }()
+  }, {
+    key: 'catchCard',
+    value: function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(card_id) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.dispatch({ type: MOVE_PAGE });
+                this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
+
+                url = '/api/catchCard/' + card_id;
+                _context2.prev = 3;
+                _context2.next = 6;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 6:
+                response = _context2.sent;
+
+                if (!(response.status === 200)) {
+                  _context2.next = 14;
+                  break;
+                }
+
+                _context2.next = 10;
+                return response.json();
+
+              case 10:
+                json = _context2.sent;
+
+                this.dispatch({ type: TOOT, text: json.text });
+                _context2.next = 15;
+                break;
+
+              case 14:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 15:
+                _context2.next = 20;
+                break;
+
+              case 17:
+                _context2.prev = 17;
+                _context2.t0 = _context2['catch'](3);
+
+                console.error(_context2.t0);
+
+              case 20:
+                _context2.prev = 20;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
+                return _context2.finish(20);
+
+              case 23:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[3, 17, 20, 23]]);
+      }));
+
+      function catchCard(_x3) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return catchCard;
     }()
   }]);
 
@@ -17829,7 +17900,7 @@ var FETCH_REQUEST_FINISH = 'counter/fetch_request_finish';
 var initialState = {
   num: 0,
   loadingCount: 0,
-  tasks: [{ id: 0, text: '', url: 'None' }],
+  tasks: [{ card_id: 0, text: '', url: 'None' }],
   text: "over",
   isLoading: false,
   title: 'welcom',
@@ -17860,13 +17931,13 @@ function reducer() {
         out += a[0].toUpperCase() + a.slice(1);
       });
       out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',");
-      newTasks.push({ id: state.tasks.length, text: out });
+      newTasks.push({ id: state.tasks.length, text: out, url: 'Noen', nowToot: true });
       return Object.assign({}, state, { tasks: newTasks });
 
     case TOOT:
       var nextTasks = state.tasks;
-      action.text.split('\n\n').slice(0, self.length - 1).map(function (a) {
-        nextTasks.push({ id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5] });
+      action.text.split('\n').slice(0, self.length - 1).map(function (a) {
+        nextTasks.push({ card_id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5], nowToot: a.split(',')[6] });
       });
       return Object.assign({}, state, { tasks: nextTasks });
 
@@ -17904,60 +17975,60 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                //this.dispatch({ type:ADD_TASK, text:text })
+                this.dispatch({ type: ADD_TASK, text: text });
                 this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
 
                 url = '/api/toot/' + encodeURI(text);
-                _context.prev = 2;
-                _context.next = 5;
+                _context.prev = 3;
+                _context.next = 6;
                 return fetch(url, {
                   method: 'GET',
                   headers: this.myHeaders
                 });
 
-              case 5:
+              case 6:
                 response = _context.sent;
 
                 if (!(response.status === 200)) {
-                  _context.next = 13;
+                  _context.next = 14;
                   break;
                 }
 
-                _context.next = 9;
+                _context.next = 10;
                 return response.json();
 
-              case 9:
+              case 10:
                 json = _context.sent;
 
                 this.dispatch({ type: TOOT, text: json.text });
-                _context.next = 14;
+                _context.next = 15;
                 break;
-
-              case 13:
-                throw new Error('illegal status code: ' + response.status);
 
               case 14:
-                _context.next = 19;
+                throw new Error('illegal status code: ' + response.status);
+
+              case 15:
+                _context.next = 20;
                 break;
 
-              case 16:
-                _context.prev = 16;
-                _context.t0 = _context['catch'](2);
+              case 17:
+                _context.prev = 17;
+                _context.t0 = _context['catch'](3);
 
                 console.error(_context.t0);
 
-              case 19:
-                _context.prev = 19;
+              case 20:
+                _context.prev = 20;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
-                return _context.finish(19);
+                return _context.finish(20);
 
-              case 22:
+              case 23:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[2, 16, 19, 22]]);
+        }, _callee, this, [[3, 17, 20, 23]]);
       }));
 
       function toot(_x2) {
@@ -17965,6 +18036,77 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
       }
 
       return toot;
+    }()
+  }, {
+    key: 'catchCard',
+    value: function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(card_id) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.dispatch({ type: MOVE_PAGE });
+                this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
+
+                url = '/api/catchCard/' + card_id;
+                _context2.prev = 3;
+                _context2.next = 6;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 6:
+                response = _context2.sent;
+
+                if (!(response.status === 200)) {
+                  _context2.next = 14;
+                  break;
+                }
+
+                _context2.next = 10;
+                return response.json();
+
+              case 10:
+                json = _context2.sent;
+
+                this.dispatch({ type: TOOT, text: json.text });
+                _context2.next = 15;
+                break;
+
+              case 14:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 15:
+                _context2.next = 20;
+                break;
+
+              case 17:
+                _context2.prev = 17;
+                _context2.t0 = _context2['catch'](3);
+
+                console.error(_context2.t0);
+
+              case 20:
+                _context2.prev = 20;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
+                return _context2.finish(20);
+
+              case 23:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[3, 17, 20, 23]]);
+      }));
+
+      function catchCard(_x3) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return catchCard;
     }()
   }]);
 
@@ -17994,6 +18136,9 @@ var styleOn = exports.styleOn = function styleOn(windowWidth) {
         height: '60%',
         fontSize: '16px',
         padding: '0px'
+      },
+      nowToot: {
+        backgroundColor: '#ffff50'
       },
       card: {
         padding: '0px',
@@ -30097,7 +30242,6 @@ var Thread = exports.Thread = function (_React$Component) {
       var _this2 = this;
 
       var styles = (0, _css.styleOn)(screen.width);
-
       return React.createElement(
         'div',
         { style: styles.wall },
@@ -30109,7 +30253,7 @@ var Thread = exports.Thread = function (_React$Component) {
             null,
             'loading'
           ),
-          React.createElement(_TodoList2.default, { tasks: this.props.value.tasks })
+          React.createElement(_TodoList2.default, { value: this.props.value, actions: this.props.actions })
         ),
         React.createElement(
           'div',
@@ -30193,46 +30337,100 @@ var Todo = function (_React$Component) {
       var _this2 = this;
 
       var styles = (0, _css.styleOn)(screen.width);
-      var linkStyle = this.props.url == 'None' ? styles.linkOff : styles.linkOn;
-      return React.createElement(
-        'div',
-        {
-          style: styles.card,
-          ref: 'card',
-          onTouchStart: function onTouchStart(e) {
-            _this2.x = e.changedTouches[0].pageX;
-            console.log(_this2.x);
-          },
-          onTouchMove: function onTouchMove(e) {
-            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-              if (_this2.props.url == 'None') return;
-              window.open(_this2.props.url, '_blank');
+      var linkStyle = this.props.task.url == 'None' ? styles.linkOff : styles.linkOn;
+      var cardStyle = this.props.task.nowToot || this.props.task.nowToot == 'true' ? styles.nowToot : styles.card;
+
+      if (this.props.task.nowToot || this.props.task.nowToot == 'true') {
+        return React.createElement(
+          'div',
+          {
+            style: cardStyle,
+            ref: 'card',
+            onTouchStart: function onTouchStart(e) {
+              _this2.x = e.changedTouches[0].pageX;
+
+              _this2.props.actions.catchCard(_this2.props.task.card_id);
+              console.log(_this2.x);
+            },
+            onTouchMove: function onTouchMove(e) {
+              if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
+                if (_this2.props.task.url == 'None') return;
+                window.open(_this2.props.task.url, '_blank');
+              }
+            },
+            onTouchEnd: function onTouchEnd(e) {
+              if (_this2.linkDisabeld) {
+                e.preventDefault();
+              } else {
+                _this2.linkDisabled = true;
+                setTimeout(function () {
+                  _this2.linkDisabled = false;
+                }, 500);
+              }
             }
           },
-          onTouchEnd: function onTouchEnd(e) {
-            if (_this2.linkDisabeld) {
-              e.preventDefault();
-            } else {
-              _this2.linkDisabled = true;
-              setTimeout(function () {
-                _this2.linkDisabled = false;
-              }, 500);
+          React.createElement(
+            'p',
+            { style: styles.text },
+            this.props.task.text.split('\n').map(function (m) {
+              return React.createElement(
+                'p',
+                { style: styles.ln },
+                m
+              );
+            })
+          ),
+          React.createElement('p', { style: linkStyle,
+            onTouchStart: function onTouchStart(e) {
+              _this2.props.actions.catchCard(_this2.props.task.card_id);
+            } })
+        );
+      } else {
+        return React.createElement(
+          'div',
+          {
+            style: cardStyle,
+            ref: 'card',
+            onTouchStart: function onTouchStart(e) {
+              _this2.x = e.changedTouches[0].pageX;
+
+              _this2.props.actions.catchCard(_this2.props.task.card_id);
+              console.log(_this2.x);
+            },
+            onTouchMove: function onTouchMove(e) {
+              if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
+                if (_this2.props.task.url == 'None') return;
+                window.open(_this2.props.task.url, '_blank');
+              }
+            },
+            onTouchEnd: function onTouchEnd(e) {
+              if (_this2.linkDisabeld) {
+                e.preventDefault();
+              } else {
+                _this2.linkDisabled = true;
+                setTimeout(function () {
+                  _this2.linkDisabled = false;
+                }, 500);
+              }
             }
-          }
-        },
-        React.createElement(
-          'p',
-          { style: styles.text },
-          this.props.text.split('\n').map(function (m) {
-            return React.createElement(
-              'p',
-              { style: styles.ln },
-              m
-            );
-          })
-        ),
-        React.createElement('p', { style: linkStyle })
-      );
+          },
+          React.createElement(
+            'p',
+            { style: styles.text },
+            this.props.task.text.split('\n').map(function (m) {
+              return React.createElement(
+                'p',
+                { style: styles.ln },
+                m
+              );
+            })
+          ),
+          React.createElement('p', { style: linkStyle,
+            onTouchStart: function onTouchStart(e) {
+              _this2.props.actions.catchCard(_this2.props.task.card_id);
+            } })
+        );
+      }
     }
   }, {
     key: 'componentDidMount',
@@ -30290,23 +30488,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var TodoList = function (_React$Component) {
   _inherits(TodoList, _React$Component);
 
-  function TodoList(props) {
+  function TodoList() {
     _classCallCheck(this, TodoList);
 
-    var _this = _possibleConstructorReturn(this, (TodoList.__proto__ || Object.getPrototypeOf(TodoList)).call(this));
-
-    _this.tasks = props;
-    return _this;
+    return _possibleConstructorReturn(this, (TodoList.__proto__ || Object.getPrototypeOf(TodoList)).apply(this, arguments));
   }
 
   _createClass(TodoList, [{
     key: 'render',
     value: function render() {
-      var tasks = this.tasks.tasks.map(function (a) {
+      var _this2 = this;
+
+      this.props.value.tasks.map(function (a) {
+        console.log(a);
+      });
+      var tasks = this.props.value.tasks.map(function (a) {
         return React.createElement(_Todo2.default, {
-          id: a.id,
-          text: a.text,
-          url: a.url
+          task: a,
+          actions: _this2.props.actions
         });
       });
       return React.createElement(
