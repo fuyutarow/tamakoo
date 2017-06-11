@@ -9,7 +9,6 @@ export type Task = {
 const ADD_TASK = 'counter/addTask';
 const TOOT = 'counter/toot';
 const MOVE_PAGE = 'counter/movePave';
-const CATCH_CARD = 'counter/catchCard';
 const FETCH_REQUEST_START = 'counter/fetch_request_start'
 const FETCH_REQUEST_FINISH = 'counter/fetch_request_finish'
 
@@ -75,9 +74,6 @@ export default function reducer (
     case MOVE_PAGE:
       return Object.assign({}, state, { tasks: [] });
 
-    case CATCH_CARD:
-
-
     default:
       return state
   }
@@ -100,29 +96,6 @@ export class ActionDispatcher {
 
   movePage(){
     this.dispatch({ type:MOVE_PAGE })
-  }
-
-  async catchCard( card_id:number ): Promise<void> {
-    //this.dispatch({ type:ADD_TASK, text:text })
-    this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
-
-    const url = '/api/catchCard/'+card_id
-    try {
-      const response: Response = await fetch(url, {
-        method: 'GET',
-        headers: this.myHeaders,
-      })
-      if (response.status === 200) { //2xx
-        const json: {amount: number} = await response.json();
-        this.dispatch({ type: TOOT, text: json.text });
-      } else {
-        throw new Error(`illegal status code: ${response.status}`)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
-    }
   }
 
   async toot( text: string ): Promise<void> {
