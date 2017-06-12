@@ -62,7 +62,7 @@ def api_cardlines(card_id):
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(pre_id))[0]
-            line = ','.join([str(user_id), user_name, when, str(pre_id), pre_text, 'None' if pre_url==None else pre_url, 'true'])
+            line = ','.join([str(user_id), user_name, when, str(pre_id), pre_text, 'None' if pre_url==None else pre_url])
             pre_lines.append(line)
         except:
             break
@@ -75,17 +75,10 @@ def api_cardlines(card_id):
                 MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(next_id))[0]
-            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, 'None' if next_url==None else next_url, 'true'])
+            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, 'None' if next_url==None else next_url])
             next_lines.append(line)
         except:
             break
-
-    lines = pre_lines[::-1] + [now_line] + next_lines
-    res_text = '\n'.join(lines)
-    result = {
-        'text': res_text
-        }
-    return make_response(jsonify(result))
 
 @api.errorhandler(404)
 def not_found(error):
