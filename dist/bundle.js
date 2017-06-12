@@ -30331,6 +30331,7 @@ var Todo = function (_React$Component) {
     value: function componentWillMount() {
       this.linkDisabled = false;
       this.isTap = false;
+      location.hash = '';
     }
   }, {
     key: 'render',
@@ -30369,7 +30370,6 @@ var Todo = function (_React$Component) {
             if (_this2.isTap) {
               _this2.isTap = false;
               _this2.props.actions.catchCard(_this2.props.task.card_id);
-              location.href = '/thread#nowToot';
             }
           }
         },
@@ -30395,7 +30395,6 @@ var Todo = function (_React$Component) {
             if (_this2.isTap) {
               _this2.isTap = false;
               _this2.props.actions.catchCard(_this2.props.task.card_id);
-              location.href = '/thread#nowToot';
             }
           }
         })
@@ -30415,6 +30414,11 @@ var Todo = function (_React$Component) {
           _this3.linkDisabled = false;
         }, 500);
       }
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      location.hash = 'nowToot';
     }
   }]);
 

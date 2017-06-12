@@ -80,6 +80,13 @@ def api_cardlines(card_id):
         except:
             break
 
+    lines = pre_lines[::-1] + [now_line] + next_lines
+    res_text = '\n'.join(lines)
+    result = {
+        'text': res_text
+        }
+    return make_response(jsonify(result))
+
 @api.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)

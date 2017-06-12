@@ -16,6 +16,7 @@ export default class Todo extends React.Component<Props, void> {
   componentWillMount(){
     this.linkDisabled = false;
     this.isTap = false;
+    location.hash = '';
   }
 
   render() {
@@ -50,7 +51,6 @@ export default class Todo extends React.Component<Props, void> {
           if(this.isTap){
             this.isTap = false;
             this.props.actions.catchCard(this.props.task.card_id);
-            location.href='/thread#nowToot';
           }
         }}
       >
@@ -69,7 +69,6 @@ export default class Todo extends React.Component<Props, void> {
             if(this.isTap){
               this.isTap = false;
               this.props.actions.catchCard(this.props.task.card_id);
-              location.href='/thread#nowToot';
             }
           }}
         >
@@ -79,15 +78,18 @@ export default class Todo extends React.Component<Props, void> {
 
   }
 
+    componentDidMount() {
+      const card = this.refs.card;
+      if( this.props.task.nowToot || this.props.task.nowToot=='true' ){
+        card.id='nowToot'
+      }
+      if( this.linkDisabled ){
+        setTimeout(() => {this.linkDisabled = false }, 500);
+      }
+    }
 
-  componentDidMount() {
-    const card = this.refs.card;
-    if( this.props.task.nowToot || this.props.task.nowToot=='true' ){
-      card.id='nowToot'
+    componentDidUpdate() {
+      location.hash='nowToot';
     }
-    if( this.linkDisabled ){
-      setTimeout(() => {this.linkDisabled = false }, 500);
-    }
-  }
 
 }
