@@ -52,7 +52,7 @@ def api_cardlines(card_id):
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
         '.format(now_id))[0]
-    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, card_url, 'true'])
+    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, 'None' if card_url==None else card_url, 'true'])
 
     pre_id = now_id
     pre_lines = []
@@ -62,7 +62,7 @@ def api_cardlines(card_id):
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(pre_id))[0]
-            line = ','.join([str(user_id), user_name, when,str(pre_id), pre_text, pre_url])
+            line = ','.join([str(user_id), user_name, when, str(pre_id), pre_text, 'None' if pre_url==None else pre_url, 'true'])
             pre_lines.append(line)
         except:
             break
@@ -75,7 +75,7 @@ def api_cardlines(card_id):
                 MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(next_id))[0]
-            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, next_url])
+            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, 'None' if next_url==None else next_url, 'true'])
             next_lines.append(line)
         except:
             break
