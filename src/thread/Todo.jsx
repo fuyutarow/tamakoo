@@ -11,9 +11,11 @@ import { Link, Route } from 'react-router-dom';
 export default class Todo extends React.Component<Props, void> {
   x:number;
   linkDisabled;
+  isTap;
 
   componentWillMount(){
     this.linkDisabled = false;
+    this.isTap = false;
   }
 
   render() {
@@ -23,87 +25,66 @@ export default class Todo extends React.Component<Props, void> {
     const cardStyle = this.props.task.nowToot || this.props.task.nowToot=='true'?
       styles.nowToot : styles.card;
 
-    if( this.props.task.nowToot || this.props.task.nowToot=='true' ){
-      return (
-          <div
-            style={cardStyle}
-            ref='card'
-            onTouchStart = { e => {
-              this.x=e.changedTouches[0].pageX
+    return (
+      <div
+        style={cardStyle}
+        ref='card'
+        onTouchStart = { e => {
+          this.x=e.changedTouches[0].pageX
+          this.isTap = true;
+        }}
+        onTouchMove = { e => {
+          this.isTap = false;
+          if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
+            if( this.props.task.url=='None') return;
+            window.open(this.props.task.url,'_blank');
+          }
+        }}
+        onTouchEnd = { e => {
+          if(this.linkDisabeld){
+            e.preventDefault()
+          }else{
+            this.linkDisabled = true;
+            setTimeout(() => { this.linkDisabled = false }, 500);
+          }
+          if(this.isTap){
+            this.isTap = false;
+            this.props.actions.catchCard(this.props.task.card_id);
+            location.href='/thread#nowToot';
+          }
+        }}
+      >
+        <p style={styles.text}>
+            {this.props.task.text.split('\n')
+              .map( m => (<p style={styles.ln}>{m}</p>) )}
+        </p>
+        <p style={linkStyle}
+          onTouchStart = { e => {
+            this.isTap = true;
+          }}
+          onTouchMove = { e => {
+            this.isTap = false;
+          }}
+          onTouchEnd = { e => {
+            if(this.isTap){
+              this.isTap = false;
+              this.props.actions.catchCard(this.props.task.card_id);
+              location.href='/thread#nowToot';
+            }
+          }}
+        >
+        </p>
+      </div>
+    );
 
-              this.props.actions.catchCard(this.props.task.card_id)
-              console.log(this.x)
-            }}
-            onTouchMove = { e => {
-              if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
-                if( this.props.task.url=='None') return;
-                window.open(this.props.task.url,'_blank');
-              }
-            }}
-            onTouchEnd = { e => {
-              if(this.linkDisabeld){
-                e.preventDefault()
-              }else{
-                this.linkDisabled = true;
-                setTimeout(() => { this.linkDisabled = false }, 500);
-              }
-            }}
-          >
-          <p style={styles.text}>
-              {this.props.task.text.split('\n')
-                .map( m => (<p style={styles.ln}>{m}</p>) )}
-          </p>
-          <p style={linkStyle}
-            onTouchStart = { e => {
-              this.props.actions.catchCard(this.props.task.card_id)
-            }}>
-          </p>
-          </div>
-      );
-    }else{
-      return (
-          <div
-            style={cardStyle}
-            ref='card'
-            onTouchStart = { e => {
-              this.x=e.changedTouches[0].pageX
-
-              this.props.actions.catchCard(this.props.task.card_id)
-              console.log(this.x)
-            }}
-            onTouchMove = { e => {
-              if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
-                if( this.props.task.url=='None') return;
-                window.open(this.props.task.url,'_blank');
-              }
-            }}
-            onTouchEnd = { e => {
-              if(this.linkDisabeld){
-                e.preventDefault()
-              }else{
-                this.linkDisabled = true;
-                setTimeout(() => { this.linkDisabled = false }, 500);
-              }
-            }}
-          >
-          <p style={styles.text}>
-              {this.props.task.text.split('\n')
-                .map( m => (<p style={styles.ln}>{m}</p>) )}
-          </p>
-          <p style={linkStyle}
-            onTouchStart = { e => {
-              this.props.actions.catchCard(this.props.task.card_id)
-            }}>
-          </p>
-          </div>
-      );
-    }
   }
 
 
   componentDidMount() {
     const card = this.refs.card;
-
+    if( this.props.task.nowToot || this.props.task.nowToot=='true' ){
+      card.id='nowToot'
+    }
     if( this.linkDisabled ){
       setTimeout(() => {this.linkDisabled = false }, 500);
     }

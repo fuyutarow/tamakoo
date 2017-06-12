@@ -36,6 +36,12 @@ def api_toot(toot_text):
 def api_cardlines(card_id):
     now_id = card_id
 
+    user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
+        MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
+        RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
+        '.format(now_id))[0]
+    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, card_url, 'true'])
+
     pre_id = now_id
     pre_lines = []
     for i in range(100):
@@ -61,12 +67,6 @@ def api_cardlines(card_id):
             next_lines.append(line)
         except:
             break
-
-    user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
-        MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
-        RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
-        '.format(now_id))[0]
-    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, card_url, 'true'])
 
     lines = pre_lines[::-1] + [now_line] + next_lines
     res_text = '\n'.join(lines)

@@ -30330,6 +30330,7 @@ var Todo = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this.linkDisabled = false;
+      this.isTap = false;
     }
   }, {
     key: 'render',
@@ -30340,97 +30341,65 @@ var Todo = function (_React$Component) {
       var linkStyle = this.props.task.url == 'None' ? styles.linkOff : styles.linkOn;
       var cardStyle = this.props.task.nowToot || this.props.task.nowToot == 'true' ? styles.nowToot : styles.card;
 
-      if (this.props.task.nowToot || this.props.task.nowToot == 'true') {
-        return React.createElement(
-          'div',
-          {
-            style: cardStyle,
-            ref: 'card',
-            onTouchStart: function onTouchStart(e) {
-              _this2.x = e.changedTouches[0].pageX;
-
-              _this2.props.actions.catchCard(_this2.props.task.card_id);
-              console.log(_this2.x);
-            },
-            onTouchMove: function onTouchMove(e) {
-              if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-                if (_this2.props.task.url == 'None') return;
-                window.open(_this2.props.task.url, '_blank');
-              }
-            },
-            onTouchEnd: function onTouchEnd(e) {
-              if (_this2.linkDisabeld) {
-                e.preventDefault();
-              } else {
-                _this2.linkDisabled = true;
-                setTimeout(function () {
-                  _this2.linkDisabled = false;
-                }, 500);
-              }
+      return React.createElement(
+        'div',
+        {
+          style: cardStyle,
+          ref: 'card',
+          onTouchStart: function onTouchStart(e) {
+            _this2.x = e.changedTouches[0].pageX;
+            _this2.isTap = true;
+          },
+          onTouchMove: function onTouchMove(e) {
+            _this2.isTap = false;
+            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
+              if (_this2.props.task.url == 'None') return;
+              window.open(_this2.props.task.url, '_blank');
             }
           },
-          React.createElement(
-            'p',
-            { style: styles.text },
-            this.props.task.text.split('\n').map(function (m) {
-              return React.createElement(
-                'p',
-                { style: styles.ln },
-                m
-              );
-            })
-          ),
-          React.createElement('p', { style: linkStyle,
-            onTouchStart: function onTouchStart(e) {
-              _this2.props.actions.catchCard(_this2.props.task.card_id);
-            } })
-        );
-      } else {
-        return React.createElement(
-          'div',
-          {
-            style: cardStyle,
-            ref: 'card',
-            onTouchStart: function onTouchStart(e) {
-              _this2.x = e.changedTouches[0].pageX;
-
-              _this2.props.actions.catchCard(_this2.props.task.card_id);
-              console.log(_this2.x);
-            },
-            onTouchMove: function onTouchMove(e) {
-              if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-                if (_this2.props.task.url == 'None') return;
-                window.open(_this2.props.task.url, '_blank');
-              }
-            },
-            onTouchEnd: function onTouchEnd(e) {
-              if (_this2.linkDisabeld) {
-                e.preventDefault();
-              } else {
-                _this2.linkDisabled = true;
-                setTimeout(function () {
-                  _this2.linkDisabled = false;
-                }, 500);
-              }
+          onTouchEnd: function onTouchEnd(e) {
+            if (_this2.linkDisabeld) {
+              e.preventDefault();
+            } else {
+              _this2.linkDisabled = true;
+              setTimeout(function () {
+                _this2.linkDisabled = false;
+              }, 500);
             }
-          },
-          React.createElement(
-            'p',
-            { style: styles.text },
-            this.props.task.text.split('\n').map(function (m) {
-              return React.createElement(
-                'p',
-                { style: styles.ln },
-                m
-              );
-            })
-          ),
-          React.createElement('p', { style: linkStyle,
-            onTouchStart: function onTouchStart(e) {
+            if (_this2.isTap) {
+              _this2.isTap = false;
               _this2.props.actions.catchCard(_this2.props.task.card_id);
-            } })
-        );
-      }
+              location.href = '/thread#nowToot';
+            }
+          }
+        },
+        React.createElement(
+          'p',
+          { style: styles.text },
+          this.props.task.text.split('\n').map(function (m) {
+            return React.createElement(
+              'p',
+              { style: styles.ln },
+              m
+            );
+          })
+        ),
+        React.createElement('p', { style: linkStyle,
+          onTouchStart: function onTouchStart(e) {
+            _this2.isTap = true;
+          },
+          onTouchMove: function onTouchMove(e) {
+            _this2.isTap = false;
+          },
+          onTouchEnd: function onTouchEnd(e) {
+            if (_this2.isTap) {
+              _this2.isTap = false;
+              _this2.props.actions.catchCard(_this2.props.task.card_id);
+              location.href = '/thread#nowToot';
+            }
+          }
+        })
+      );
     }
   }, {
     key: 'componentDidMount',
@@ -30438,7 +30407,9 @@ var Todo = function (_React$Component) {
       var _this3 = this;
 
       var card = this.refs.card;
-
+      if (this.props.task.nowToot || this.props.task.nowToot == 'true') {
+        card.id = 'nowToot';
+      }
       if (this.linkDisabled) {
         setTimeout(function () {
           _this3.linkDisabled = false;
