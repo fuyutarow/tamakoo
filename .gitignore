@@ -10,3 +10,6 @@ nohup.out
 __pycache__/
 echo_model
 dump/
+.ipynb_checkpoints/
+neo4jlab.ipynb
+
