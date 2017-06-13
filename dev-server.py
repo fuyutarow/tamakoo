@@ -26,7 +26,7 @@ def api_toot(toot_text):
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    res_text = ''.join([ ''.join(doc[index[i]].split(' ')) for i in range(100)])
+    res_text = ''.join([ ''.join(doc[index[i]].split(' ')) for i in range(20)])
     result = {
         'text': res_text
         }
@@ -46,7 +46,7 @@ def api_cardlines(card_id):
 
     pre_id = now_id
     pre_lines = []
-    for i in range(100):
+    for i in range(10):
         try:
             user_id, user_name, when, pre_id, pre_text, pre_url = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -59,7 +59,7 @@ def api_cardlines(card_id):
 
     next_id = now_id
     next_lines = []
-    for i in range(100):
+    for i in range(10):
         try:
             user_id, user_name, when, next_id, next_text, next_url = gdb.query('\
                 MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\

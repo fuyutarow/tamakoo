@@ -12,12 +12,16 @@ interface Props {
   actions: ActionDispatcher;
 };
 
+const speech = new webkitSpeechRecognition();
+speech.lang = 'ja';
+speech.continuous = true;
+
 export class Face extends React.Component<void, Props, void> {
   toot() {
-    const task = (ReactDOM.findDOMNode(this.refs.task)).value;
-    if( task=="" ) return;
-    this.props.actions.toot(task);
-    (ReactDOM.findDOMNode(this.refs.task)).value = "";
+    const note = (ReactDOM.findDOMNode(this.refs.note)).value;
+    if( note=="" ) return;
+    this.props.actions.toot(note);
+    (ReactDOM.findDOMNode(this.refs.note)).value = "";
   }
 
   render() {
@@ -29,10 +33,10 @@ export class Face extends React.Component<void, Props, void> {
 
     return (
       <div style={styles.wall}>
-        <textarea style={styles.textarea} type='text' ref='task'
+        <textarea style={styles.textarea} type='text' ref='note'
           placeholder="toot to open tamaKoo"/>
         <Link to='/thread'>
-          <button style={styles.button} onClick={()=>this.toot()} >
+          <button style={styles.button} onClick={()=>this.toot()} ref="speakbtn" >
             echo
           </button>
         </Link>
@@ -46,5 +50,24 @@ export class Face extends React.Component<void, Props, void> {
         this.toot();
       }
     }
+    speech.start();
+    speech.onresult = e => {
+      for( let i = e.resultIndex; i < e.results.length; ++i ){
+        console.log(e.results[i][0].transcript)
+        this.props.actions.listen(e.results[i][0].transcript);
+      }
+    }
+
+    const speakbtn = this.refs.speakbtn;
+    speakbtn.addEventListener('click', () => {
+      const synthes = new SpeechSynthesisUtterance();
+      //synthes.voiceURI = 1;
+      synthes.volume = 1;// 0 - 1
+      synthes.rate = 1;// 0 - 10
+      synthes.pitch = 2;// 0 - 2
+      synthes.text = this.refs.note.value;
+      synthes.lang = 'ja-JP';
+      speechSynthesis.speak( synthes );
+    }, false);
   }
 }

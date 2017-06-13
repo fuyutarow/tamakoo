@@ -12,29 +12,31 @@ export default class Todo extends React.Component<Props, void> {
   x:number;
   linkDisabled;
   isTap;
+  styles;
 
   componentWillMount(){
-    this.linkDisabled = false;
-    this.isTap = false;
     location.hash = '';
+    this.isTap = false;
+    this.linkDisabled = false;
+    this.styles = styleOn(screen.width);
   }
 
   render() {
-    const styles = styleOn(screen.width);
     const linkStyle = this.props.task.url=='None'?
-      styles.linkOff : styles.linkOn;
+      this.styles.linkOff : this.styles.linkOn;
     const cardStyle = this.props.task.nowToot || this.props.task.nowToot=='true'?
-      styles.nowToot : styles.card;
-
+      this.styles.nowToot : this.styles.card;
     return (
       <div
         style={cardStyle}
         ref='card'
         onTouchStart = { e => {
+          if( !this.props.value.touchAble ) return;
           this.x=e.changedTouches[0].pageX
           this.isTap = true;
         }}
         onTouchMove = { e => {
+          if( !this.props.value.touchAble ) return;
           this.isTap = false;
           if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
             if( this.props.task.url=='None') return;
@@ -42,6 +44,7 @@ export default class Todo extends React.Component<Props, void> {
           }
         }}
         onTouchEnd = { e => {
+          if( !this.props.value.touchAble ) return;
           if(this.linkDisabeld){
             e.preventDefault()
           }else{
@@ -50,46 +53,38 @@ export default class Todo extends React.Component<Props, void> {
           }
           if(this.isTap){
             this.isTap = false;
-            this.props.actions.catchCard(this.props.task.card_id);
+            this.catchCard();
           }
         }}
       >
-        <p style={styles.text}>
+        <p style={this.styles.text}>
             {this.props.task.text.split('\n')
-              .map( m => (<p style={styles.ln}>{m}</p>) )}
+              .map( m => (<p style={this.styles.ln}>{m}</p>) )}
         </p>
-        <p style={linkStyle}
-          onTouchStart = { e => {
-            this.isTap = true;
-          }}
-          onTouchMove = { e => {
-            this.isTap = false;
-          }}
-          onTouchEnd = { e => {
-            if(this.isTap){
-              this.isTap = false;
-              this.props.actions.catchCard(this.props.task.card_id);
-            }
-          }}
-        >
-        </p>
+        <p style={linkStyle} />
       </div>
     );
-
   }
+
+
+
+    catchCard(){
+      const card = this.refs.card;
+      card.style = this.styles.nowToot;
+      this.props.actions.catchCard(this.props.task.card_id);
+    }
 
     componentDidMount() {
       const card = this.refs.card;
       if( this.props.task.nowToot || this.props.task.nowToot=='true' ){
         card.id='nowToot'
       }
+
+
       if( this.linkDisabled ){
         setTimeout(() => {this.linkDisabled = false }, 500);
       }
     }
 
-    componentDidUpdate() {
-      location.hash='nowToot';
-    }
 
 }

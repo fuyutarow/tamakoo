@@ -13,7 +13,16 @@ export const styleOn = (windowWidth) =>  {
         padding: '0px',
       },
       nowToot: {
-        backgroundColor: '#ffff50',
+        padding: '10px 0px',
+        color: 'rgba(0, 0, 0, 0.87)',
+        backgroundColor: 'rgb(255, 255, 255)',
+        transition: 'all 450ms cubicBezier(0.23, 1, 0.32, 1) 0ms',
+        boxSizing: 'borderBox',
+        fontFamily: 'Roboto, sansSerif',
+        WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
+        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+        borderRadius: '2px',
+        zIndex: '1',
       },
       card: {
         padding: '0px',

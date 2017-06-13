@@ -24,7 +24,6 @@ export class Thread extends React.Component<void, Props, void> {
           {(this.props.value.loadingCount === 0) ? null : <p>loading</p>}
           <TodoList value={this.props.value} actions={this.props.actions} />
         </div>
-
         <div style={styles.bar}>
           <Link to='/' onClick={e=>{
             this.props.actions.movePage()

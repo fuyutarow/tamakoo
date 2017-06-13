@@ -10,6 +10,7 @@ export default class TodoList extends React.Component<Props,{}> {
       .map( a =>
           <Todo
             task={a}
+            value={this.props.value}
             actions={this.props.actions}
           /> )
     return (

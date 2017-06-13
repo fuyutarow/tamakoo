@@ -8,9 +8,11 @@ export type Task = {
 
 const ADD_TASK = 'counter/addTask';
 const TOOT = 'counter/toot';
-const MOVE_PAGE = 'counter/movePave';
+const CLEAR_CARDS = 'counter/clear_cards';
 const FETCH_REQUEST_START = 'counter/fetch_request_start'
 const FETCH_REQUEST_FINISH = 'counter/fetch_request_finish'
+const TOUCH_ABLED = 'counter/touch_abled'
+const TOUCH_DISABLED = 'counter/touch_disabled'
 
 export interface CounterState {
   num: number;
@@ -20,6 +22,7 @@ export interface CounterState {
   isLoading: boolean;
   title: string;
   page: number;
+  touchAble: boolean;
 }
 
 export type ActionTypes =
@@ -35,7 +38,8 @@ const initialState:CounterState = {
   text: "over",
   isLoading: false,
   title: 'welcom',
-  page: 0
+  page: 0,
+  touchAble: true,
 };
 
 export default function reducer (
@@ -71,14 +75,20 @@ export default function reducer (
           nextTasks.push({card_id:a.split(',')[3], text:a.split(',')[4], url:a.split(',')[5], nowToot:a.split(',')[6]}) });
       return Object.assign({}, state, { tasks:nextTasks });
 
-    case MOVE_PAGE:
+    case CLEAR_CARDS:
       return Object.assign({}, state, { tasks: [] });
+
+    case TOUCH_ABLED:
+      return Object.assign({}, state, { touchAble: true });
+
+    case TOUCH_DISABLED:
+      return Object.assign({}, state, { touchAble: false });
+
 
     default:
       return state
   }
 }
-
 
 export class ActionDispatcher {
   dispatch: Dispatch<ReduxAction>
@@ -95,7 +105,7 @@ export class ActionDispatcher {
   }
 
   movePage(){
-    this.dispatch({ type:MOVE_PAGE })
+    this.dispatch({ type:CLEAR_CARDS })
   }
 
   async toot( text: string ): Promise<void> {
@@ -122,7 +132,7 @@ export class ActionDispatcher {
   }
 
   async catchCard( card_id: number ): Promise<void> {
-    this.dispatch({ type:MOVE_PAGE })
+    this.dispatch({ type:TOUCH_DISABLED })
     this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
 
     const url = '/api/catchCard/'+card_id;
@@ -133,7 +143,8 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount: number} = await response.json();
-        this.dispatch({ type: TOOT, text: json.text });
+        this.dispatch({ type:CLEAR_CARDS })
+        this.dispatch({ type:TOOT, text: json.text });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -141,6 +152,7 @@ export class ActionDispatcher {
       console.error(err)
     } finally {
       this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
+      this.dispatch({ type:TOUCH_ABLED })
     }
   }
 
