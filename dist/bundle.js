@@ -10800,7 +10800,7 @@ var TOUCH_DISABLED = 'counter/touch_disabled';
 var initialState = {
   num: 0,
   loadingCount: 0,
-  tasks: [{ card_id: 0, text: '', url: 'None' }],
+  tasks: [],
   text: "over",
   isLoading: false,
   title: 'welcom',
@@ -10832,13 +10832,13 @@ function reducer() {
         out += a[0].toUpperCase() + a.slice(1);
       });
       out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',");
-      newTasks.push({ id: state.tasks.length, text: out, url: 'Noen', nowToot: true });
+      newTasks.push({ card_id: state.tasks.length, text: out, url: 'None', mode: 'toot' });
       return Object.assign({}, state, { tasks: newTasks });
 
     case TOOT:
       var nextTasks = state.tasks;
       action.text.split('\n').slice(0, self.length - 1).map(function (a) {
-        nextTasks.push({ card_id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5], nowToot: a.split(',')[6] });
+        nextTasks.push({ card_id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5], mode: a.split(',')[6] });
       });
       return Object.assign({}, state, { tasks: nextTasks });
 
@@ -17913,7 +17913,7 @@ var TOUCH_DISABLED = 'counter/touch_disabled';
 var initialState = {
   num: 0,
   loadingCount: 0,
-  tasks: [{ card_id: 0, text: '', url: 'None' }],
+  tasks: [],
   text: "over",
   isLoading: false,
   title: 'welcom',
@@ -17945,13 +17945,13 @@ function reducer() {
         out += a[0].toUpperCase() + a.slice(1);
       });
       out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',");
-      newTasks.push({ id: state.tasks.length, text: out, url: 'Noen', nowToot: true });
+      newTasks.push({ card_id: state.tasks.length, text: out, url: 'Noen', mode: 'toot' });
       return Object.assign({}, state, { tasks: newTasks });
 
     case TOOT:
       var nextTasks = state.tasks;
       action.text.split('\n').slice(0, self.length - 1).map(function (a) {
-        nextTasks.push({ card_id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5], nowToot: a.split(',')[6] });
+        nextTasks.push({ card_id: a.split(',')[3], text: a.split(',')[4], url: a.split(',')[5], mode: a.split(',')[6] });
       });
       return Object.assign({}, state, { tasks: nextTasks });
 
@@ -30091,16 +30091,6 @@ var Face = exports.Face = function (_React$Component) {
       return React.createElement(
         'div',
         { style: styles.wall },
-        React.createElement(
-          'p',
-          null,
-          '          ',
-          React.createElement(
-            'button',
-            { ref: 'speakbtn' },
-            'Speak'
-          )
-        ),
         React.createElement('textarea', { style: styles.textarea, type: 'text', ref: 'note',
           placeholder: 'toot to open tamaKoo' }),
         React.createElement(
@@ -30110,7 +30100,7 @@ var Face = exports.Face = function (_React$Component) {
             'button',
             { style: styles.button, onClick: function onClick() {
                 return _this2.toot();
-              } },
+              }, ref: 'speakbtn' },
             'echo'
           )
         )
@@ -30130,7 +30120,7 @@ var Face = exports.Face = function (_React$Component) {
       speech.onresult = function (e) {
         for (var i = e.resultIndex; i < e.results.length; ++i) {
           console.log(e.results[i][0].transcript);
-          _this3.props.actions.listen(e.results[i][0].transcript);
+          _this3.refs.note.value = e.results[i][0].transcript;
         }
       };
 
@@ -30397,6 +30387,14 @@ var Todo = function (_React$Component) {
       this.isTap = false;
       this.linkDisabled = false;
       this.styles = (0, _css.styleOn)(screen.width);
+      this.isToot = this.props.task.mode == 'toot'; //? true:false;
+      this.isCalled = true; //this.props.task.mode=='called'//? true:false;
+    }
+  }, {
+    key: 'componentWillUpdate',
+    value: function componentWillUpdate() {
+      this.isToot = this.props.task.mode == 'toot';
+      this.isCalled = this.props.task.mode == 'called';
     }
   }, {
     key: 'render',
@@ -30404,41 +30402,20 @@ var Todo = function (_React$Component) {
       var _this2 = this;
 
       var linkStyle = this.props.task.url == 'None' ? this.styles.linkOff : this.styles.linkOn;
-      var cardStyle = this.props.task.nowToot || this.props.task.nowToot == 'true' ? this.styles.nowToot : this.styles.card;
+      var cardStyle = this.isToot || this.isCalled ? this.styles.nowToot : this.styles.card;
+
+      var anchor = this.isCalled ? React.createElement(
+        'p',
+        null,
+        React.createElement(
+          'button',
+          { ref: 'anchor' },
+          '>>'
+        )
+      ) : null;
       return React.createElement(
         'div',
-        {
-          style: cardStyle,
-          ref: 'card',
-          onTouchStart: function onTouchStart(e) {
-            if (!_this2.props.value.touchAble) return;
-            _this2.x = e.changedTouches[0].pageX;
-            _this2.isTap = true;
-          },
-          onTouchMove: function onTouchMove(e) {
-            if (!_this2.props.value.touchAble) return;
-            _this2.isTap = false;
-            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-              if (_this2.props.task.url == 'None') return;
-              window.open(_this2.props.task.url, '_blank');
-            }
-          },
-          onTouchEnd: function onTouchEnd(e) {
-            if (!_this2.props.value.touchAble) return;
-            if (_this2.linkDisabeld) {
-              e.preventDefault();
-            } else {
-              _this2.linkDisabled = true;
-              setTimeout(function () {
-                _this2.linkDisabled = false;
-              }, 500);
-            }
-            if (_this2.isTap) {
-              _this2.isTap = false;
-              _this2.catchCard();
-            }
-          }
-        },
+        { style: cardStyle, ref: 'card' },
         React.createElement(
           'p',
           { style: this.styles.text },
@@ -30448,7 +30425,8 @@ var Todo = function (_React$Component) {
               { style: _this2.styles.ln },
               m
             );
-          })
+          }),
+          anchor
         ),
         React.createElement('p', { style: linkStyle })
       );
@@ -30466,9 +30444,42 @@ var Todo = function (_React$Component) {
       var _this3 = this;
 
       var card = this.refs.card;
-      if (this.props.task.nowToot || this.props.task.nowToot == 'true') {
+      if (this.isCalled) {
         card.id = 'nowToot';
       }
+      card.addEventListener('touchstart', function (e) {
+        if (!_this3.props.value.touchAble) return;
+        _this3.x = e.changedTouches[0].pageX;
+        _this3.isTap = true;
+      }, false);
+      card.addEventListener('touchmove', function (e) {
+        if (!_this3.props.value.touchAble) return;
+        _this3.isTap = false;
+        if (!_this3.linkDisabled && _this3.x - e.changedTouches[0].pageX > 80) {
+          if (_this3.props.task.url == 'None') return;
+          window.open(_this3.props.task.url, '_blank');
+        }
+      }, false);
+      card.addEventListener('touchend', function (e) {
+        if (!_this3.props.value.touchAble) return;
+        if (_this3.linkDisabeld) {
+          e.preventDefault();
+        } else {
+          _this3.linkDisabled = true;
+          setTimeout(function () {
+            _this3.linkDisabled = false;
+          }, 500);
+        }
+        if (_this3.isTap) {
+          _this3.isTap = false;
+          _this3.catchCard();
+        }
+      }, false);
+
+      var anchor = this.refs.anchor;
+      anchor.addEventListener('click', function (e) {
+        console.log('Good');
+      }, false);
 
       if (this.linkDisabled) {
         setTimeout(function () {
@@ -30530,12 +30541,10 @@ var TodoList = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      this.props.value.tasks.map(function (a) {
-        console.log(a);
-      });
-      var tasks = this.props.value.tasks.map(function (a) {
+      var tasks = this.props.value.tasks.map(function (a, idx) {
         return React.createElement(_Todo2.default, {
           task: a,
+          order: idx,
           value: _this2.props.value,
           actions: _this2.props.actions
         });

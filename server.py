@@ -38,7 +38,10 @@ def api_toot(toot_text):
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    res_text = ''.join([ ''.join(doc[index[i]].split(' ')) for i in range(100)])
+    #res_text = ''.join([''.join(doc[index[i]].split(' ')) for i in range(20)])
+    res_text = ''
+    for i in range(100):
+        res_text += ''.join([''.join(doc[index[i]].split(' '))]).split('\n')[0]+',normal\n'
     result = {
         'text': res_text
         }
@@ -62,7 +65,7 @@ def api_cardlines(card_id):
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(pre_id))[0]
-            line = ','.join([str(user_id), user_name, when, str(pre_id), pre_text, 'None' if pre_url==None else pre_url])
+            line = ','.join([str(user_id), user_name, when, str(pre_id), pre_text, 'None' if pre_url==None else pre_url, 'normal'])
             pre_lines.append(line)
         except:
             break
@@ -75,7 +78,7 @@ def api_cardlines(card_id):
                 MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(next_id))[0]
-            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, 'None' if next_url==None else next_url])
+            line = ','.join([str(user_id), user_name, when, str(next_id), next_text, 'None' if next_url==None else next_url, 'normal'])
             next_lines.append(line)
         except:
             break

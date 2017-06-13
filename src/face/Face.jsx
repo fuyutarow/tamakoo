@@ -54,7 +54,7 @@ export class Face extends React.Component<void, Props, void> {
     speech.onresult = e => {
       for( let i = e.resultIndex; i < e.results.length; ++i ){
         console.log(e.results[i][0].transcript)
-        this.props.actions.listen(e.results[i][0].transcript);
+        this.refs.note.value = e.results[i][0].transcript;
       }
     }
 

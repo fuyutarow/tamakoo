@@ -34,7 +34,7 @@ export type ActionTypes =
 const initialState:CounterState = {
   num: 0,
   loadingCount: 0,
-  tasks: [{card_id:0,text:'',url:'None'}],
+  tasks: [],
   text: "over",
   isLoading: false,
   title: 'welcom',
@@ -64,7 +64,7 @@ export default function reducer (
       out = out
         .replace(/: /g, ":").replace(/:/g, ": '")
         .replace(/ ;/g, ";").replace(/;/g, "',")
-      newTasks.push({id:state.tasks.length, text:out, url:'Noen', nowToot:true});
+      newTasks.push({card_id:state.tasks.length, text:out, url:'Noen', mode:'toot'});
       return Object.assign({}, state, { tasks:newTasks });
 
     case TOOT:
@@ -72,7 +72,7 @@ export default function reducer (
       action.text.split('\n')
         .slice(0,self.length-1)
         .map( a => {
-          nextTasks.push({card_id:a.split(',')[3], text:a.split(',')[4], url:a.split(',')[5], nowToot:a.split(',')[6]}) });
+          nextTasks.push({card_id:a.split(',')[3], text:a.split(',')[4], url:a.split(',')[5], mode:a.split(',')[6]}) });
       return Object.assign({}, state, { tasks:nextTasks });
 
     case CLEAR_CARDS:
