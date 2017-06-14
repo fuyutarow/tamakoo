@@ -47,7 +47,7 @@ def api_toot(toot_text):
         }
     return make_response(jsonify(result))
 
-@api.route('/api/catchCard/<int:card_id>', methods=['GET'])
+@api.route('/api/callCard/<int:card_id>', methods=['GET'])
 def api_cardlines(card_id):
     now_id = card_id
 

@@ -6,6 +6,11 @@ export const styleOn = (windowWidth) =>  {
         backgroundColor: '#fffff9',
         color: 'rgba(0, 0, 0, 0.87)',
       },
+      wall2: {
+        backgroundColor: '#666663',
+        color: 'rgba(50, 0, 50, 0.87)',
+        padding: '15px 15px 15px 15px',
+      },
       timeline: {
         backgroundColor: '#fffff9',
         height: '60%',

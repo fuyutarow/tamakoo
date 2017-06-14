@@ -16,10 +16,9 @@ const TOUCH_DISABLED = 'counter/touch_disabled'
 
 export interface CounterState {
   num: number;
-  loadingCount: number;
   tasks: Task[];
   text: string;
-  isLoading: boolean;
+  phase: string;
   title: string;
   page: number;
   touchAble: boolean;
@@ -33,10 +32,9 @@ export type ActionTypes =
 
 const initialState:CounterState = {
   num: 0,
-  loadingCount: 0,
   tasks: [],
   text: "over",
-  isLoading: false,
+  phase: 'ground',
   title: 'welcom',
   page: 0,
   touchAble: true,
@@ -48,11 +46,11 @@ export default function reducer (
 ): CounterState {
   switch (action.type) {
     case FETCH_REQUEST_START: {
-      return Object.assign({}, state, {loadingCount: state.loadingCount + 1})
+      return Object.assign({}, state, { phase:'loading' })
     }
 
     case FETCH_REQUEST_FINISH: {
-      return Object.assign({}, state, {loadingCount: state.loadingCount - 1})
+      return Object.assign({}, state, { phase:'ground' })
     }
 
     case ADD_TASK:// css -> css-in-js
@@ -64,7 +62,7 @@ export default function reducer (
       out = out
         .replace(/: /g, ":").replace(/:/g, ": '")
         .replace(/ ;/g, ";").replace(/;/g, "',")
-      newTasks.push({card_id:state.tasks.length, text:out, url:'Noen', mode:'toot'});
+      newTasks.push({card_id:state.tasks.length, text:out, url:'None', mode:'toot'});
       return Object.assign({}, state, { tasks:newTasks });
 
     case TOOT:
@@ -76,13 +74,18 @@ export default function reducer (
       return Object.assign({}, state, { tasks:nextTasks });
 
     case CLEAR_CARDS:
-      return Object.assign({}, state, { tasks: [] });
+      if( !action.order ){
+        return Object.assign({}, state, { tasks: [] });
+      }
+      let calledCard = state.tasks[action.order]
+      calledCard['mode'] = 'called'
+      return Object.assign({}, state, { tasks:[calledCard] });
 
     case TOUCH_ABLED:
-      return Object.assign({}, state, { touchAble: true });
+      return Object.assign({}, state, { touchAble:true });
 
     case TOUCH_DISABLED:
-      return Object.assign({}, state, { touchAble: false });
+      return Object.assign({}, state, { touchAble:false });
 
 
     default:
@@ -110,7 +113,7 @@ export class ActionDispatcher {
 
   async toot( text: string ): Promise<void> {
     this.dispatch({ type:ADD_TASK, text:text })
-    this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
+    this.dispatch({ type:FETCH_REQUEST_START });
 
     const url = '/api/toot/'+encodeURI(text)
     try {
@@ -119,7 +122,7 @@ export class ActionDispatcher {
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
-        const json: {amount: number} = await response.json();
+        const json: {amount:number} = await response.json();
         this.dispatch({ type: TOOT, text: json.text });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
@@ -127,31 +130,32 @@ export class ActionDispatcher {
     } catch (err) {
       console.error(err)
     } finally {
-      this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
     }
   }
 
-  async catchCard( card_id: number ): Promise<void> {
+  async callCard( card_id:number, order:number ): Promise<void> {
+    this.dispatch({ type:CLEAR_CARDS, order:order })
     this.dispatch({ type:TOUCH_DISABLED })
-    this.dispatch({ type: FETCH_REQUEST_START, isLoading: true });
+    this.dispatch({ type:FETCH_REQUEST_START });
 
-    const url = '/api/catchCard/'+card_id;
+    const url = '/api/callCard/'+card_id;
     try {
       const response: Response = await fetch(url, {
         method: 'GET',
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
-        const json: {amount: number} = await response.json();
         this.dispatch({ type:CLEAR_CARDS })
-        this.dispatch({ type:TOOT, text: json.text });
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:TOOT, text:json.text });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
     } catch (err) {
       console.error(err)
     } finally {
-      this.dispatch({ type: FETCH_REQUEST_FINISH, isLoading: false });
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
       this.dispatch({ type:TOUCH_ABLED })
     }
   }

@@ -10,25 +10,37 @@ import {Link, Route} from 'react-router-dom';
 import { styleOn } from './css';
 import AddButtonSVG from '../../assets/svg/add-button-inside-black-circle.svg';
 
+import { VelocityComponent, VelocityTransitionGroup } from 'velocity-react'
+
+
 interface Props {
   value: CounterState;
   actions: ActionDispatcher;
 };
 
 export class Thread extends React.Component<void, Props, void> {
+  trst:string;
+
+  componentWillMount(){
+    this.styles = styleOn(screen.width);
+    this.test = 'lolo';
+    this.wall = this.styles.wall;
+  }
+
   render() {
-    const styles = styleOn(screen.width);
+    const wall =
+      this.props.value.phase=='ground'? this.styles.wall : this.styles.wall2
+
     return (
-      <div style={styles.wall}>
-        <div style={styles.timeline}>
-          {(this.props.value.loadingCount === 0) ? null : <p>loading</p>}
+      <div ref='ttt' style={wall}>
+        <div style={this.styles.timeline}>
           <TodoList value={this.props.value} actions={this.props.actions} />
         </div>
-        <div style={styles.bar}>
+        <div style={this.styles.bar}>
           <Link to='/' onClick={e=>{
             this.props.actions.movePage()
           }}>
-            <img style={styles.newTab} src={AddButtonSVG} />
+            <img style={this.styles.newTab} src={AddButtonSVG} />
           </Link>
         </div>
       </div>
@@ -36,10 +48,6 @@ export class Thread extends React.Component<void, Props, void> {
   }
 
   componentDidMount() {
-    document.onkeydown = e => {
-      if( e.key=='Enter' && e.ctrlKey ){
-        this.addTask();
-      }
-    }
+
   }
 }

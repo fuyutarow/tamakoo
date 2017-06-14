@@ -7,6 +7,8 @@ import {
   } from 'material-ui';
 import { styleOn } from './css';
 import { Link, Route } from 'react-router-dom';
+import { VelocityComponent, VelocityTransitionGroup } from 'velocity-react';
+//<VelocityComponent ref="velocity" key={'bounce'} animation={'transition.bounceIn'}>
 
 export default class Todo extends React.Component<Props, void> {
   x:number;
@@ -45,10 +47,10 @@ export default class Todo extends React.Component<Props, void> {
     );
   }
 
-    catchCard(){
+    callCard(){
       const card = this.refs.card;
       card.style = this.styles.nowToot;
-      this.props.actions.catchCard(this.props.task.card_id);
+      this.props.actions.callCard(this.props.task.card_id, this.props.order);
     }
 
     componentDidMount() {
@@ -79,7 +81,7 @@ export default class Todo extends React.Component<Props, void> {
         }
         if(this.isTap){
           this.isTap = false;
-          this.catchCard();
+          this.callCard();
         }
       }, false);
 
