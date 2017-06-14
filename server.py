@@ -38,7 +38,6 @@ def api_toot(toot_text):
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    #res_text = ''.join([''.join(doc[index[i]].split(' ')) for i in range(20)])
     res_text = ''
     for i in range(100):
         res_text += ''.join([''.join(doc[index[i]].split(' '))]).split('\n')[0]+',normal\n'
@@ -46,16 +45,21 @@ def api_toot(toot_text):
         'text': res_text
         }
     return make_response(jsonify(result))
+    result = {
+        'text': res_text
+        }
+    return make_response(jsonify(result))
 
 @api.route('/api/callCard/<int:card_id>', methods=['GET'])
 def api_cardlines(card_id):
+    print(card_id)
     now_id = card_id
 
     user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
         '.format(now_id))[0]
-    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, 'None' if card_url==None else card_url, 'true'])
+    now_line = ','.join([str(user_id), user_name, when, str(card_id), card_text, 'None' if card_url==None else card_url, 'called'])
 
     pre_id = now_id
     pre_lines = []

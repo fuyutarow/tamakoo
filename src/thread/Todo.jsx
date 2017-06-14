@@ -7,58 +7,63 @@ import {
   } from 'material-ui';
 import { styleOn } from './css';
 import { Link, Route } from 'react-router-dom';
-import { VelocityComponent, VelocityTransitionGroup } from 'velocity-react';
-//<VelocityComponent ref="velocity" key={'bounce'} animation={'transition.bounceIn'}>
 
 export default class Todo extends React.Component<Props, void> {
   x:number;
+  linkDisabled;
+  isTap;
 
   componentWillMount(){
-    location.hash = '';
-    this.isTap = false;
     this.linkDisabled = false;
-    this.styles = styleOn(screen.width);
-  }
-
-  componentWillUpdate(){
-    this.isToot = (this.props.task.mode=='toot')
-    this.isCalled = (this.props.task.mode=='called')
+    this.isTap = false;
+    location.hash = '';
   }
 
   render() {
-    const linkStyle = this.props.task.url=='None'?
-      this.styles.linkOff : this.styles.linkOn;
-    const cardStyle = (this.isToot || this.isCalled)?
-      this.styles.nowToot : this.styles.card;
+    console.log(this.props)
 
-    const anchorPart = !this.isCalled? null :
-      <p>
-        <textarea style={this.styles.textarea} type='text' ref='note'
-          placeholder=">>"/>
-        <button style={this.styles.button} ref="echobtn" onClick={e=>this.anchor()}>
-          echo
-        </button>
-      </p>
+    const styles = styleOn(screen.width);
+    const linkStyle = this.props.task.url=='None'?
+      styles.linkOff : styles.linkOn;
+    const cardStyle = this.props.task.mode=='toot' || this.props.task.mode=='called' ?
+      styles.nowToot : styles.card;
+    const cardCenter =
+      this.props.task.mode=='toot' || this.props.task.mode=='normal' ?
+        <p style={styles.text}>
+          {this.props.task.text.split('\n')
+          .map( m => (<p style={styles.ln}>{m}</p>) )}
+        </p>
+      :this.props.task.mode=='called' ?
+        <p style={styles.text}>
+          {this.props.task.text.split('\n')
+            .map( m => (<p style={styles.ln}>{m}</p>) )}
+          <p>
+            <textarea style={styles.textarea} type='text' ref='task'
+              placeholder="toot to open tamaKoo"/>
+            <button style={styles.button} onClick={()=>this.toot()}>echo</button>
+          </p>
+        </p>
+      :null
+
     return (
-      <div style={cardStyle} ref='card'
-        onTouchStart={e=>{
-          if( !this.props.value.touchAble ) return;
-          if( this.isCalled ) return;
+      <div
+        style={cardStyle}
+        ref='card'
+        onTouchStart = { e => {
+          if( this.props.value.phase=='loading' ) return;
           this.x=e.changedTouches[0].pageX
           this.isTap = true;
         }}
-        onTouchMove={e=>{
-          if( !this.props.value.touchAble ) return;
-          if( this.isCalled ) return;
+        onTouchMove = { e => {
+          if( this.props.value.phase=='loading' ) return;
           this.isTap = false;
           if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
             if( this.props.task.url=='None') return;
             window.open(this.props.task.url,'_blank');
           }
         }}
-        onTouchEnd={e=>{
-          if( !this.props.value.touchAble ) return;
-          if( this.isCalled ) return;
+        onTouchEnd = { e => {
+          if( this.props.value.phase=='loading' ) return;
           if(this.linkDisabeld){
             e.preventDefault()
           }else{
@@ -67,35 +72,28 @@ export default class Todo extends React.Component<Props, void> {
           }
           if(this.isTap){
             this.isTap = false;
-            this.callCard();
+            this.props.actions.callCard(this.props.task);
           }
         }}
       >
-        <p style={this.styles.text}>
-          {this.props.task.text.split('\n')
-            .map( m => (<p style={this.styles.ln}>{m}</p>) )}
-          { anchorPart }
-        </p>
-        <p style={linkStyle} />
+        {cardCenter}
+        <p style={linkStyle}></p>
       </div>
     );
   }
 
-    callCard(){
-      const card = this.refs.card;
-      card.style = this.styles.nowToot;
-      this.props.actions.callCard(this.props.task.card_id, this.props.order);
-    }
-
     componentDidMount() {
+      const card = this.refs.card;
+      if( this.props.task.mode=='toot' || this.props.task.mode=='called' ){
+        card.id='nowToot'
+      }
       if( this.linkDisabled ){
         setTimeout(() => {this.linkDisabled = false }, 500);
       }
+    }
 
-      const card = this.refs.card;
-      if( this.isCalled ){
-        card.id='nowToot'
-      }
+    componentDidUpdate() {
+      location.hash='nowToot';
     }
 
 }

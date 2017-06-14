@@ -20,4 +20,3 @@ sims = cosine_similarity([vec], doc_vecs)
 index = np.argsort(sims[0])[::-1]
 for i in range(args.number):
     print(''.join(doc[index[i]].split(' ')))
-

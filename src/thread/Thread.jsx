@@ -23,16 +23,11 @@ export class Thread extends React.Component<void, Props, void> {
 
   componentWillMount(){
     this.styles = styleOn(screen.width);
-    this.test = 'lolo';
-    this.wall = this.styles.wall;
   }
 
   render() {
-    const wall =
-      this.props.value.phase=='ground'? this.styles.wall : this.styles.wall2
-
     return (
-      <div ref='ttt' style={wall}>
+      <div ref='ttt' style={this.styles.wall}>
         <div style={this.styles.timeline}>
           <TodoList value={this.props.value} actions={this.props.actions} />
         </div>

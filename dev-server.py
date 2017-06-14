@@ -34,11 +34,14 @@ def api_toot(toot_text):
         'text': res_text
         }
     return make_response(jsonify(result))
+    result = {
+        'text': res_text
+        }
+    return make_response(jsonify(result))
 
 @api.route('/api/callCard/<int:card_id>', methods=['GET'])
 def api_cardlines(card_id):
     print(card_id)
-
     now_id = card_id
 
     user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
