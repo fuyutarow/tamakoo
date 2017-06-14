@@ -13,9 +13,9 @@ export default class TodoList extends React.Component<Props,{}> {
             actions={this.props.actions}
           /> )
     return (
-      <p>
+      <div>
         {tasks}
-      </p>
+      </div>
     );
   }
 }

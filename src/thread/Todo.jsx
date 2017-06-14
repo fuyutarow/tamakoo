@@ -18,8 +18,6 @@ export default class Todo extends React.Component<Props, void> {
     this.isTap = false;
     this.linkDisabled = false;
     this.styles = styleOn(screen.width);
-    this.isToot = this.props.task.mode=='toot'//? true:false;
-    this.isCalled = true//this.props.task.mode=='called'//? true:false;
   }
 
   componentWillUpdate(){
@@ -33,14 +31,50 @@ export default class Todo extends React.Component<Props, void> {
     const cardStyle = (this.isToot || this.isCalled)?
       this.styles.nowToot : this.styles.card;
 
-    const anchor = this.isCalled?
-      <p><button ref='anchor'>>></button></p> : null;
+    const anchorPart = !this.isCalled? null :
+      <p>
+        <textarea style={this.styles.textarea} type='text' ref='note'
+          placeholder=">>"/>
+        <button style={this.styles.button} ref="echobtn" onClick={e=>this.anchor()}>
+          echo
+        </button>
+      </p>
     return (
-      <div style={cardStyle} ref='card'>
+      <div style={cardStyle} ref='card'
+        onTouchStart={e=>{
+          if( !this.props.value.touchAble ) return;
+          if( this.isCalled ) return;
+          this.x=e.changedTouches[0].pageX
+          this.isTap = true;
+        }}
+        onTouchMove={e=>{
+          if( !this.props.value.touchAble ) return;
+          if( this.isCalled ) return;
+          this.isTap = false;
+          if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
+            if( this.props.task.url=='None') return;
+            window.open(this.props.task.url,'_blank');
+          }
+        }}
+        onTouchEnd={e=>{
+          if( !this.props.value.touchAble ) return;
+          if( this.isCalled ) return;
+          if(this.linkDisabeld){
+            e.preventDefault()
+          }else{
+            this.linkDisabled = true;
+            setTimeout(() => { this.linkDisabled = false }, 500);
+          }
+          if(this.isTap){
+            this.isTap = false;
+            this.callCard();
+          }
+        }}
+      >
         <p style={this.styles.text}>
-            {this.props.task.text.split('\n')
-              .map( m => (<p style={this.styles.ln}>{m}</p>) )}
-            { anchor }
+          {this.props.task.text.split('\n')
+            .map( m => (<p style={this.styles.ln}>{m}</p>) )}
+          { anchorPart }
         </p>
         <p style={linkStyle} />
       </div>
@@ -54,48 +88,14 @@ export default class Todo extends React.Component<Props, void> {
     }
 
     componentDidMount() {
+      if( this.linkDisabled ){
+        setTimeout(() => {this.linkDisabled = false }, 500);
+      }
+
       const card = this.refs.card;
       if( this.isCalled ){
         card.id='nowToot'
       }
-      card.addEventListener('touchstart', e => {
-        if( !this.props.value.touchAble ) return;
-        this.x=e.changedTouches[0].pageX
-        this.isTap = true;
-      }, false)
-      card.addEventListener('touchmove', e => {
-        if( !this.props.value.touchAble ) return;
-        this.isTap = false;
-        if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
-          if( this.props.task.url=='None') return;
-          window.open(this.props.task.url,'_blank');
-        }
-      }, false);
-      card.addEventListener('touchend', e => {
-        if( !this.props.value.touchAble ) return;
-        if(this.linkDisabeld){
-          e.preventDefault()
-        }else{
-          this.linkDisabled = true;
-          setTimeout(() => { this.linkDisabled = false }, 500);
-        }
-        if(this.isTap){
-          this.isTap = false;
-          this.callCard();
-        }
-      }, false);
-
-      const anchor = this.refs.anchor;
-      anchor.addEventListener('click', e => {
-        console.log('Good')
-      }, false);
-
-
-
-      if( this.linkDisabled ){
-        setTimeout(() => {this.linkDisabled = false }, 500);
-      }
     }
-
 
 }

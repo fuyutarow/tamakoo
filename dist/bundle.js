@@ -18691,131 +18691,98 @@ Object.defineProperty(exports, "__esModule", {
 });
 var styleOn = exports.styleOn = function styleOn(windowWidth) {
   //if( windowWidth < 480 ){
-  if (windowWidth < 720) {
-    return {
-      wall: {
-        backgroundColor: '#fffff9',
-        color: 'rgba(0, 0, 0, 0.87)'
-      },
-      wall2: {
-        backgroundColor: '#666663',
-        color: 'rgba(50, 0, 50, 0.87)',
-        padding: '15px 15px 15px 15px'
-      },
-      timeline: {
-        backgroundColor: '#fffff9',
-        height: '60%',
-        fontSize: '16px',
-        padding: '0px'
-      },
-      nowToot: {
-        padding: '10px 0px',
-        color: 'rgba(0, 0, 0, 0.87)',
-        backgroundColor: 'rgb(255, 255, 255)',
-        transition: 'all 450ms cubicBezier(0.23, 1, 0.32, 1) 0ms',
-        boxSizing: 'borderBox',
-        fontFamily: 'Roboto, sansSerif',
-        WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
-        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
-        borderRadius: '2px',
-        zIndex: '1'
-      },
-      card: {
-        padding: '0px',
-        display: 'flex'
-      },
-      text: {
-        width: '99%',
-        listStyle: 'none'
-      },
-      linkOn: {
-        width: '1%',
-        backgroundColor: '#ddd',
-        listStyle: 'none'
-      },
-      linkOff: {
-        width: '1%',
-        backgroundColor: '#fff',
-        listStyle: 'none'
-      },
-      ln: {
-        padding: '5px',
-        margin: '0px'
-      },
-      bar: {
-        color: 'rgba(0, 0, 0, 0.87)',
-        backgroundColor: 'rgb(0, 188, 212)',
-        transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
-        boxSizing: 'border-box',
-        fontFamily: 'Roboto, sans-serif',
-        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
-        borderRadius: '0px',
-        position: 'fixed',
-        zIndex: '9999',
-        width: '100vw',
-        height: '50px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        bottom: 0,
-        overflow: 'hidden'
-      },
+  //if( windowWidth < 720 ){
+  return {
+    wall: {
+      backgroundColor: '#fffff9',
+      color: 'rgba(0, 0, 0, 0.87)'
+    },
+    wall2: {
+      backgroundColor: '#666663',
+      color: 'rgba(50, 0, 50, 0.87)',
+      padding: '15px 15px 15px 15px'
+    },
+    timeline: {
+      backgroundColor: '#fffff9',
+      height: '60%',
+      fontSize: '16px',
+      padding: '0px'
+    },
+    nowToot: {
+      padding: '10px 0px',
+      color: 'rgba(0, 0, 0, 0.87)',
+      backgroundColor: 'rgb(255, 255, 255)',
+      transition: 'all 450ms cubicBezier(0.23, 1, 0.32, 1) 0ms',
+      boxSizing: 'borderBox',
+      fontFamily: 'Roboto, sansSerif',
+      WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
+      boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+      borderRadius: '2px',
+      zIndex: '1'
+    },
+    card: {
+      padding: '0px',
+      display: 'flex'
+    },
+    text: {
+      width: '99%',
+      listStyle: 'none'
+    },
+    linkOn: {
+      width: '1%',
+      backgroundColor: '#ddd',
+      listStyle: 'none'
+    },
+    linkOff: {
+      width: '1%',
+      backgroundColor: '#fff',
+      listStyle: 'none'
+    },
+    ln: {
+      padding: '5px',
+      margin: '0px'
+    },
+    button: {
+      fontSize: '16px',
+      fontWeight: 'bold',
+      padding: '10px 30px',
+      borderStyle: 'none',
+      backgroundColor: '#248',
+      color: '#fff'
+    },
+    textarea: {
+      fontSize: '18px',
+      width: '100%',
+      height: '30%',
+      border: 'none'
+    },
+    bar: {
+      color: 'rgba(0, 0, 0, 0.87)',
+      backgroundColor: 'rgb(0, 188, 212)',
+      transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+      boxSizing: 'border-box',
+      fontFamily: 'Roboto, sans-serif',
+      boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+      borderRadius: '0px',
+      position: 'fixed',
+      zIndex: '9999',
+      width: '100vw',
+      height: '50px',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      bottom: 0,
+      overflow: 'hidden'
+    },
 
-      newTab: {
-        width: '30px',
-        height: '30px'
-      },
-      checkbox: {
-        marginBottom: 16
-      }
-    };
-  } else {
-    return {
-      bar: {
-        color: 'rgba(0, 0, 0, 0.87)',
-        backgroundColor: 'rgb(0, 188, 212)',
-        transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
-        boxSizing: 'border-box',
-        fontFamily: 'Roboto, sans-serif',
-        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
-        borderRadius: '0px',
-        position: 'fixed',
-        zIndex: '9999',
-        width: '100%',
-        height: '100px',
-        display: 'flex',
-        paddingLeft: '24px',
-        paddingRight: '24px',
-        bottom: 0
-      },
-      timeline: {
-        height: '60%'
-      },
-      post: {
-        height: '30%'
-      },
-      button: {
-        fontSize: '1.4em',
-        fontWeight: 'bold',
-        padding: '10px 30px',
-        borderStyle: 'none',
-        backgroundColor: '#248',
-        color: '#fff'
-      },
-      textarea: {
-        fontSize: '1.8em',
-        width: '100%',
-        height: '30%'
-      },
-      newTab: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        boxShadow: 'none',
-        margin: '0 auto'
-      }
-    };
-  }
+    newTab: {
+      width: '30px',
+      height: '30px'
+    },
+    checkbox: {
+      marginBottom: 16
+    }
+  };
 };
 
 /***/ }),
@@ -31214,74 +31181,27 @@ Object.defineProperty(exports, "__esModule", {
 });
 var styleOn = exports.styleOn = function styleOn(windowWidth) {
   //if( windowWidth < 480 ){
-  if (windowWidth < 720) {
-    return {
-      wall: {
-        backgroundColor: '#fffff9',
-        color: 'rgba(0, 0, 0, 0.87)'
-      },
-      button: {
-        fontSize: '16px',
-        fontWeight: 'bold',
-        padding: '10px 30px',
-        borderStyle: 'none',
-        backgroundColor: '#248',
-        color: '#fff'
-      },
-      textarea: {
-        fontSize: '18px',
-        width: '100%',
-        height: '30%',
-        border: 'none'
-      }
-    };
-  } else {
-    return {
-      bar: {
-        color: 'rgba(0, 0, 0, 0.87)',
-        backgroundColor: 'rgb(0, 188, 212)',
-        transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
-        boxSizing: 'border-box',
-        fontFamily: 'Roboto, sans-serif',
-        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
-        borderRadius: '0px',
-        position: 'fixed',
-        zIndex: '9999',
-        width: '100%',
-        height: '100px',
-        display: 'flex',
-        paddingLeft: '24px',
-        paddingRight: '24px',
-        bottom: 0
-      },
-      timeline: {
-        height: '60%'
-      },
-      post: {
-        height: '30%'
-      },
-      button: {
-        fontSize: '1.4em',
-        fontWeight: 'bold',
-        padding: '10px 30px',
-        borderStyle: 'none',
-        backgroundColor: '#248',
-        color: '#fff'
-      },
-      textarea: {
-        fontSize: '1.8em',
-        width: '100%',
-        height: '30%'
-      },
-      newTab: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        boxShadow: 'none',
-        margin: '0 auto'
-      }
-    };
-  }
+  //if( windowWidth < 720 ){
+  return {
+    wall: {
+      backgroundColor: '#fffff9',
+      color: 'rgba(0, 0, 0, 0.87)'
+    },
+    button: {
+      fontSize: '16px',
+      fontWeight: 'bold',
+      padding: '10px 30px',
+      borderStyle: 'none',
+      backgroundColor: '#248',
+      color: '#fff'
+    },
+    textarea: {
+      fontSize: '18px',
+      width: '100%',
+      height: '30%',
+      border: 'none'
+    }
+  };
 };
 
 /***/ }),
@@ -31449,8 +31369,6 @@ var Todo = function (_React$Component) {
       this.isTap = false;
       this.linkDisabled = false;
       this.styles = (0, _css.styleOn)(screen.width);
-      this.isToot = this.props.task.mode == 'toot'; //? true:false;
-      this.isCalled = true; //this.props.task.mode=='called'//? true:false;
     }
   }, {
     key: 'componentWillUpdate',
@@ -31466,18 +31384,54 @@ var Todo = function (_React$Component) {
       var linkStyle = this.props.task.url == 'None' ? this.styles.linkOff : this.styles.linkOn;
       var cardStyle = this.isToot || this.isCalled ? this.styles.nowToot : this.styles.card;
 
-      var anchor = this.isCalled ? React.createElement(
+      var anchorPart = !this.isCalled ? null : React.createElement(
         'p',
         null,
+        React.createElement('textarea', { style: this.styles.textarea, type: 'text', ref: 'note',
+          placeholder: '>>' }),
         React.createElement(
           'button',
-          { ref: 'anchor' },
-          '>>'
+          { style: this.styles.button, ref: 'echobtn', onClick: function onClick(e) {
+              return _this2.anchor();
+            } },
+          'echo'
         )
-      ) : null;
+      );
       return React.createElement(
         'div',
-        { style: cardStyle, ref: 'card' },
+        { style: cardStyle, ref: 'card',
+          onTouchStart: function onTouchStart(e) {
+            if (!_this2.props.value.touchAble) return;
+            if (_this2.isCalled) return;
+            _this2.x = e.changedTouches[0].pageX;
+            _this2.isTap = true;
+          },
+          onTouchMove: function onTouchMove(e) {
+            if (!_this2.props.value.touchAble) return;
+            if (_this2.isCalled) return;
+            _this2.isTap = false;
+            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
+              if (_this2.props.task.url == 'None') return;
+              window.open(_this2.props.task.url, '_blank');
+            }
+          },
+          onTouchEnd: function onTouchEnd(e) {
+            if (!_this2.props.value.touchAble) return;
+            if (_this2.isCalled) return;
+            if (_this2.linkDisabeld) {
+              e.preventDefault();
+            } else {
+              _this2.linkDisabled = true;
+              setTimeout(function () {
+                _this2.linkDisabled = false;
+              }, 500);
+            }
+            if (_this2.isTap) {
+              _this2.isTap = false;
+              _this2.callCard();
+            }
+          }
+        },
         React.createElement(
           'p',
           { style: this.styles.text },
@@ -31488,7 +31442,7 @@ var Todo = function (_React$Component) {
               m
             );
           }),
-          anchor
+          anchorPart
         ),
         React.createElement('p', { style: linkStyle })
       );
@@ -31505,48 +31459,15 @@ var Todo = function (_React$Component) {
     value: function componentDidMount() {
       var _this3 = this;
 
-      var card = this.refs.card;
-      if (this.isCalled) {
-        card.id = 'nowToot';
-      }
-      card.addEventListener('touchstart', function (e) {
-        if (!_this3.props.value.touchAble) return;
-        _this3.x = e.changedTouches[0].pageX;
-        _this3.isTap = true;
-      }, false);
-      card.addEventListener('touchmove', function (e) {
-        if (!_this3.props.value.touchAble) return;
-        _this3.isTap = false;
-        if (!_this3.linkDisabled && _this3.x - e.changedTouches[0].pageX > 80) {
-          if (_this3.props.task.url == 'None') return;
-          window.open(_this3.props.task.url, '_blank');
-        }
-      }, false);
-      card.addEventListener('touchend', function (e) {
-        if (!_this3.props.value.touchAble) return;
-        if (_this3.linkDisabeld) {
-          e.preventDefault();
-        } else {
-          _this3.linkDisabled = true;
-          setTimeout(function () {
-            _this3.linkDisabled = false;
-          }, 500);
-        }
-        if (_this3.isTap) {
-          _this3.isTap = false;
-          _this3.callCard();
-        }
-      }, false);
-
-      var anchor = this.refs.anchor;
-      anchor.addEventListener('click', function (e) {
-        console.log('Good');
-      }, false);
-
       if (this.linkDisabled) {
         setTimeout(function () {
           _this3.linkDisabled = false;
         }, 500);
+      }
+
+      var card = this.refs.card;
+      if (this.isCalled) {
+        card.id = 'nowToot';
       }
     }
   }]);
@@ -31612,7 +31533,7 @@ var TodoList = function (_React$Component) {
         });
       });
       return React.createElement(
-        'p',
+        'div',
         null,
         tasks
       );
