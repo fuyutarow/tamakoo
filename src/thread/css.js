@@ -9,9 +9,9 @@ export const styleOn = (windowWidth) =>  {
       button: {
         fontSize: '16px',
         fontWeight: 'bold',
-        padding: '10px 30px',
+        padding: '5px 10px',
         borderStyle: 'none',
-        backgroundColor:'#248',
+        backgroundColor:'#ffdb58',
         color: '#fff',
       },
       textarea: {
@@ -71,20 +71,6 @@ export const styleOn = (windowWidth) =>  {
       ln: {
         padding: '5px',
         margin: '0px',
-      },
-      button: {
-        fontSize: '16px',
-        fontWeight: 'bold',
-        padding: '10px 30px',
-        borderStyle: 'none',
-        backgroundColor:'#248',
-        color: '#fff',
-      },
-      textarea: {
-        fontSize: '18px',
-        width: '100%',
-        height: '30%',
-        border: 'none',
       },
       bar: {
         color: 'rgba(0, 0, 0, 0.87)',

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { ActionDispatcher, Task } from '../module';
 import {
   AppBar, MenuItem,
@@ -13,6 +14,13 @@ export default class Todo extends React.Component<Props, void> {
   linkDisabled;
   isTap;
 
+  anchor() {
+    const note = (ReactDOM.findDOMNode(this.refs.note)).value;
+    if( note=="" ) return;
+    this.props.actions.anchor(this.props.task.card_id, this.props.order, note);
+    (ReactDOM.findDOMNode(this.refs.note)).value = "";
+  }
+
   componentWillMount(){
     this.linkDisabled = false;
     this.isTap = false;
@@ -20,7 +28,6 @@ export default class Todo extends React.Component<Props, void> {
   }
 
   render() {
-
     const styles = styleOn(screen.width);
     const cardStyle = this.props.task.mode=='toot' || this.props.task.mode=='called' ?
       styles.nowToot : styles.card;
@@ -42,20 +49,18 @@ export default class Todo extends React.Component<Props, void> {
         </p>
 
       :this.props.task.mode=='called' ?
-        <p style={styles.cardcenter} onClick={e=>{
-          this.props.actions.callCard(this.props.task);
-        }}>
+        <p style={styles.cardcenter}>
           <Link to={'/user/'+this.props.task.user_id}>
-            <button onClick={e=>{
+            <h3 onClick={e=>{
               this.props.actions.askUser(this.props.task.user_id)
-            }}>{this.props.task.user_name}</button>
+            }}>{this.props.task.user_name}</h3>
           </Link>
           {this.props.task.text.split('\n')
             .map( m => (<p style={styles.ln}>{m}</p>) )}
           <p>
-            <textarea style={styles.textarea} type='text' ref='task'
-              placeholder="toot to open tamaKoo"/>
-            <button style={styles.button} onClick={()=>this.toot()}>echo</button>
+            <textarea style={styles.textarea} type='text' ref='note'
+              placeholder=">>"/>
+            <button style={styles.button} onClick={e=>this.anchor()}>echo</button>
           </p>
         </p>
 
@@ -81,7 +86,7 @@ export default class Todo extends React.Component<Props, void> {
     componentDidMount() {
       const card = this.refs.card;
       if( this.props.task.mode=='toot' || this.props.task.mode=='called' ){
-        card.id='nowToot'
+        card.id='flash'
       }
       if( this.linkDisabled ){
         setTimeout(() => {this.linkDisabled = false }, 500);
@@ -90,7 +95,7 @@ export default class Todo extends React.Component<Props, void> {
     }
 
     componentDidUpdate() {
-      location.hash='nowToot';
+      location.hash='flash';
     }
 
 }

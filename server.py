@@ -16,24 +16,24 @@ wakati = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), 
 
 from datetime import datetime
 
-
 api = Flask(__name__)
 
 @api.route('/')
 def index():
-    return open('index.html').read()
+    return open('index.html', encoding='utf-8').read()
 
 @api.route('/dist/bundle.js')
 def bundle():
-    return open('dist/bundle.js').read()
+    return open('dist/bundle.js', encoding='utf-8').read()
 
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
+    user_id = 46245
     now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
     gdb.query('\
-        MATCH (a:User) WHERE ID(a)=46245\
+        MATCH (a:User) WHERE ID(a)=%s\
         CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s"})'\
-        %(now,toot_text), data_contents=True)
+        %(user_id,now,toot_text), data_contents=True)
 
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
@@ -50,9 +50,22 @@ def api_toot(toot_text):
         }
     return make_response(jsonify(result))
 
+@api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
+def api_anchor(anchor_text):
+    user_id = 46245
+    card_id, toot_text = anchor_text.split(',')
+    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    gdb.query('\
+        MATCH (a:User),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
+        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)'\
+        %( user_id, card_id, now, toot_text, now, now ), data_contents=True)
+    result = {
+        'text': 'toot complete'
+        }
+    return make_response(jsonify(result))
+
 @api.route('/api/callCard/<int:card_id>', methods=['GET'])
-def api_cardlines(card_id):
-    print(card_id)
+def api_callCard(card_id):
     now_id = card_id
 
     user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
@@ -89,6 +102,32 @@ def api_cardlines(card_id):
 
     lines = pre_lines[::-1] + [now_line] + next_lines
     res_text = '\n'.join(lines)
+    result = {
+        'text': res_text
+        }
+    return make_response(jsonify(result))
+
+@api.route('/api/askUser/<int:user_id>', methods=['GET'])
+def api_askUser(user_id):
+    user_id, user_name, user_bio = gdb.query('\
+        MATCH (a:User) WHERE ID(a)={} RETURN ID(a), a.name, a.bio\
+        '.format(user_id))[0]
+    result = {
+        'text': ','.join([str(user_id), user_name, 'None' if user_bio==None else user_bio])
+    }
+    return  make_response(jsonify(result))
+
+@api.route('/api/hisToot/<int:user_id>', methods=['GET'])
+def api_hisToot(user_id):
+    res_text = ''
+    for line in gdb.query('\
+        MATCH p=(a)-[r:Toot]->(b) WHERE ID(a)={}\
+        RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 200\
+        '.format(user_id)):
+
+        user_id, user_name, toot_when, card_id, card_text, card_url = line
+        line = ','.join([str(user_id), user_name, toot_when, str(card_id), card_text, 'None' if card_url==None else card_url, 'normal'])
+        res_text+=line+'\n'
     result = {
         'text': res_text
         }

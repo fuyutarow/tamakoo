@@ -42,27 +42,6 @@ export default class Todo extends React.Component<Props, void> {
             .map( m => (<p style={styles.ln}>{m}</p>) )}
           </p></Link>
         </p>
-
-      :this.props.task.mode=='called' ?
-        <p style={styles.cardcenter} onClick={e=>{
-          this.props.actions.callCard(this.props.task);
-        }}>
-          <Link to={'/user/'+this.props.task.user_id}>
-            <button onClick={e=>{
-              this.props.actions.askUser(this.props.task.user_id)
-            }}>{this.props.task.user_name}</button>
-          </Link>
-          <Link to='/thread' style={{textDecoration:'none',color:'black'}}><p>
-            {this.props.task.text.split('\n')
-            .map( m => (<p style={styles.ln}>{m}</p>) )}
-          </p></Link>
-          <p>
-            <textarea style={styles.textarea} type='text' ref='task'
-              placeholder="toot to open tamaKoo"/>
-            <button style={styles.button} onClick={()=>this.toot()}>echo</button>
-          </p>
-        </p>
-
       :null
 
     const copyRight = this.props.task.url=='None'?

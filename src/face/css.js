@@ -9,9 +9,9 @@ export const styleOn = (windowWidth) =>  {
       button: {
         fontSize: '16px',
         fontWeight: 'bold',
-        padding: '10px 30px',
+        padding: '8px 16px',
         borderStyle: 'none',
-        backgroundColor:'#248',
+        backgroundColor:'#ffdb58',
         color: '#fff',
       },
       textarea: {
