@@ -17,6 +17,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import store from "./Store";
 import Face from './face/Container';
 import Thread from './thread/Container';
+import Userleft from './userleft/Container';
 
 const wallpaper = {
   backgroundColor: 'rgb(255, 64, 129)',
@@ -29,6 +30,7 @@ ReactDOM.render(
     <Switch>
       <Route exact path='/' component={Face} />
       <Route exact path='/thread' component={Thread} />
+      <Route exact path='/user/:id' component={Userleft} />
     </Switch>
     </Router>
   </MuiThemeProvider>

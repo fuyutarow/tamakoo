@@ -26,10 +26,10 @@ export default class Todo extends React.Component<Props, void> {
       styles.nowToot : styles.card;
 
     const userLeft =
-      <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}
-        onClick={e=>{
+      <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}>
+        <p onClick={e=>{
           this.props.actions.askUser(this.props.task.user_id)
-      }}>
+        }}></p>
       </Link>
 
     const cardCenter =
@@ -37,8 +37,10 @@ export default class Todo extends React.Component<Props, void> {
         <p style={styles.cardcenter} onClick={e=>{
           this.props.actions.callCard(this.props.task);
         }}>
-          {this.props.task.text.split('\n')
-          .map( m => (<p style={styles.ln}>{m}</p>) )}
+          <Link to='/thread' style={{textDecoration:'none',color:'black'}}><p>
+            {this.props.task.text.split('\n')
+            .map( m => (<p style={styles.ln}>{m}</p>) )}
+          </p></Link>
         </p>
 
       :this.props.task.mode=='called' ?
@@ -50,8 +52,10 @@ export default class Todo extends React.Component<Props, void> {
               this.props.actions.askUser(this.props.task.user_id)
             }}>{this.props.task.user_name}</button>
           </Link>
-          {this.props.task.text.split('\n')
+          <Link to='/thread' style={{textDecoration:'none',color:'black'}}><p>
+            {this.props.task.text.split('\n')
             .map( m => (<p style={styles.ln}>{m}</p>) )}
+          </p></Link>
           <p>
             <textarea style={styles.textarea} type='text' ref='task'
               placeholder="toot to open tamaKoo"/>
@@ -79,18 +83,6 @@ export default class Todo extends React.Component<Props, void> {
   }
 
     componentDidMount() {
-      const card = this.refs.card;
-      if( this.props.task.mode=='toot' || this.props.task.mode=='called' ){
-        card.id='nowToot'
-      }
-      if( this.linkDisabled ){
-        setTimeout(() => {this.linkDisabled = false }, 500);
-      }
 
     }
-
-    componentDidUpdate() {
-      location.hash='nowToot';
-    }
-
 }

@@ -51,12 +51,12 @@ export const styleOn = (windowWidth) =>  {
         width: '9%',
         listStyle: 'none',
         margin: '16px 0px 16px 0px',
-        backgroundColor: '#'+Math.floor(Math.random()*parseInt('ffffff',16)).toString(16),
       },
       cardcenter: {
         width: '90%',
         listStyle: 'none',
-        paddin: '5px',
+        margin: '0px',
+        padding: '5px',
       },
       linkOn: {
         width: '1%',

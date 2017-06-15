@@ -40,7 +40,7 @@ def api_toot(toot_text):
     return make_response(jsonify(result))
 
 @api.route('/api/callCard/<int:card_id>', methods=['GET'])
-def api_cardlines(card_id):
+def api_callCard(card_id):
     print(card_id)
     now_id = card_id
 
@@ -83,9 +83,35 @@ def api_cardlines(card_id):
         }
     return make_response(jsonify(result))
 
+@api.route('/api/askUser/<int:user_id>', methods=['GET'])
+def api_askUser(user_id):
+    user_id, user_name, user_bio = gdb.query('\
+        MATCH (a:User) WHERE ID(a)={} RETURN ID(a), a.name, a.bio\
+        '.format(user_id))[0]
+    result = {
+        'text': ','.join([str(user_id), user_name, 'None' if user_bio==None else user_bio])
+    }
+    return  make_response(jsonify(result))
+
+@api.route('/api/hisToot/<int:user_id>', methods=['GET'])
+def api_hisToot(user_id):
+    res_text = ''
+    for line in gdb.query('\
+        MATCH p=(a)-[r:Toot]->(b) WHERE ID(a)={}\
+        RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 25\
+        '.format(user_id)):
+
+        user_id, user_name, toot_when, card_id, card_text, card_url = line
+        line = ','.join([str(user_id), user_name, toot_when, str(card_id), card_text, 'None' if card_url==None else card_url, 'normal'])
+        res_text+=line+'\n'
+    result = {
+        'text': res_text
+        }
+    return make_response(jsonify(result))
+
 @api.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    return  make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
     model_name = 'echo_model/doc2vec.20170611T223642.model'
