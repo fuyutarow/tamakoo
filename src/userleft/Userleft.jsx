@@ -2,28 +2,36 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import type {CounterState, ActionDispatcher} from "../module"
-import TodoList from './TodoList';
 import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import {Link, Route} from 'react-router-dom';
 import { styleOn } from './css';
 import AddButtonSVG from '../../assets/svg/add-button-inside-black-circle.svg';
-import { VelocityComponent, VelocityTransitionGroup } from 'velocity-react'
+import TodoList from './TodoList';
 
 interface Props {
   value: CounterState;
   actions: ActionDispatcher;
 };
 
-export class Thread extends React.Component<void, Props, void> {
+export class Userleft extends React.Component<void, Props, void> {
+
   componentWillMount(){
     this.styles = styleOn(screen.width);
+    this.props.actions.hisToot(this.props.match.params.id)
+    console.log(this.props.match.params.id);
+    console.log(this.props);
   }
 
   render() {
     return (
-      <div ref='ttt' style={this.styles.wall}>
+      <div style={this.styles.wall}>
+        <div>
+          <p>{this.props.value.userInfo.user_name}</p>
+          <p>{this.props.value.userInfo.user_bio}</p>
+        </div>
+        <hr/>
         <div style={this.styles.timeline}>
           <TodoList value={this.props.value} actions={this.props.actions} />
         </div>
@@ -38,6 +46,7 @@ export class Thread extends React.Component<void, Props, void> {
     )
   }
 
-  componentDidMount() {
+  componentDidMount(){
+    console.log(this.props)
   }
 }

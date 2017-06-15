@@ -14,14 +14,12 @@ const FETCH_REQUEST_FINISH = 'counter/fetch_request_finish'
 const ONLY_CARD = 'counter/only_card';
 const CLEAR_CARDS = 'counter/clear_cards';
 const CALL = 'counter/call';
+const ANSWER_USER = 'counter/answer_user';
 
 export interface CounterState {
-  num: number;
   tasks: Task[];
-  text: string;
-  title: string;
-  page: number;
-  phase: string
+  phase: string;
+  userInfo: any;
 }
 
 export type ActionTypes =
@@ -31,12 +29,9 @@ export type ActionTypes =
   | FetchRequestFinishAction
 
 const initialState:CounterState = {
-  num: 0,
   tasks: [],
-  text: "over",
-  title: 'welcom',
-  page: 0,
   phase: 'ground',
+  userInfo: {user_id:null, user_name:null, nuser_bio:null},
 };
 
 export default function reducer (
@@ -63,17 +58,22 @@ export default function reducer (
       return Object.assign({}, state, { tasks:[{id:state.tasks.length, text:out, url:'Noen', mode:'toot'}] });
 
     case TOOT:
-      const nextTasks = state.tasks;
-      action.text.split('\n')
+      const nextTasks = action.text.split('\n')
         .slice(0,self.length-1)
-        .map( a => {
-          nextTasks.push({card_id:a.split(',')[3], text:a.split(',')[4], url:a.split(',')[5], mode:a.split(',')[6]}) });
-      return Object.assign({}, state, { tasks:nextTasks });
+        .map( a => { return {
+          user_id:a.split(',')[0],
+          user_name:a.split(',')[1],
+          card_id:a.split(',')[3],
+          text:a.split(',')[4],
+          url:a.split(',')[5],
+          mode:a.split(',')[6]} });
+      return Object.assign({}, state, { tasks:state.tasks.concat(nextTasks) });
 
     case CALL:
-      console.log('>>>>>',action.card)
       return Object.assign({}, state, {
         tasks: [{
+          user_id: action.card.user_id,
+          user_name: action.card.user_name,
           card_id: action.card.card_id,
           text: action.card.text,
           url: action.card.url,
@@ -81,9 +81,13 @@ export default function reducer (
         }]
       });
 
-
-    case MOVE_PAGE:
-      return Object.assign({}, state, { tasks: [] });
+    case ANSWER_USER:
+      const info = {
+        user_id: action.text.split(',')[0],
+        user_name: action.text.split(',')[1],
+        user_bio: action.text.split(',')[2],
+      }
+      return Object.assign({}, state, { userInfo: info });
 
     case CLEAR_CARDS:
       return Object.assign({}, state, { tasks: [] });
@@ -141,7 +145,6 @@ export class ActionDispatcher {
   }
 
   async callCard( card:any ): Promise<void> {
-    console.log('+++++',card)
     this.dispatch({ type:CALL, card:card });
     this.dispatch({ type:FETCH_REQUEST_START });
 
@@ -164,4 +167,50 @@ export class ActionDispatcher {
       this.dispatch({ type:FETCH_REQUEST_FINISH });
     }
   }
+
+  async askUser( user_id:number ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/askUser/'+user_id;
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:ANSWER_USER, text:json.text });
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
+  async hisToot( user_id:number ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/hisToot/'+user_id;
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        this.dispatch({ type:CLEAR_CARDS })
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:TOOT, text:json.text });
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
 }

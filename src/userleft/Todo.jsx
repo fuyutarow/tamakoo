@@ -53,6 +53,7 @@ export default class Todo extends React.Component<Props, void> {
             if(this.isTap){
               this.isTap = false;
               this.props.actions.callCard(this.props.task);
+              location.href='/thread';
             }
           }}
         >
@@ -85,6 +86,7 @@ export default class Todo extends React.Component<Props, void> {
             if(this.isTap){
               this.isTap = false;
               this.props.actions.callCard(this.props.task);
+              location.href='/thread';
             }
           }}
         >

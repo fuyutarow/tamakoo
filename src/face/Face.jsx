@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import type {CounterState, ActionDispatcher} from "./module"
+import type {CounterState, ActionDispatcher} from "../module"
 import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';

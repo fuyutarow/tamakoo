@@ -1,6 +1,6 @@
 // @flow
-import counter from './face/module'
-import type {CounterActions, CounterState} from './face/module'
+import counter from './module'
+import type {CounterActions, CounterState} from './module'
 import { createStore, combineReducers } from 'redux'
 
 export default createStore(

@@ -1,3 +1,6 @@
+require('react-progress-bar-plus/lib/progress-bar.css');
+
+
 module.exports = {
   entry: './src/Index.jsx',
   output: {

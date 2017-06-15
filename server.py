@@ -29,7 +29,7 @@ def bundle():
 
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
-    now = datetime.now().strftime("%Y%m%dT%H%M%S")
+    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
     gdb.query('\
         MATCH (a:User) WHERE ID(a)=46245\
         CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s"})'\
