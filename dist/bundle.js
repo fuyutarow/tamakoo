@@ -4185,16 +4185,17 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ADD_TASK = 'counter/addTask';
+var ADD_TASK = 'counter/add_task';
 
+var INSERT_TASK = 'counter/insert_task';
 var TOOT = 'counter/toot';
-var MOVE_PAGE = 'counter/movePave';
 var FETCH_REQUEST_START = 'counter/fetch_request_start';
 var FETCH_REQUEST_FINISH = 'counter/fetch_request_finish';
 var ONLY_CARD = 'counter/only_card';
 var CLEAR_CARDS = 'counter/clear_cards';
 var CALL = 'counter/call';
 var ANSWER_USER = 'counter/answer_user';
+var INIT_STATE = 'counter/init_state';
 
 var initialState = {
   tasks: [],
@@ -4207,6 +4208,10 @@ function reducer() {
   var action = arguments[1];
 
   switch (action.type) {
+
+    case INIT_STATE:
+      return Object.assign({}, state, initialState);
+
     case FETCH_REQUEST_START:
       {
         return Object.assign({}, state, { phase: 'loading' });
@@ -4216,16 +4221,6 @@ function reducer() {
       {
         return Object.assign({}, state, { phase: 'ground' });
       }
-
-    case ADD_TASK:
-      // css -> css-in-js
-      var lis = action.text.split("-");
-      var out = lis[0];
-      lis.slice(1).map(function (a) {
-        out += a[0].toUpperCase() + a.slice(1);
-      });
-      out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',");
-      return Object.assign({}, state, { tasks: [{ id: state.tasks.length, text: out, url: 'Noen', mode: 'toot' }] });
 
     case TOOT:
       var nextTasks = action.text.split('\n').slice(0, self.length - 1).map(function (a) {
@@ -4237,7 +4232,36 @@ function reducer() {
           url: a.split(',')[5],
           mode: a.split(',')[6] };
       });
-      return Object.assign({}, state, { tasks: state.tasks.concat(nextTasks) });
+      return Object.assign({}, state, {
+        tasks: state.tasks.concat(nextTasks)
+      });
+
+    case ADD_TASK:
+      // css -> css-in-js
+      var lis = action.text.split("-");
+      var out = lis[0];
+      lis.slice(1).map(function (a) {
+        out += a[0].toUpperCase() + a.slice(1);
+      });
+      out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',");
+      return Object.assign({}, state, {
+        tasks: state.tasks.concat([{
+          card_id: -1,
+          text: out,
+          url: 'Noen',
+          mode: 'toot' }])
+      });
+
+    case INSERT_TASK:
+      console.log('insert');
+      var insertedTasks = state.tasks;
+      insertedTasks.splice(action.order + 1, 0, {
+        card_id: -1,
+        text: action.text,
+        url: 'Noen',
+        mode: 'toot'
+      });
+      return Object.assign({}, state, { tasks: insertedTasks });
 
     case CALL:
       return Object.assign({}, state, {
@@ -4285,9 +4309,9 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
   }
 
   _createClass(ActionDispatcher, [{
-    key: 'movePage',
-    value: function movePage() {
-      this.dispatch({ type: MOVE_PAGE });
+    key: 'initState',
+    value: function initState() {
+      this.dispatch({ type: INIT_STATE });
     }
   }, {
     key: 'toot',
@@ -4298,60 +4322,61 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                this.dispatch({ type: INIT_STATE });
                 this.dispatch({ type: ADD_TASK, text: text });
                 this.dispatch({ type: FETCH_REQUEST_START });
 
                 url = '/api/toot/' + encodeURI(text);
-                _context.prev = 3;
-                _context.next = 6;
+                _context.prev = 4;
+                _context.next = 7;
                 return fetch(url, {
                   method: 'GET',
                   headers: this.myHeaders
                 });
 
-              case 6:
+              case 7:
                 response = _context.sent;
 
                 if (!(response.status === 200)) {
-                  _context.next = 14;
+                  _context.next = 15;
                   break;
                 }
 
-                _context.next = 10;
+                _context.next = 11;
                 return response.json();
 
-              case 10:
+              case 11:
                 json = _context.sent;
 
                 this.dispatch({ type: TOOT, text: json.text });
-                _context.next = 15;
+                _context.next = 16;
                 break;
-
-              case 14:
-                throw new Error('illegal status code: ' + response.status);
 
               case 15:
-                _context.next = 20;
+                throw new Error('illegal status code: ' + response.status);
+
+              case 16:
+                _context.next = 21;
                 break;
 
-              case 17:
-                _context.prev = 17;
-                _context.t0 = _context['catch'](3);
+              case 18:
+                _context.prev = 18;
+                _context.t0 = _context['catch'](4);
 
                 console.error(_context.t0);
 
-              case 20:
-                _context.prev = 20;
+              case 21:
+                _context.prev = 21;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context.finish(20);
+                return _context.finish(21);
 
-              case 23:
+              case 24:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[3, 17, 20, 23]]);
+        }, _callee, this, [[4, 18, 21, 24]]);
       }));
 
       function toot(_x2) {
@@ -4361,18 +4386,18 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
       return toot;
     }()
   }, {
-    key: 'callCard',
+    key: 'anchor',
     value: function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(card) {
-        var url, response, json;
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(card_id, order, text) {
+        var url, response;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                this.dispatch({ type: CALL, card: card });
+                this.dispatch({ type: INSERT_TASK, order: order, text: text });
                 this.dispatch({ type: FETCH_REQUEST_START });
 
-                url = '/api/callCard/' + card.card_id;
+                url = '/api/anchor/' + encodeURI(card_id + ',' + text);
                 _context2.prev = 3;
                 _context2.next = 6;
                 return fetch(url, {
@@ -4384,127 +4409,121 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 response = _context2.sent;
 
                 if (!(response.status === 200)) {
-                  _context2.next = 15;
+                  _context2.next = 10;
+                  break;
+                }
+
+                _context2.next = 11;
+                break;
+
+              case 10:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 11:
+                _context2.next = 16;
+                break;
+
+              case 13:
+                _context2.prev = 13;
+                _context2.t0 = _context2['catch'](3);
+
+                console.error(_context2.t0);
+
+              case 16:
+                _context2.prev = 16;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH });
+                return _context2.finish(16);
+
+              case 19:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[3, 13, 16, 19]]);
+      }));
+
+      function anchor(_x3, _x4, _x5) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return anchor;
+    }()
+  }, {
+    key: 'callCard',
+    value: function () {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(card) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.dispatch({ type: CALL, card: card });
+                this.dispatch({ type: FETCH_REQUEST_START });
+
+                url = '/api/callCard/' + card.card_id;
+                _context3.prev = 3;
+                _context3.next = 6;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 6:
+                response = _context3.sent;
+
+                if (!(response.status === 200)) {
+                  _context3.next = 15;
                   break;
                 }
 
                 //2xx
                 this.dispatch({ type: CLEAR_CARDS });
-                _context2.next = 11;
+                _context3.next = 11;
                 return response.json();
 
               case 11:
-                json = _context2.sent;
+                json = _context3.sent;
 
                 this.dispatch({ type: TOOT, text: json.text });
-                _context2.next = 16;
+                _context3.next = 16;
                 break;
 
               case 15:
                 throw new Error('illegal status code: ' + response.status);
 
               case 16:
-                _context2.next = 21;
+                _context3.next = 21;
                 break;
 
               case 18:
-                _context2.prev = 18;
-                _context2.t0 = _context2['catch'](3);
+                _context3.prev = 18;
+                _context3.t0 = _context3['catch'](3);
 
-                console.error(_context2.t0);
+                console.error(_context3.t0);
 
               case 21:
-                _context2.prev = 21;
+                _context3.prev = 21;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context2.finish(21);
+                return _context3.finish(21);
 
               case 24:
               case 'end':
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this, [[3, 18, 21, 24]]);
+        }, _callee3, this, [[3, 18, 21, 24]]);
       }));
 
-      function callCard(_x3) {
-        return _ref2.apply(this, arguments);
+      function callCard(_x6) {
+        return _ref3.apply(this, arguments);
       }
 
       return callCard;
     }()
   }, {
     key: 'askUser',
-    value: function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(user_id) {
-        var url, response, json;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                this.dispatch({ type: FETCH_REQUEST_START });
-
-                url = '/api/askUser/' + user_id;
-                _context3.prev = 2;
-                _context3.next = 5;
-                return fetch(url, {
-                  method: 'GET',
-                  headers: this.myHeaders
-                });
-
-              case 5:
-                response = _context3.sent;
-
-                if (!(response.status === 200)) {
-                  _context3.next = 13;
-                  break;
-                }
-
-                _context3.next = 9;
-                return response.json();
-
-              case 9:
-                json = _context3.sent;
-
-                this.dispatch({ type: ANSWER_USER, text: json.text });
-                _context3.next = 14;
-                break;
-
-              case 13:
-                throw new Error('illegal status code: ' + response.status);
-
-              case 14:
-                _context3.next = 19;
-                break;
-
-              case 16:
-                _context3.prev = 16;
-                _context3.t0 = _context3['catch'](2);
-
-                console.error(_context3.t0);
-
-              case 19:
-                _context3.prev = 19;
-
-                this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context3.finish(19);
-
-              case 22:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this, [[2, 16, 19, 22]]);
-      }));
-
-      function askUser(_x4) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return askUser;
-    }()
-  }, {
-    key: 'hisToot',
     value: function () {
       var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(user_id) {
         var url, response, json;
@@ -4514,7 +4533,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 0:
                 this.dispatch({ type: FETCH_REQUEST_START });
 
-                url = '/api/hisToot/' + user_id;
+                url = '/api/askUser/' + user_id;
                 _context4.prev = 2;
                 _context4.next = 5;
                 return fetch(url, {
@@ -4526,51 +4545,121 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 response = _context4.sent;
 
                 if (!(response.status === 200)) {
-                  _context4.next = 14;
+                  _context4.next = 13;
+                  break;
+                }
+
+                _context4.next = 9;
+                return response.json();
+
+              case 9:
+                json = _context4.sent;
+
+                this.dispatch({ type: ANSWER_USER, text: json.text });
+                _context4.next = 14;
+                break;
+
+              case 13:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 14:
+                _context4.next = 19;
+                break;
+
+              case 16:
+                _context4.prev = 16;
+                _context4.t0 = _context4['catch'](2);
+
+                console.error(_context4.t0);
+
+              case 19:
+                _context4.prev = 19;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH });
+                return _context4.finish(19);
+
+              case 22:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[2, 16, 19, 22]]);
+      }));
+
+      function askUser(_x7) {
+        return _ref4.apply(this, arguments);
+      }
+
+      return askUser;
+    }()
+  }, {
+    key: 'hisToot',
+    value: function () {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(user_id) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                this.dispatch({ type: FETCH_REQUEST_START });
+
+                url = '/api/hisToot/' + user_id;
+                _context5.prev = 2;
+                _context5.next = 5;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 5:
+                response = _context5.sent;
+
+                if (!(response.status === 200)) {
+                  _context5.next = 14;
                   break;
                 }
 
                 //2xx
                 this.dispatch({ type: CLEAR_CARDS });
-                _context4.next = 10;
+                _context5.next = 10;
                 return response.json();
 
               case 10:
-                json = _context4.sent;
+                json = _context5.sent;
 
                 this.dispatch({ type: TOOT, text: json.text });
-                _context4.next = 15;
+                _context5.next = 15;
                 break;
 
               case 14:
                 throw new Error('illegal status code: ' + response.status);
 
               case 15:
-                _context4.next = 20;
+                _context5.next = 20;
                 break;
 
               case 17:
-                _context4.prev = 17;
-                _context4.t0 = _context4['catch'](2);
+                _context5.prev = 17;
+                _context5.t0 = _context5['catch'](2);
 
-                console.error(_context4.t0);
+                console.error(_context5.t0);
 
               case 20:
-                _context4.prev = 20;
+                _context5.prev = 20;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context4.finish(20);
+                return _context5.finish(20);
 
               case 23:
               case 'end':
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this, [[2, 17, 20, 23]]);
+        }, _callee5, this, [[2, 17, 20, 23]]);
       }));
 
-      function hisToot(_x5) {
-        return _ref4.apply(this, arguments);
+      function hisToot(_x8) {
+        return _ref5.apply(this, arguments);
       }
 
       return hisToot;
@@ -18636,15 +18725,10 @@ exports.default = MuiThemeProvider;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var styleOn = exports.styleOn = function styleOn(windowWidth) {
-  var _ref;
-
   //if( windowWidth < 480 ){
   //if( windowWidth < 720 ){
-  return _ref = {
+  return {
     wall: {
       backgroundColor: '#fffff9',
       color: 'rgba(0, 0, 0, 0.87)'
@@ -18652,9 +18736,9 @@ var styleOn = exports.styleOn = function styleOn(windowWidth) {
     button: {
       fontSize: '16px',
       fontWeight: 'bold',
-      padding: '10px 30px',
+      padding: '5px 10px',
       borderStyle: 'none',
-      backgroundColor: '#248',
+      backgroundColor: '#ffdb58',
       color: '#fff'
     },
     textarea: {
@@ -18714,42 +18798,33 @@ var styleOn = exports.styleOn = function styleOn(windowWidth) {
     ln: {
       padding: '5px',
       margin: '0px'
+    },
+    bar: {
+      color: 'rgba(0, 0, 0, 0.87)',
+      backgroundColor: 'rgb(0, 188, 212)',
+      transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+      boxSizing: 'border-box',
+      fontFamily: 'Roboto, sans-serif',
+      boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+      borderRadius: '0px',
+      position: 'fixed',
+      zIndex: '9999',
+      width: '100vw',
+      height: '50px',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      bottom: 0,
+      overflow: 'hidden'
+    },
+    newTab: {
+      width: '30px',
+      height: '30px'
+    },
+    checkbox: {
+      marginBottom: 16
     }
-  }, _defineProperty(_ref, 'button', {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    padding: '10px 30px',
-    borderStyle: 'none',
-    backgroundColor: '#248',
-    color: '#fff'
-  }), _defineProperty(_ref, 'textarea', {
-    fontSize: '18px',
-    width: '100%',
-    height: '30%',
-    border: 'none'
-  }), _defineProperty(_ref, 'bar', {
-    color: 'rgba(0, 0, 0, 0.87)',
-    backgroundColor: 'rgb(0, 188, 212)',
-    transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
-    boxSizing: 'border-box',
-    fontFamily: 'Roboto, sans-serif',
-    boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
-    borderRadius: '0px',
-    position: 'fixed',
-    zIndex: '9999',
-    width: '100vw',
-    height: '50px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    bottom: 0,
-    overflow: 'hidden'
-  }), _defineProperty(_ref, 'newTab', {
-    width: '30px',
-    height: '30px'
-  }), _defineProperty(_ref, 'checkbox', {
-    marginBottom: 16
-  }), _ref;
+  };
 };
 
 /***/ }),
@@ -31493,10 +31568,10 @@ var Face = exports.Face = function (_React$Component) {
   _createClass(Face, [{
     key: 'toot',
     value: function toot() {
-      var note = ReactDOM.findDOMNode(this.refs.note).value;
-      if (note == "") return;
-      this.props.actions.toot(note);
-      ReactDOM.findDOMNode(this.refs.note).value = "";
+      var note = ReactDOM.findDOMNode(this.refs.note);
+      if (note.value == "") return;
+      this.props.actions.toot(note.value);
+      note.value = "";
     }
   }, {
     key: 'render',
@@ -31532,14 +31607,9 @@ var Face = exports.Face = function (_React$Component) {
     value: function componentDidMount() {
       var _this3 = this;
 
-      document.onkeydown = function (e) {
-        if (e.key == 'Enter' && e.ctrlKey) {
-          _this3.toot();
-        }
-        if (e.key == 't' && e.shiftKey) {
-          console.log(echobtn.style);
-        }
-      };
+      var note = ReactDOM.findDOMNode(this.refs.note);
+      if (note == '') console.log('none');
+      if (note != '') console.log('goo');
 
       if ('webkitSpeechRecognition' in window) {
 
@@ -31551,8 +31621,8 @@ var Face = exports.Face = function (_React$Component) {
           }
         };
 
-        var _echobtn = this.refs.echobtn;
-        _echobtn.addEventListener('click', function () {
+        var echobtn = this.refs.echobtn;
+        echobtn.addEventListener('click', function () {
           var synthes = new SpeechSynthesisUtterance();
           //synthes.voiceURI = 1;
           synthes.volume = 1; // 0 - 1
@@ -31590,9 +31660,9 @@ var styleOn = exports.styleOn = function styleOn(windowWidth) {
     button: {
       fontSize: '16px',
       fontWeight: 'bold',
-      padding: '10px 30px',
+      padding: '8px 16px',
       borderStyle: 'none',
-      backgroundColor: '#248',
+      backgroundColor: '#ffdb58',
       color: '#fff'
     },
     textarea: {
@@ -31697,7 +31767,7 @@ var Thread = exports.Thread = function (_React$Component) {
           React.createElement(
             _reactRouterDom.Link,
             { to: '/', onClick: function onClick(e) {
-                _this2.props.actions.movePage();
+                _this2.props.actions.initState();
               } },
             React.createElement('img', { style: this.styles.newTab, src: _addButtonInsideBlackCircle2.default })
           )
@@ -31729,6 +31799,10 @@ var _react = __webpack_require__(1);
 
 var React = _interopRequireWildcard(_react);
 
+var _reactDom = __webpack_require__(19);
+
+var ReactDOM = _interopRequireWildcard(_reactDom);
+
 var _module = __webpack_require__(67);
 
 var _materialUi = __webpack_require__(343);
@@ -31755,6 +31829,14 @@ var Todo = function (_React$Component) {
   }
 
   _createClass(Todo, [{
+    key: 'anchor',
+    value: function anchor() {
+      var note = ReactDOM.findDOMNode(this.refs.note).value;
+      if (note == "") return;
+      this.props.actions.anchor(this.props.task.card_id, this.props.order, note);
+      ReactDOM.findDOMNode(this.refs.note).value = "";
+    }
+  }, {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this.linkDisabled = false;
@@ -31788,14 +31870,12 @@ var Todo = function (_React$Component) {
         })
       ) : this.props.task.mode == 'called' ? React.createElement(
         'p',
-        { style: styles.cardcenter, onClick: function onClick(e) {
-            _this2.props.actions.callCard(_this2.props.task);
-          } },
+        { style: styles.cardcenter },
         React.createElement(
           _reactRouterDom.Link,
           { to: '/user/' + this.props.task.user_id },
           React.createElement(
-            'button',
+            'h3',
             { onClick: function onClick(e) {
                 _this2.props.actions.askUser(_this2.props.task.user_id);
               } },
@@ -31812,12 +31892,12 @@ var Todo = function (_React$Component) {
         React.createElement(
           'p',
           null,
-          React.createElement('textarea', { style: styles.textarea, type: 'text', ref: 'task',
-            placeholder: 'toot to open tamaKoo' }),
+          React.createElement('textarea', { style: styles.textarea, type: 'text', ref: 'note',
+            placeholder: '>>' }),
           React.createElement(
             'button',
-            { style: styles.button, onClick: function onClick() {
-                return _this2.toot();
+            { style: styles.button, onClick: function onClick(e) {
+                return _this2.anchor();
               } },
             'echo'
           )
@@ -31844,7 +31924,7 @@ var Todo = function (_React$Component) {
 
       var card = this.refs.card;
       if (this.props.task.mode == 'toot' || this.props.task.mode == 'called') {
-        card.id = 'nowToot';
+        card.id = 'flash';
       }
       if (this.linkDisabled) {
         setTimeout(function () {
@@ -31855,7 +31935,7 @@ var Todo = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      location.hash = 'nowToot';
+      location.hash = 'flash';
     }
   }]);
 
@@ -32015,50 +32095,6 @@ var Todo = function (_React$Component) {
                 m
               );
             })
-          )
-        )
-      ) : this.props.task.mode == 'called' ? React.createElement(
-        'p',
-        { style: styles.cardcenter, onClick: function onClick(e) {
-            _this2.props.actions.callCard(_this2.props.task);
-          } },
-        React.createElement(
-          _reactRouterDom.Link,
-          { to: '/user/' + this.props.task.user_id },
-          React.createElement(
-            'button',
-            { onClick: function onClick(e) {
-                _this2.props.actions.askUser(_this2.props.task.user_id);
-              } },
-            this.props.task.user_name
-          )
-        ),
-        React.createElement(
-          _reactRouterDom.Link,
-          { to: '/thread', style: { textDecoration: 'none', color: 'black' } },
-          React.createElement(
-            'p',
-            null,
-            this.props.task.text.split('\n').map(function (m) {
-              return React.createElement(
-                'p',
-                { style: styles.ln },
-                m
-              );
-            })
-          )
-        ),
-        React.createElement(
-          'p',
-          null,
-          React.createElement('textarea', { style: styles.textarea, type: 'text', ref: 'task',
-            placeholder: 'toot to open tamaKoo' }),
-          React.createElement(
-            'button',
-            { style: styles.button, onClick: function onClick() {
-                return _this2.toot();
-              } },
-            'echo'
           )
         )
       ) : null;

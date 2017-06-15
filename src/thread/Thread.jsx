@@ -29,7 +29,7 @@ export class Thread extends React.Component<void, Props, void> {
         </div>
         <div style={this.styles.bar}>
           <Link to='/' onClick={e=>{
-            this.props.actions.movePage()
+            this.props.actions.initState()
           }}>
             <img style={this.styles.newTab} src={AddButtonSVG} />
           </Link>

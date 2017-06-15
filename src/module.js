@@ -6,15 +6,16 @@ export type Task = {
   url: string;
 }
 
-const ADD_TASK = 'counter/addTask';
+const ADD_TASK = 'counter/add_task';
+const INSERT_TASK = 'counter/insert_task';
 const TOOT = 'counter/toot';
-const MOVE_PAGE = 'counter/movePave';
 const FETCH_REQUEST_START = 'counter/fetch_request_start'
 const FETCH_REQUEST_FINISH = 'counter/fetch_request_finish'
 const ONLY_CARD = 'counter/only_card';
 const CLEAR_CARDS = 'counter/clear_cards';
 const CALL = 'counter/call';
 const ANSWER_USER = 'counter/answer_user';
+const INIT_STATE = 'counter/init_state'
 
 export interface CounterState {
   tasks: Task[];
@@ -39,6 +40,10 @@ export default function reducer (
   action: ActionTypes
 ): CounterState {
   switch (action.type) {
+
+    case INIT_STATE:
+      return Object.assign({}, state, initialState );
+
     case FETCH_REQUEST_START: {
       return Object.assign({}, state, { phase:'loading' })
     }
@@ -46,16 +51,6 @@ export default function reducer (
     case FETCH_REQUEST_FINISH: {
       return Object.assign({}, state, { phase:'ground' })
     }
-
-    case ADD_TASK:// css -> css-in-js
-      let lis = action.text.split("-");
-      let out = lis[0]
-      lis.slice(1)
-        .map( a => { out+=a[0].toUpperCase()+a.slice(1) })
-      out = out
-        .replace(/: /g, ":").replace(/:/g, ": '")
-        .replace(/ ;/g, ";").replace(/;/g, "',")
-      return Object.assign({}, state, { tasks:[{id:state.tasks.length, text:out, url:'Noen', mode:'toot'}] });
 
     case TOOT:
       const nextTasks = action.text.split('\n')
@@ -67,7 +62,36 @@ export default function reducer (
           text:a.split(',')[4],
           url:a.split(',')[5],
           mode:a.split(',')[6]} });
-      return Object.assign({}, state, { tasks:state.tasks.concat(nextTasks) });
+      return Object.assign({}, state, {
+        tasks:state.tasks.concat(nextTasks)
+      });
+
+    case ADD_TASK:// css -> css-in-js
+      let lis = action.text.split("-");
+      let out = lis[0]
+      lis.slice(1)
+        .map( a => { out+=a[0].toUpperCase()+a.slice(1) })
+      out = out
+        .replace(/: /g, ":").replace(/:/g, ": '")
+        .replace(/ ;/g, ";").replace(/;/g, "',")
+      return Object.assign({}, state, {
+        tasks: state.tasks.concat( [{
+          card_id: -1,
+          text:out,
+          url:'Noen',
+          mode:'toot'}] )
+      });
+
+    case INSERT_TASK:
+      console.log('insert')
+      let insertedTasks = state.tasks;
+      insertedTasks.splice(action.order+1,0, {
+        card_id: -1,
+        text: action.text,
+        url: 'Noen',
+        mode:'toot'
+      })
+      return Object.assign({}, state, { tasks: insertedTasks });
 
     case CALL:
       return Object.assign({}, state, {
@@ -117,11 +141,12 @@ export class ActionDispatcher {
     }
   }
 
-  movePage(){
-    this.dispatch({ type:MOVE_PAGE })
+  initState(){
+    this.dispatch({ type:INIT_STATE })
   }
 
   async toot( text: string ): Promise<void> {
+    this.dispatch({ type:INIT_STATE })
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
@@ -134,6 +159,28 @@ export class ActionDispatcher {
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
         this.dispatch({ type:TOOT, text:json.text });
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
+  async anchor( card_id:number, order:number, text:string ): Promise<void> {
+    this.dispatch({ type:INSERT_TASK, order:order, text:text })
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/anchor/'+encodeURI(card_id+','+text)
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }

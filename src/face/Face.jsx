@@ -20,10 +20,10 @@ if( ('webkitSpeechRecognition' in window) ){
 
 export class Face extends React.Component<void, Props, void> {
   toot() {
-    const note = (ReactDOM.findDOMNode(this.refs.note)).value;
-    if( note=="" ) return;
-    this.props.actions.toot(note);
-    (ReactDOM.findDOMNode(this.refs.note)).value = "";
+    const note = (ReactDOM.findDOMNode(this.refs.note));
+    if( note.value=="" ) return;
+    this.props.actions.toot(note.value);
+    note.value = "";
   }
 
   render() {
@@ -47,15 +47,6 @@ export class Face extends React.Component<void, Props, void> {
   }
 
   componentDidMount() {
-    document.onkeydown = e => {
-    if( e.key=='Enter' && e.ctrlKey ){
-      this.toot();
-    }
-    if( e.key=='t'  && e.shiftKey){
-      console.log(echobtn.style);
-    }
-    }
-
     if( ('webkitSpeechRecognition' in window) ){
 
       speech.start();

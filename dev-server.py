@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, jsonify, abort, make_response
-import numpy as np
-import gensim
-from gensim.models import doc2vec
-from sklearn.metrics.pairwise import cosine_similarity
-wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
 
 import secure
 from neo4jrestclient.client import GraphDatabase
 url = secure.url
 gdb = GraphDatabase(url)
 
+import numpy as np
+import gensim
+from gensim.models import doc2vec
+from sklearn.metrics.pairwise import cosine_similarity
+wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
+
+from datetime import datetime
+
 api = Flask(__name__)
+
 
 @api.route('/')
 def index():
@@ -23,12 +27,18 @@ def bundle():
 
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):
+    user_id = 46245
+    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    gdb.query('\
+        MATCH (a:User) WHERE ID(a)=%s\
+        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s"})'\
+        %(user_id,now,toot_text), data_contents=True)
+
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    #res_text = ''.join([''.join(doc[index[i]].split(' ')) for i in range(20)])
     res_text = ''
-    for i in range(20):
+    for i in range(100):
         res_text += ''.join([''.join(doc[index[i]].split(' '))]).split('\n')[0]+',normal\n'
     result = {
         'text': res_text
@@ -36,6 +46,20 @@ def api_toot(toot_text):
     return make_response(jsonify(result))
     result = {
         'text': res_text
+        }
+    return make_response(jsonify(result))
+
+@api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
+def api_anchor(anchor_text):
+    user_id = 46245
+    card_id, toot_text = anchor_text.split(',')
+    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    gdb.query('\
+        MATCH (a:User),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
+        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)'\
+        %( user_id, card_id, now, toot_text, now, now ), data_contents=True)
+    result = {
+        'text': 'toot complete'
         }
     return make_response(jsonify(result))
 
@@ -52,7 +76,7 @@ def api_callCard(card_id):
 
     pre_id = now_id
     pre_lines = []
-    for i in range(10):
+    for i in range(100):
         try:
             user_id, user_name, when, pre_id, pre_text, pre_url = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -65,7 +89,7 @@ def api_callCard(card_id):
 
     next_id = now_id
     next_lines = []
-    for i in range(10):
+    for i in range(100):
         try:
             user_id, user_name, when, next_id, next_text, next_url = gdb.query('\
                 MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -98,7 +122,7 @@ def api_hisToot(user_id):
     res_text = ''
     for line in gdb.query('\
         MATCH p=(a)-[r:Toot]->(b) WHERE ID(a)={}\
-        RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 25\
+        RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 200\
         '.format(user_id)):
 
         user_id, user_name, toot_when, card_id, card_text, card_url = line
@@ -111,11 +135,11 @@ def api_hisToot(user_id):
 
 @api.errorhandler(404)
 def not_found(error):
-    return  make_response(jsonify({'error': 'Not found'}), 404)
+    return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
     model_name = 'echo_model/doc2vec.20170611T223642.model'
-    toots_fname = 'dump/tamakoo.20170611T220442.test.csv'
+    toots_fname = 'dump/tamakoo.20170611T220442.dump.csv'
 
     model = gensim.models.Doc2Vec.load(model_name)
     doc = open(toots_fname, encoding='utf-8').readlines()
