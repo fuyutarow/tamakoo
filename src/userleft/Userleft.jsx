@@ -27,8 +27,8 @@ export class Userleft extends React.Component<void, Props, void> {
   render() {
     return (
       <div style={this.styles.wall}>
-        <div>
-          <p>{this.props.value.userInfo.user_name}</p>
+        <div id='crown'>
+          <h2>{this.props.value.userInfo.user_name}</h2>
           <p>{this.props.value.userInfo.user_bio}</p>
         </div>
         <hr/>
@@ -46,7 +46,7 @@ export class Userleft extends React.Component<void, Props, void> {
     )
   }
 
-  componentDidMount(){
-    console.log(this.props)
+  componentDidUpdate() {
+    location.hash='crown';
   }
 }

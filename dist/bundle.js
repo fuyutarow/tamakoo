@@ -18693,11 +18693,13 @@ var styleOn = exports.styleOn = function styleOn(windowWidth) {
     userleft: {
       width: '9%',
       listStyle: 'none',
+      margin: '16px 0px 16px 0px',
       backgroundColor: '#' + Math.floor(Math.random() * parseInt('ffffff', 16)).toString(16)
     },
     cardcenter: {
       width: '90%',
-      listStyle: 'none'
+      listStyle: 'none',
+      paddin: '5px'
     },
     linkOn: {
       width: '1%',
@@ -18817,11 +18819,13 @@ var styleOn = exports.styleOn = function styleOn(windowWidth) {
     userleft: {
       width: '9%',
       listStyle: 'none',
-      backgroundColor: '#' + Math.floor(Math.random() * parseInt('ffffff', 16)).toString(16)
+      margin: '16px 0px 16px 0px'
     },
     cardcenter: {
       width: '90%',
-      listStyle: 'none'
+      listStyle: 'none',
+      margin: '0px',
+      padding: '5px'
     },
     linkOn: {
       width: '1%',
@@ -31764,39 +31768,17 @@ var Todo = function (_React$Component) {
 
       var styles = (0, _css.styleOn)(screen.width);
       var cardStyle = this.props.task.mode == 'toot' || this.props.task.mode == 'called' ? styles.nowToot : styles.card;
-      var userLeft = React.createElement('p', { style: styles.userleft });
+
+      var userLeft = React.createElement(_reactRouterDom.Link, { to: '/user/' + this.props.task.user_id, style: styles.userleft,
+        onClick: function onClick(e) {
+          _this2.props.actions.askUser(_this2.props.task.user_id);
+        } });
+
       var cardCenter = this.props.task.mode == 'toot' || this.props.task.mode == 'normal' ? React.createElement(
         'p',
-        { style: styles.cardcenter,
-          onTouchStart: function onTouchStart(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.x = e.changedTouches[0].pageX;
-            _this2.isTap = true;
-          },
-          onTouchMove: function onTouchMove(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.isTap = false;
-            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-              if (_this2.props.task.url == 'None') return;
-              window.open(_this2.props.task.url, '_blank');
-            }
-          },
-          onTouchEnd: function onTouchEnd(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            if (_this2.linkDisabeld) {
-              e.preventDefault();
-            } else {
-              _this2.linkDisabled = true;
-              setTimeout(function () {
-                _this2.linkDisabled = false;
-              }, 500);
-            }
-            if (_this2.isTap) {
-              _this2.isTap = false;
-              _this2.props.actions.callCard(_this2.props.task);
-            }
-          }
-        },
+        { style: styles.cardcenter, onClick: function onClick(e) {
+            _this2.props.actions.callCard(_this2.props.task);
+          } },
         this.props.task.text.split('\n').map(function (m) {
           return React.createElement(
             'p',
@@ -31806,36 +31788,9 @@ var Todo = function (_React$Component) {
         })
       ) : this.props.task.mode == 'called' ? React.createElement(
         'p',
-        { style: styles.cardcenter,
-          onTouchStart: function onTouchStart(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.x = e.changedTouches[0].pageX;
-            _this2.isTap = true;
-          },
-          onTouchMove: function onTouchMove(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.isTap = false;
-            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-              if (_this2.props.task.url == 'None') return;
-              window.open(_this2.props.task.url, '_blank');
-            }
-          },
-          onTouchEnd: function onTouchEnd(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            if (_this2.linkDisabeld) {
-              e.preventDefault();
-            } else {
-              _this2.linkDisabled = true;
-              setTimeout(function () {
-                _this2.linkDisabled = false;
-              }, 500);
-            }
-            if (_this2.isTap) {
-              _this2.isTap = false;
-              _this2.props.actions.callCard(_this2.props.task);
-            }
-          }
-        },
+        { style: styles.cardcenter, onClick: function onClick(e) {
+            _this2.props.actions.callCard(_this2.props.task);
+          } },
         React.createElement(
           _reactRouterDom.Link,
           { to: '/user/' + this.props.task.user_id },
@@ -31868,6 +31823,7 @@ var Todo = function (_React$Component) {
           )
         )
       ) : null;
+
       var copyRight = this.props.task.url == 'None' ? React.createElement('p', { style: styles.linkOff }) : React.createElement('p', { style: styles.linkOn });
 
       return React.createElement(
@@ -32032,80 +31988,40 @@ var Todo = function (_React$Component) {
 
       var styles = (0, _css.styleOn)(screen.width);
       var cardStyle = this.props.task.mode == 'toot' || this.props.task.mode == 'called' ? styles.nowToot : styles.card;
-      var userLeft = React.createElement('p', { style: styles.userleft });
+
+      var userLeft = React.createElement(
+        _reactRouterDom.Link,
+        { to: '/user/' + this.props.task.user_id, style: styles.userleft },
+        React.createElement('p', { onClick: function onClick(e) {
+            _this2.props.actions.askUser(_this2.props.task.user_id);
+          } })
+      );
+
       var cardCenter = this.props.task.mode == 'toot' || this.props.task.mode == 'normal' ? React.createElement(
         'p',
-        { style: styles.cardcenter,
-          onTouchStart: function onTouchStart(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.x = e.changedTouches[0].pageX;
-            _this2.isTap = true;
-          },
-          onTouchMove: function onTouchMove(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.isTap = false;
-            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-              if (_this2.props.task.url == 'None') return;
-              window.open(_this2.props.task.url, '_blank');
-            }
-          },
-          onTouchEnd: function onTouchEnd(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            if (_this2.linkDisabeld) {
-              e.preventDefault();
-            } else {
-              _this2.linkDisabled = true;
-              setTimeout(function () {
-                _this2.linkDisabled = false;
-              }, 500);
-            }
-            if (_this2.isTap) {
-              _this2.isTap = false;
-              _this2.props.actions.callCard(_this2.props.task);
-              location.href = '/thread';
-            }
-          }
-        },
-        this.props.task.text.split('\n').map(function (m) {
-          return React.createElement(
+        { style: styles.cardcenter, onClick: function onClick(e) {
+            _this2.props.actions.callCard(_this2.props.task);
+          } },
+        React.createElement(
+          _reactRouterDom.Link,
+          { to: '/thread', style: { textDecoration: 'none', color: 'black' } },
+          React.createElement(
             'p',
-            { style: styles.ln },
-            m
-          );
-        })
+            null,
+            this.props.task.text.split('\n').map(function (m) {
+              return React.createElement(
+                'p',
+                { style: styles.ln },
+                m
+              );
+            })
+          )
+        )
       ) : this.props.task.mode == 'called' ? React.createElement(
         'p',
-        { style: styles.cardcenter,
-          onTouchStart: function onTouchStart(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.x = e.changedTouches[0].pageX;
-            _this2.isTap = true;
-          },
-          onTouchMove: function onTouchMove(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            _this2.isTap = false;
-            if (!_this2.linkDisabled && _this2.x - e.changedTouches[0].pageX > 80) {
-              if (_this2.props.task.url == 'None') return;
-              window.open(_this2.props.task.url, '_blank');
-            }
-          },
-          onTouchEnd: function onTouchEnd(e) {
-            if (_this2.props.value.phase == 'loading') return;
-            if (_this2.linkDisabeld) {
-              e.preventDefault();
-            } else {
-              _this2.linkDisabled = true;
-              setTimeout(function () {
-                _this2.linkDisabled = false;
-              }, 500);
-            }
-            if (_this2.isTap) {
-              _this2.isTap = false;
-              _this2.props.actions.callCard(_this2.props.task);
-              location.href = '/thread';
-            }
-          }
-        },
+        { style: styles.cardcenter, onClick: function onClick(e) {
+            _this2.props.actions.callCard(_this2.props.task);
+          } },
         React.createElement(
           _reactRouterDom.Link,
           { to: '/user/' + this.props.task.user_id },
@@ -32117,13 +32033,21 @@ var Todo = function (_React$Component) {
             this.props.task.user_name
           )
         ),
-        this.props.task.text.split('\n').map(function (m) {
-          return React.createElement(
+        React.createElement(
+          _reactRouterDom.Link,
+          { to: '/thread', style: { textDecoration: 'none', color: 'black' } },
+          React.createElement(
             'p',
-            { style: styles.ln },
-            m
-          );
-        }),
+            null,
+            this.props.task.text.split('\n').map(function (m) {
+              return React.createElement(
+                'p',
+                { style: styles.ln },
+                m
+              );
+            })
+          )
+        ),
         React.createElement(
           'p',
           null,
@@ -32138,6 +32062,7 @@ var Todo = function (_React$Component) {
           )
         )
       ) : null;
+
       var copyRight = this.props.task.url == 'None' ? React.createElement('p', { style: styles.linkOff }) : React.createElement('p', { style: styles.linkOn });
 
       return React.createElement(
@@ -32153,24 +32078,7 @@ var Todo = function (_React$Component) {
     }
   }, {
     key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this3 = this;
-
-      var card = this.refs.card;
-      if (this.props.task.mode == 'toot' || this.props.task.mode == 'called') {
-        card.id = 'nowToot';
-      }
-      if (this.linkDisabled) {
-        setTimeout(function () {
-          _this3.linkDisabled = false;
-        }, 500);
-      }
-    }
-  }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate() {
-      location.hash = 'nowToot';
-    }
+    value: function componentDidMount() {}
   }]);
 
   return Todo;
@@ -32331,9 +32239,9 @@ var Userleft = exports.Userleft = function (_React$Component) {
         { style: this.styles.wall },
         React.createElement(
           'div',
-          null,
+          { id: 'crown' },
           React.createElement(
-            'p',
+            'h2',
             null,
             this.props.value.userInfo.user_name
           ),
@@ -32363,9 +32271,9 @@ var Userleft = exports.Userleft = function (_React$Component) {
       );
     }
   }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      console.log(this.props);
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      location.hash = 'crown';
     }
   }]);
 

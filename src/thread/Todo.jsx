@@ -24,70 +24,27 @@ export default class Todo extends React.Component<Props, void> {
     const styles = styleOn(screen.width);
     const cardStyle = this.props.task.mode=='toot' || this.props.task.mode=='called' ?
       styles.nowToot : styles.card;
+
     const userLeft =
-      <p style={styles.userleft}></p>
+      <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}
+        onClick={e=>{
+          this.props.actions.askUser(this.props.task.user_id)
+      }}>
+      </Link>
+
     const cardCenter =
       this.props.task.mode=='toot' || this.props.task.mode=='normal' ?
-        <p style={styles.cardcenter}
-          onTouchStart = { e => {
-            if( this.props.value.phase=='loading' ) return;
-            this.x=e.changedTouches[0].pageX
-            this.isTap = true;
-          }}
-          onTouchMove = { e => {
-            if( this.props.value.phase=='loading' ) return;
-            this.isTap = false;
-            if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
-              if( this.props.task.url=='None') return;
-              window.open(this.props.task.url,'_blank');
-            }
-          }}
-          onTouchEnd = { e => {
-            if( this.props.value.phase=='loading' ) return;
-            if(this.linkDisabeld){
-              e.preventDefault()
-            }else{
-              this.linkDisabled = true;
-              setTimeout(() => { this.linkDisabled = false }, 500);
-            }
-            if(this.isTap){
-              this.isTap = false;
-              this.props.actions.callCard(this.props.task);
-            }
-          }}
-        >
+        <p style={styles.cardcenter} onClick={e=>{
+          this.props.actions.callCard(this.props.task);
+        }}>
           {this.props.task.text.split('\n')
           .map( m => (<p style={styles.ln}>{m}</p>) )}
         </p>
+
       :this.props.task.mode=='called' ?
-        <p style={styles.cardcenter}
-          onTouchStart = { e => {
-            if( this.props.value.phase=='loading' ) return;
-            this.x=e.changedTouches[0].pageX
-            this.isTap = true;
-          }}
-          onTouchMove = { e => {
-            if( this.props.value.phase=='loading' ) return;
-            this.isTap = false;
-            if( !this.linkDisabled && this.x - e.changedTouches[0].pageX > 80 ){
-              if( this.props.task.url=='None') return;
-              window.open(this.props.task.url,'_blank');
-            }
-          }}
-          onTouchEnd = { e => {
-            if( this.props.value.phase=='loading' ) return;
-            if(this.linkDisabeld){
-              e.preventDefault()
-            }else{
-              this.linkDisabled = true;
-              setTimeout(() => { this.linkDisabled = false }, 500);
-            }
-            if(this.isTap){
-              this.isTap = false;
-              this.props.actions.callCard(this.props.task);
-            }
-          }}
-        >
+        <p style={styles.cardcenter} onClick={e=>{
+          this.props.actions.callCard(this.props.task);
+        }}>
           <Link to={'/user/'+this.props.task.user_id}>
             <button onClick={e=>{
               this.props.actions.askUser(this.props.task.user_id)
@@ -96,13 +53,14 @@ export default class Todo extends React.Component<Props, void> {
           {this.props.task.text.split('\n')
             .map( m => (<p style={styles.ln}>{m}</p>) )}
           <p>
-
             <textarea style={styles.textarea} type='text' ref='task'
               placeholder="toot to open tamaKoo"/>
             <button style={styles.button} onClick={()=>this.toot()}>echo</button>
           </p>
         </p>
+
       :null
+
     const copyRight = this.props.task.url=='None'?
        <p style={styles.linkOff}></p>
        :
