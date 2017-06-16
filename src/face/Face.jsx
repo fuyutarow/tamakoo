@@ -6,6 +6,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import {Link, Route} from 'react-router-dom';
+import Image from 'react-image-resizer';
+
 import { styleOn } from './css';
 interface Props {
   value: CounterState;
@@ -27,20 +29,19 @@ export class Face extends React.Component<void, Props, void> {
   }
 
   render() {
+
     console.log("window width: ",window.innerWidth)
-    console.log("screen width: ",screen.width)
+    console.log("screen width: ",screen.width,screen.height)
     console.log("client width: ",document.documentElement.clientWidth)
 
     const styles = styleOn(screen.width);
 
     return (
-      <div style={styles.wall}>
-        <textarea style={styles.textarea} type='text' ref='note'
+      <div style={styles.toot}>
+        <input style={styles.textarea} type='text' ref='note'
           placeholder="toot to open tamaKoo"/>
-        <Link to='/thread'>
-          <button style={styles.button} ref="echobtn" onClick={e=>this.toot()}>
-            echo
-          </button>
+        <Link to='/thread' style={styles.button} ref="echobtn" onClick={e=>this.toot()}>
+          <img draggable="false" style={styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
         </Link>
       </div>
     )

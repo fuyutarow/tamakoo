@@ -6,20 +6,7 @@ export const styleOn = (windowWidth) =>  {
         backgroundColor: '#fffff9',
         color: 'rgba(0, 0, 0, 0.87)',
       },
-      button: {
-        fontSize: '16px',
-        fontWeight: 'bold',
-        padding: '10px 30px',
-        borderStyle: 'none',
-        backgroundColor:'#248',
-        color: '#fff',
-      },
-      textarea: {
-        fontSize: '18px',
-        width: '100%',
-        height: '30%',
-        border: 'none',
-      },
+
       wall2: {
         backgroundColor: '#666663',
         color: 'rgba(50, 0, 50, 0.87)',

@@ -5,12 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=no">
 <style type="text/css">
 body {
-  background-color: #fffff9
+  background-image: url("/tamakoo.png");
+  background-position: -6vw 0vh;
 }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="./dist/bundle.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+function fff(){
+  w = $(window).width();
+  var W = 744;
+  h = $(window).height();
+  var H = 1052;
+  $("body").css("backgroundSize", 120+"vw");
+  //$("body").css("backgroundPosition", "-20vw -"+ 0.3*H-0.234*h+"px");
+  console.log(0.3*H-0.234*h+"px")
+}
+$(window).load(function() {
+  fff();
+});
+$(window).resize(function() {
+  fff();
+});
+</script>
+
 </body>
 </html>

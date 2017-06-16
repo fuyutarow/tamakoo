@@ -16,7 +16,7 @@ wakati = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), 
 
 from datetime import datetime
 
-api = Flask(__name__)
+api = Flask(__name__,  static_url_path='/dist')
 
 @api.route('/')
 def index():
@@ -25,6 +25,14 @@ def index():
 @api.route('/dist/bundle.js')
 def bundle():
     return open('dist/bundle.js', encoding='utf-8').read()
+
+@api.route('/tamakoo.png')
+def face():
+    return send_from_directory(os.path.join(api.root_path, 'dist'),'tamakoo.png')
+
+@api.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
 
 @api.route('/api/toot/<string:toot_text>', methods=['GET'])
 def api_toot(toot_text):

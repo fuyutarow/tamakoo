@@ -57,11 +57,13 @@ export default class Todo extends React.Component<Props, void> {
           </Link>
           {this.props.task.text.split('\n')
             .map( m => (<p style={styles.ln}>{m}</p>) )}
-          <p>
-            <textarea style={styles.textarea} type='text' ref='note'
-              placeholder=">>"/>
-            <button style={styles.button} onClick={e=>this.anchor()}>echo</button>
-          </p>
+          <div style={styles.toot}>
+            <input style={styles.textarea} type='text' ref='note'
+              placeholder=">>response"/>
+            <Link to='/thread' style={styles.button} ref="echobtn" onClick={e=>this.anchor()}>
+              <img draggable="false" style={styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
+            </Link>
+          </div>
         </p>
 
       :null

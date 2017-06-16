@@ -6,25 +6,6 @@ export const styleOn = (windowWidth) =>  {
         backgroundColor: '#fffff9',
         color: 'rgba(0, 0, 0, 0.87)',
       },
-      button: {
-        fontSize: '16px',
-        fontWeight: 'bold',
-        padding: '5px 10px',
-        borderStyle: 'none',
-        backgroundColor:'#ffdb58',
-        color: '#fff',
-      },
-      textarea: {
-        fontSize: '18px',
-        width: '100%',
-        height: '30%',
-        border: 'none',
-      },
-      wall2: {
-        backgroundColor: '#666663',
-        color: 'rgba(50, 0, 50, 0.87)',
-        padding: '15px 15px 15px 15px',
-      },
       timeline: {
         backgroundColor: '#fffff9',
         height: '60%',
@@ -32,7 +13,7 @@ export const styleOn = (windowWidth) =>  {
         padding: '0px',
       },
       nowToot: {
-        padding: '10px 0px',
+        padding: '10px',
         color: 'rgba(0, 0, 0, 0.87)',
         backgroundColor: 'rgb(255, 255, 255)',
         transition: 'all 450ms cubicBezier(0.23, 1, 0.32, 1) 0ms',
@@ -97,5 +78,47 @@ export const styleOn = (windowWidth) =>  {
       checkbox: {
         marginBottom: 16,
       },
+      toot: {
+        backgroundColor: '#fffff9',
+        color: 'rgba(0, 0, 0, 0.87)',
+        position: 'relative',
+        display: 'block',
+        textAlign: 'center',
+        width: '90%',
+        marginLeft: '5vw',
+      },
+      textarea: {
+        fontSize: '16px',
+        height: '40px',
+        width: '85%',
+        border: 'none',
+        paddingLeft: '0',
+        position: 'relative',
+        display: 'block',
+        marginTop: '0em',
+        margin: '0px',
+      },
+      button: {
+        width: '40px',
+        height: '40px',
+        fontSize: '16px',
+        fontWeight: 'bold',
+        borderStyle: 'none',
+        background: 'none',
+        //backgroundColor:'#ffdb58',
+        color: '#fff',
+        display: 'flex',
+        borderRadius: '0',
+        padding: '0',
+        margin: '3px 0px 0px 0px',
+        position: 'absolute',
+        right: '0',
+        top: '0',
+      },
+      emoji: {
+        width:'100%',
+        height:'100%',
+      },
+
     }
 }

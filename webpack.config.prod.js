@@ -35,7 +35,11 @@ module.exports = {
                 noquotes: true
             }
         },
-      }
+      },
+      {
+        test: /\.(jpg|png)$/,
+        loaders: 'url-loader'
+      },
     ]
   }
 }
