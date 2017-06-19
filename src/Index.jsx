@@ -15,9 +15,9 @@ injectTapEventPlugin();
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import store from "./Store";
-import Face from './face/Container';
-import Thread from './thread/Container';
-import Userleft from './userleft/Container';
+import Face from './face/Root';
+import Thread from './thread/Root';
+import Userleft from './userleft/Root';
 
 ReactDOM.render(
 <Provider store={store}>

@@ -32,14 +32,16 @@ export default class Todo extends React.Component<Props, void> {
         }}></p>
       </Link>
 
+    const textln = this.props.task.text.split('\n')
+      .map( m => (<p style={styles.ln}>{m}</p>) )
+
     const cardCenter =
-      this.props.task.mode=='toot' || this.props.task.mode=='normal' ?
+      this.props.task.mode=='toot' || this.props.task.mode=='drawn' ?
         <p style={styles.cardcenter} onClick={e=>{
           this.props.actions.callCard(this.props.task);
         }}>
           <Link to='/thread' style={{textDecoration:'none',color:'black'}}><p>
-            {this.props.task.text.split('\n')
-            .map( m => (<p style={styles.ln}>{m}</p>) )}
+            { textln }
           </p></Link>
         </p>
       :null

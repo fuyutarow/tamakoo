@@ -55,13 +55,16 @@ export default function reducer (
     case TOOT:
       const nextTasks = action.text.split('\n')
         .slice(0,self.length-1)
-        .map( a => { return {
-          user_id:a.split(',')[0],
-          user_name:a.split(',')[1],
-          card_id:a.split(',')[3],
-          text:a.split(',')[4],
-          url:a.split(',')[5],
-          mode:a.split(',')[6]} });
+        .map( a => {
+          console.log('$',a.split('\t'))
+          return {
+          user_id:a.split('\t')[0],
+          user_name:a.split('\t')[1],
+          toot_when:a.split('\t')[2],
+          card_id:a.split('\t')[3],
+          text:a.split('\t')[4],
+          url:a.split('\t')[5],
+          mode:a.split('\t')[6]} });
       return Object.assign({}, state, {
         tasks:state.tasks.concat(nextTasks)
       });
@@ -73,7 +76,7 @@ export default function reducer (
         .map( a => { out+=a[0].toUpperCase()+a.slice(1) })
       out = out
         .replace(/: /g, ":").replace(/:/g, ": '")
-        .replace(/ ;/g, ";").replace(/;/g, "',")
+        .replace(/ ;/g, ";").replace(/;/g, "',\n")
       return Object.assign({}, state, {
         tasks: state.tasks.concat( [{
           card_id: -1,
@@ -107,9 +110,9 @@ export default function reducer (
 
     case ANSWER_USER:
       const info = {
-        user_id: action.text.split(',')[0],
-        user_name: action.text.split(',')[1],
-        user_bio: action.text.split(',')[2],
+        user_id: action.text.split('\t')[0],
+        user_name: action.text.split('\t')[1],
+        user_bio: action.text.split('\t')[2],
       }
       return Object.assign({}, state, { userInfo: info });
 
@@ -158,6 +161,7 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
+        console.log('#',json.text)
         this.dispatch({ type:TOOT, text:json.text });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
@@ -173,7 +177,7 @@ export class ActionDispatcher {
     this.dispatch({ type:INSERT_TASK, order:order, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
-    const url = '/api/anchor/'+encodeURI(card_id+','+text)
+    const url = '/api/anchor/'+encodeURI(card_id+'\t'+text)
     try {
       const response:Response = await fetch(url, {
         method: 'GET',

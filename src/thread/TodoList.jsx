@@ -1,8 +1,20 @@
 import * as React from 'react';
 import Todo from './Todo';
-import { ActionDispatcher, Task } from '../module';
+
+const styles = (windowWidth) => { return {
+  timeline: {
+    backgroundColor: '#fffff9',
+    height: '60%',
+    fontSize: '16px',
+    padding: '0px',
+  },
+}}
 
 export default class TodoList extends React.Component<Props,{}> {
+  componentWillMount(){
+    this.styles = styles(screen.width);
+  }
+
   render() {
     const tasks = this.props.value.tasks
       .map( (a,idx) =>
@@ -13,7 +25,7 @@ export default class TodoList extends React.Component<Props,{}> {
             actions={this.props.actions}
           /> )
     return (
-      <div>
+      <div style={this.styles.timeline}>
         {tasks}
       </div>
     );

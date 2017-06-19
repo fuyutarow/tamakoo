@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import type {CounterState, ActionDispatcher} from "../module"
-import RaisedButton from 'material-ui/RaisedButton';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import {Link, Route} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Image from 'react-image-resizer';
+
+import { CounterState, ActionDispatcher } from "../module"
+import Bar from './bar';
 
 import { styleOn } from './css';
 interface Props {
@@ -43,13 +42,13 @@ export class Face extends React.Component<void, Props, void> {
         <Link to='/thread' style={styles.button} ref="echobtn" onClick={e=>this.toot()}>
           <img draggable="false" style={styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
         </Link>
+        <Bar value={this.props.value} actions={this.props.actions} />
       </div>
     )
   }
 
   componentDidMount() {
     if( ('webkitSpeechRecognition' in window) ){
-
       speech.start();
       speech.onresult = e => {
         for( let i = e.resultIndex; i < e.results.length; ++i ){

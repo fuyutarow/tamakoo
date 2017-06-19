@@ -6,12 +6,6 @@ export const styleOn = (windowWidth) =>  {
         backgroundColor: '#fffff9',
         color: 'rgba(0, 0, 0, 0.87)',
       },
-      timeline: {
-        backgroundColor: '#fffff9',
-        height: '60%',
-        fontSize: '16px',
-        padding: '0px',
-      },
       nowToot: {
         padding: '10px',
         color: 'rgba(0, 0, 0, 0.87)',
@@ -52,28 +46,6 @@ export const styleOn = (windowWidth) =>  {
       ln: {
         padding: '5px',
         margin: '0px',
-      },
-      bar: {
-        color: 'rgba(0, 0, 0, 0.87)',
-        backgroundColor: 'rgb(0, 188, 212)',
-        transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
-        boxSizing: 'border-box',
-        fontFamily: 'Roboto, sans-serif',
-        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
-        borderRadius: '0px',
-        position: 'fixed',
-        zIndex: '9999',
-        width: '100vw',
-        height: '50px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        bottom: 0,
-        overflow: 'hidden',
-      },
-      newTab: {
-        width: '30px',
-        height: '30px',
       },
       checkbox: {
         marginBottom: 16,

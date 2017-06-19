@@ -6,8 +6,10 @@ gdb = GraphDatabase(url)
 from datetime import datetime
 
 now = datetime.now().strftime("%Y%m%dT%H%M%S")
-fname = '/home/tamakoo/dump/tamakoo.'+now+'.dump.csv'
-f= open(fname,'w')
+chkpoint_fname = '/home/tamakoo/dump/tamakoo.dump.{}.tsv'.format(now)
+cf = open(chkpoint_fname,'w')
+running_fname = '/home/tamakoo/dump/tamakoo.dump.running.tsv'
+rf = open(running_fname,'w')
 results = gdb.query('\
     MATCH p=(a)-[r:Toot]->(b) RETURN\
     ID(a) as user_id, a.name as user_name, r.when as toot_when,\
@@ -15,5 +17,6 @@ results = gdb.query('\
     ')
 for result in results:
     result = [ str(e) for e in result]
-    line = ','.join(result)+'\n'
-    f.write(line)
+    line = '\t'.join(result)+'\n'
+    rf.write(line)
+    cf.write(line)
