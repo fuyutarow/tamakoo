@@ -3056,7 +3056,15 @@ var INIT_STATE = 'counter/init_state';
 var initialState = {
   tasks: [],
   phase: 'ground',
-  userInfo: { user_id: null, user_name: null, nuser_bio: null }
+  userInfo: { user_id: null, user_name: null, nuser_bio: null },
+  loginUser: {
+    id: 10,
+    alias: 'test_user',
+    name: 'test_user',
+    bio: 'I am test user.',
+    color: '#3210561',
+    since: '20170619T234108+0900'
+  }
 };
 
 function reducer() {
@@ -3079,16 +3087,16 @@ function reducer() {
       }
 
     case TOOT:
-      var nextTasks = action.text.split('\n').slice(0, self.length - 1).map(function (a) {
-        console.log('$', a.split('\t'));
+      var nextTasks = action.cards.map(function (a) {
         return {
-          user_id: a.split('\t')[0],
-          user_name: a.split('\t')[1],
-          toot_when: a.split('\t')[2],
-          card_id: a.split('\t')[3],
-          text: a.split('\t')[4],
-          url: a.split('\t')[5],
-          mode: a.split('\t')[6] };
+          user_id: a.user_id,
+          user_name: a.user_name,
+          toot_when: a.toot_when,
+          card_id: a.card_id,
+          text: a.text,
+          url: a.url,
+          mode: a.mode
+        };
       });
       return Object.assign({}, state, {
         tasks: state.tasks.concat(nextTasks)
@@ -3096,28 +3104,37 @@ function reducer() {
 
     case ADD_TASK:
       // css -> css-in-js
-      var lis = action.text.split("-");
-      var out = lis[0];
-      lis.slice(1).map(function (a) {
-        out += a[0].toUpperCase() + a.slice(1);
-      });
-      out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',\n");
+      var css2js = function css2js(css) {
+        var lis = css.split("-");
+        var out = lis[0];
+        lis.slice(1).map(function (a) {
+          out += a[0].toUpperCase() + a.slice(1);
+        });
+        out = out.replace(/: /g, ":").replace(/:/g, ": '").replace(/ ;/g, ";").replace(/;/g, "',\n");
+        return out;
+      };
       return Object.assign({}, state, {
         tasks: state.tasks.concat([{
           card_id: -1,
-          text: out,
-          url: 'Noen',
-          mode: 'toot' }])
+          text: css2js(action.text),
+          url: 'None',
+          mode: 'tooted' }])
       });
 
     case INSERT_TASK:
       console.log('insert');
-      var insertedTasks = state.tasks;
+      var insertedTasks = state.tasks.map(function (a) {
+        if (a['mode'] == 'tooted') {
+          a['mode'] = 'block';
+        }
+        return a;
+      });
+      console.log('***', insertedTasks);
       insertedTasks.splice(action.order + 1, 0, {
         card_id: -1,
         text: action.text,
         url: 'Noen',
-        mode: 'toot'
+        mode: 'tooted'
       });
       return Object.assign({}, state, { tasks: insertedTasks });
 
@@ -3135,9 +3152,10 @@ function reducer() {
 
     case ANSWER_USER:
       var info = {
-        user_id: action.text.split('\t')[0],
-        user_name: action.text.split('\t')[1],
-        user_bio: action.text.split('\t')[2]
+        user_id: action.user.id,
+        user_alias: action.user.alias,
+        user_name: action.user.name,
+        user_bio: action.user.bio
       };
       return Object.assign({}, state, { userInfo: info });
 
@@ -3181,61 +3199,66 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
             switch (_context.prev = _context.next) {
               case 0:
                 this.dispatch({ type: INIT_STATE });
+                console.log('%%%', text);
                 this.dispatch({ type: ADD_TASK, text: text });
                 this.dispatch({ type: FETCH_REQUEST_START });
 
-                url = '/api/toot/' + encodeURI(text);
-                _context.prev = 4;
-                _context.next = 7;
+                url = '/api/toot/' + encodeURI(JSON.stringify({
+                  user_id: 10,
+                  toot_text: text
+                }));
+                _context.prev = 5;
+                _context.next = 8;
                 return fetch(url, {
                   method: 'GET',
                   headers: this.myHeaders
                 });
 
-              case 7:
+              case 8:
                 response = _context.sent;
 
+                console.log();
+
                 if (!(response.status === 200)) {
-                  _context.next = 16;
+                  _context.next = 17;
                   break;
                 }
 
-                _context.next = 11;
+                _context.next = 13;
                 return response.json();
 
-              case 11:
+              case 13:
                 json = _context.sent;
 
-                console.log('#', json.text);
-                this.dispatch({ type: TOOT, text: json.text });
-                _context.next = 17;
+                this.dispatch({ type: TOOT, cards: json.cards });
+                _context.next = 18;
                 break;
-
-              case 16:
-                throw new Error('illegal status code: ' + response.status);
 
               case 17:
-                _context.next = 22;
+                throw new Error('illegal status code: ' + response.status);
+
+              case 18:
+                _context.next = 23;
                 break;
 
-              case 19:
-                _context.prev = 19;
-                _context.t0 = _context['catch'](4);
+              case 20:
+                _context.prev = 20;
+                _context.t0 = _context['catch'](5);
 
                 console.error(_context.t0);
 
-              case 22:
-                _context.prev = 22;
+              case 23:
+                _context.prev = 23;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context.finish(22);
+                return _context.finish(23);
 
-              case 25:
+              case 26:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, this, [[4, 19, 22, 25]]);
+        }, _callee, this, [[5, 20, 23, 26]]);
       }));
 
       function toot(_x2) {
@@ -3332,7 +3355,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 response = _context3.sent;
 
                 if (!(response.status === 200)) {
-                  _context3.next = 15;
+                  _context3.next = 16;
                   break;
                 }
 
@@ -3344,35 +3367,36 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 11:
                 json = _context3.sent;
 
-                this.dispatch({ type: TOOT, text: json.text });
-                _context3.next = 16;
+                console.log(json);
+                this.dispatch({ type: TOOT, cards: json.cards });
+                _context3.next = 17;
                 break;
-
-              case 15:
-                throw new Error('illegal status code: ' + response.status);
 
               case 16:
-                _context3.next = 21;
+                throw new Error('illegal status code: ' + response.status);
+
+              case 17:
+                _context3.next = 22;
                 break;
 
-              case 18:
-                _context3.prev = 18;
+              case 19:
+                _context3.prev = 19;
                 _context3.t0 = _context3['catch'](3);
 
                 console.error(_context3.t0);
 
-              case 21:
-                _context3.prev = 21;
+              case 22:
+                _context3.prev = 22;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context3.finish(21);
+                return _context3.finish(22);
 
-              case 24:
+              case 25:
               case 'end':
                 return _context3.stop();
             }
           }
-        }, _callee3, this, [[3, 18, 21, 24]]);
+        }, _callee3, this, [[3, 19, 22, 25]]);
       }));
 
       function callCard(_x6) {
@@ -3391,7 +3415,6 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
             switch (_context4.prev = _context4.next) {
               case 0:
                 this.dispatch({ type: FETCH_REQUEST_START });
-
                 url = '/api/askUser/' + user_id;
                 _context4.prev = 2;
                 _context4.next = 5;
@@ -3414,7 +3437,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 9:
                 json = _context4.sent;
 
-                this.dispatch({ type: ANSWER_USER, text: json.text });
+                this.dispatch({ type: ANSWER_USER, user: json.user });
                 _context4.next = 14;
                 break;
 
@@ -3486,7 +3509,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 10:
                 json = _context5.sent;
 
-                this.dispatch({ type: TOOT, text: json.text });
+                this.dispatch({ type: TOOT, cards: json.cards });
                 _context5.next = 15;
                 break;
 
@@ -18713,12 +18736,15 @@ var Todo = function (_React$Component) {
       var _this2 = this;
 
       var styles = (0, _css.styleOn)(screen.width);
-      var cardStyle = this.props.task.mode == 'toot' || this.props.task.mode == 'called' ? styles.nowToot : styles.card;
 
-      var userLeft = React.createElement(_reactRouterDom.Link, { to: '/user/' + this.props.task.user_id, style: styles.userleft,
-        onClick: function onClick(e) {
-          _this2.props.actions.askUser(_this2.props.task.user_id);
-        } });
+      var userLeft = this.props.task.mode == 'winded' || this.props.task.mode == 'drawn' ? React.createElement(
+        'div',
+        { style: styles.userleft },
+        React.createElement(_reactRouterDom.Link, { to: '/user/' + this.props.task.user_id, style: styles.userleft,
+          onClick: function onClick(e) {
+            _this2.props.actions.askUser(_this2.props.task.user_id);
+          } })
+      ) : null;
 
       var textln = this.props.task.text.split('\n').map(function (m) {
         return React.createElement(
@@ -18732,7 +18758,7 @@ var Todo = function (_React$Component) {
         'div',
         { style: styles.toot },
         React.createElement('input', { style: styles.textarea, type: 'text', ref: 'note',
-          placeholder: '>>response' }),
+          placeholder: '>> response' }),
         React.createElement(
           _reactRouterDom.Link,
           { to: '/thread', style: styles.button, ref: 'echobtn', onClick: function onClick(e) {
@@ -18742,11 +18768,16 @@ var Todo = function (_React$Component) {
         )
       );
 
-      var cardCenter = this.props.task.mode == 'toot' ? React.createElement(
+      var cardCenter = this.props.task.mode == 'tooted' ? React.createElement(
         'p',
         { style: styles.cardcenter },
         textln,
         responseForm
+      ) : this.props.task.mode == 'winded' || this.props.task.mode == 'block' ? React.createElement(
+        'p',
+        { style: styles.cardcenter },
+        '^',
+        textln
       ) : this.props.task.mode == 'drawn' ? React.createElement(
         'p',
         { style: styles.cardcenter, onClick: function onClick(e) {
@@ -18773,12 +18804,11 @@ var Todo = function (_React$Component) {
 
       var copyRight = this.props.task.url == 'None' ? React.createElement('p', { style: styles.linkOff }) : React.createElement('p', { style: styles.linkOn });
 
+      var cardStyle = this.props.task.mode == 'tooted' || this.props.task.mode == 'block' || this.props.task.mode == 'called' ? styles.nowToot : this.props.task.mode == 'winded' || this.props.task.mode == 'drawn' ? styles.card : null;
+
       return React.createElement(
         'div',
-        {
-          style: cardStyle,
-          ref: 'card'
-        },
+        { style: cardStyle, ref: 'card' },
         userLeft,
         cardCenter,
         copyRight
@@ -31784,16 +31814,46 @@ var styles = function styles(windowWidth) {
       position: 'fixed',
       zIndex: '9999',
       width: '100vw',
-      height: '50px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      bottom: 0,
-      overflow: 'hidden'
+      height: '7vh',
+      //justifyContent: 'center',
+      //alignItems: 'center',
+      bottom: '0',
+      overflow: 'hidden',
+      left: '0',
+      display: 'grid',
+      gridTemplateColumns: '100px 100px 100px',
+      gridGap: '10vw'
+    },
+    login: {
+      backgroundColor: '#ddd',
+      width: '30vw',
+      height: '5vh',
+      left: '5vw',
+      borderRadius: '5px',
+      margin: '1vh 1vh 1vh 3vw',
+      //padding: '1vh 0 1vh 0',
+      fontSize: '16px',
+      display: 'table'
+    },
+    loginVertical: {
+      display: 'table-cell',
+      verticalAlign: 'middle'
+    },
+    loginHorizonal: {
+      marginLeft: 'auto',
+      marginRight: 'auto'
     },
     newTab: {
-      width: '30px',
-      height: '30px'
+      margin: '1vh 1vh 1vh -2.5vh',
+      position: 'fixed',
+      width: '5vh',
+      height: '5vh',
+      left: '50vw'
+
+    },
+    newTabBtn: {
+      width: '100%',
+      height: '100%'
     }
   };
 };
@@ -31817,16 +31877,37 @@ var Bar = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement(
+      var loginBtn = React.createElement(
         'div',
-        { style: this.styles.bar },
+        { style: this.styles.login },
+        React.createElement(
+          'div',
+          { style: this.styles.loginVertical },
+          React.createElement(
+            'div',
+            { style: this.styles.loginHorizonal },
+            this.props.value.loginUser.alias
+          )
+        )
+      );
+
+      var newTabBtn = React.createElement(
+        'div',
+        { style: this.styles.newTab },
         React.createElement(
           _reactRouterDom.Link,
           { to: '/', onClick: function onClick(e) {
               _this2.props.actions.initState();
             } },
-          React.createElement('img', { style: this.styles.newTab, src: _addButtonInsideBlackCircle2.default })
+          React.createElement('img', { style: this.styles.newTabBtn, src: _addButtonInsideBlackCircle2.default })
         )
+      );
+
+      return React.createElement(
+        'div',
+        { style: this.styles.bar },
+        loginBtn,
+        newTabBtn
       );
     }
   }]);
@@ -31981,7 +32062,6 @@ var Thread = exports.Thread = function (_React$Component) {
       return React.createElement(
         'div',
         { ref: 'ttt', style: this.styles.wall },
-        React.createElement(_cable2.default, null),
         React.createElement(_TodoList2.default, { value: this.props.value, actions: this.props.actions }),
         React.createElement(_bar2.default, { value: this.props.value, actions: this.props.actions })
       );
@@ -32119,16 +32199,46 @@ var styles = function styles(windowWidth) {
       position: 'fixed',
       zIndex: '9999',
       width: '100vw',
-      height: '50px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      bottom: 0,
-      overflow: 'hidden'
+      height: '7vh',
+      //justifyContent: 'center',
+      //alignItems: 'center',
+      bottom: '0',
+      overflow: 'hidden',
+      left: '0',
+      display: 'grid',
+      gridTemplateColumns: '100px 100px 100px',
+      gridGap: '10vw'
+    },
+    login: {
+      backgroundColor: '#ddd',
+      width: '30vw',
+      height: '5vh',
+      left: '5vw',
+      borderRadius: '5px',
+      margin: '1vh 1vh 1vh 3vw',
+      //padding: '1vh 0 1vh 0',
+      fontSize: '16px',
+      display: 'table'
+    },
+    loginVertical: {
+      display: 'table-cell',
+      verticalAlign: 'middle'
+    },
+    loginHorizonal: {
+      marginLeft: 'auto',
+      marginRight: 'auto'
     },
     newTab: {
-      width: '30px',
-      height: '30px'
+      margin: '1vh 1vh 1vh -2.5vh',
+      position: 'fixed',
+      width: '5vh',
+      height: '5vh',
+      left: '50vw'
+
+    },
+    newTabBtn: {
+      width: '100%',
+      height: '100%'
     }
   };
 };
@@ -32152,16 +32262,37 @@ var Bar = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement(
+      var loginBtn = React.createElement(
         'div',
-        { style: this.styles.bar },
+        { style: this.styles.login },
+        React.createElement(
+          'div',
+          { style: this.styles.loginVertical },
+          React.createElement(
+            'div',
+            { style: this.styles.loginHorizonal },
+            this.props.value.loginUser.alias
+          )
+        )
+      );
+
+      var newTabBtn = React.createElement(
+        'div',
+        { style: this.styles.newTab },
         React.createElement(
           _reactRouterDom.Link,
           { to: '/', onClick: function onClick(e) {
               _this2.props.actions.initState();
             } },
-          React.createElement('img', { style: this.styles.newTab, src: _addButtonInsideBlackCircle2.default })
+          React.createElement('img', { style: this.styles.newTabBtn, src: _addButtonInsideBlackCircle2.default })
         )
+      );
+
+      return React.createElement(
+        'div',
+        { style: this.styles.bar },
+        loginBtn,
+        newTabBtn
       );
     }
   }]);
@@ -32292,7 +32423,7 @@ var Todo = function (_React$Component) {
       var _this2 = this;
 
       var styles = (0, _css.styleOn)(screen.width);
-      var cardStyle = this.props.task.mode == 'toot' || this.props.task.mode == 'called' ? styles.nowToot : styles.card;
+      var cardStyle = this.props.task.mode == 'tooted' || this.props.task.mode == 'called' ? styles.nowToot : styles.card;
 
       var userLeft = React.createElement(
         _reactRouterDom.Link,
@@ -32577,16 +32708,46 @@ var styles = function styles(windowWidth) {
       position: 'fixed',
       zIndex: '9999',
       width: '100vw',
-      height: '50px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      bottom: 0,
-      overflow: 'hidden'
+      height: '7vh',
+      //justifyContent: 'center',
+      //alignItems: 'center',
+      bottom: '0',
+      overflow: 'hidden',
+      left: '0',
+      display: 'grid',
+      gridTemplateColumns: '100px 100px 100px',
+      gridGap: '10vw'
+    },
+    login: {
+      backgroundColor: '#ddd',
+      width: '30vw',
+      height: '5vh',
+      left: '5vw',
+      borderRadius: '5px',
+      margin: '1vh 1vh 1vh 3vw',
+      //padding: '1vh 0 1vh 0',
+      fontSize: '16px',
+      display: 'table'
+    },
+    loginVertical: {
+      display: 'table-cell',
+      verticalAlign: 'middle'
+    },
+    loginHorizonal: {
+      marginLeft: 'auto',
+      marginRight: 'auto'
     },
     newTab: {
-      width: '30px',
-      height: '30px'
+      margin: '1vh 1vh 1vh -2.5vh',
+      position: 'fixed',
+      width: '5vh',
+      height: '5vh',
+      left: '50vw'
+
+    },
+    newTabBtn: {
+      width: '100%',
+      height: '100%'
     }
   };
 };
@@ -32610,16 +32771,37 @@ var Bar = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return React.createElement(
+      var loginBtn = React.createElement(
         'div',
-        { style: this.styles.bar },
+        { style: this.styles.login },
+        React.createElement(
+          'div',
+          { style: this.styles.loginVertical },
+          React.createElement(
+            'div',
+            { style: this.styles.loginHorizonal },
+            this.props.value.loginUser.alias
+          )
+        )
+      );
+
+      var newTabBtn = React.createElement(
+        'div',
+        { style: this.styles.newTab },
         React.createElement(
           _reactRouterDom.Link,
           { to: '/', onClick: function onClick(e) {
               _this2.props.actions.initState();
             } },
-          React.createElement('img', { style: this.styles.newTab, src: _addButtonInsideBlackCircle2.default })
+          React.createElement('img', { style: this.styles.newTabBtn, src: _addButtonInsideBlackCircle2.default })
         )
+      );
+
+      return React.createElement(
+        'div',
+        { style: this.styles.bar },
+        loginBtn,
+        newTabBtn
       );
     }
   }]);

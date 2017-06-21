@@ -14,16 +14,46 @@ const styles = (windowWidth) => { return {
     position: 'fixed',
     zIndex: '9999',
     width: '100vw',
-    height: '50px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    bottom: 0,
+    height: '7vh',
+    //justifyContent: 'center',
+    //alignItems: 'center',
+    bottom: '0',
     overflow: 'hidden',
+    left: '0',
+    display: 'grid',
+    gridTemplateColumns: '100px 100px 100px',
+    gridGap: '10vw',
+  },
+  login: {
+    backgroundColor: '#ddd',
+    width: '30vw',
+    height: '5vh',
+    left: '5vw',
+    borderRadius: '5px',
+    margin: '1vh 1vh 1vh 3vw',
+    //padding: '1vh 0 1vh 0',
+    fontSize: '16px',
+    display: 'table',
+  },
+  loginVertical: {
+    display: 'table-cell',
+    verticalAlign: 'middle',
+  },
+  loginHorizonal: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   newTab: {
-    width: '30px',
-    height: '30px',
+    margin: '1vh 1vh 1vh -2.5vh',
+    position: 'fixed',
+    width: '5vh',
+    height: '5vh',
+    left: '50vw',
+
+  },
+  newTabBtn: {
+    width: '100%',
+    height: '100%',
   },
 }}
 
@@ -33,13 +63,28 @@ export default class Bar extends React.Component<Props,{}> {
   }
 
   render() {
+    const loginBtn =
+      <div style={this.styles.login}>
+        <div style={this.styles.loginVertical}>
+          <div style={this.styles.loginHorizonal}>
+            {this.props.value.loginUser.alias}
+          </div>
+        </div>
+      </div>
+
+    const newTabBtn =
+      <div  style={this.styles.newTab}>
+        <Link to='/' onClick={e=>{
+            this.props.actions.initState()
+        }}>
+          <img style={this.styles.newTabBtn} src={AddButtonSVG} />
+        </Link>
+      </div>
+
     return (
       <div style={this.styles.bar}>
-        <Link to='/' onClick={e=>{
-          this.props.actions.initState()
-        }}>
-          <img style={this.styles.newTab} src={AddButtonSVG} />
-        </Link>
+        {loginBtn}
+        {newTabBtn}
       </div>
     );
   }

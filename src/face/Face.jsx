@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import Image from 'react-image-resizer';
 
-import { CounterState, ActionDispatcher } from "../module"
+import { CounterState, ActionDispatcher } from "../module";
 import Bar from './bar';
 
 import { styleOn } from './css';
@@ -29,9 +29,9 @@ export class Face extends React.Component<void, Props, void> {
 
   render() {
 
-    console.log("window width: ",window.innerWidth)
-    console.log("screen width: ",screen.width,screen.height)
-    console.log("client width: ",document.documentElement.clientWidth)
+    console.log("window width: ",window.innerWidth);
+    console.log("screen width: ",screen.width,screen.height);
+    console.log("client width: ",document.documentElement.clientWidth);
 
     const styles = styleOn(screen.width);
 

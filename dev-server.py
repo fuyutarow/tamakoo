@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory
 import os
+import json
+
 import secure
 from neo4jrestclient.client import GraphDatabase
 url = secure.url
@@ -36,27 +38,38 @@ def face():
 def favicon():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
 
-@api.route('/api/toot/<string:toot_text>', methods=['GET'])
-def api_toot(toot_text):
-    user_id = 10
+@api.route('/api/toot/<string:state>', methods=['GET'])
+def api_toot(state):
+    state = json.loads(state)
+    user_id = state['user_id']
+    toot_text = state['toot_text']
     now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
     access = 'public'
     since = now
     gdb.query('\
         MATCH (a:User) WHERE ID(a)=%s\
-        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s"})'\
-        %(user_id,now,toot_text), data_contents=True)
+        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",since:"%s",access:"%s"})'\
+        %(user_id,now,toot_text,since,access), data_contents=True)
 
     vec = model.infer_vector(wakati(toot_text))
     sims = cosine_similarity([vec], doc_vecs)
     index = np.argsort(sims[0])[::-1]
-    res_text = ''
+    lines = []
     for i in range(20):
-        line = '\t'.join( doc[index[i]][:-1].split('\t')+['drawn'] ) + '\n'
-        res_text += line
-        result = {
-            'text': res_text
-            }
+        line = doc[index[i]][:-1].split('\t')
+        line = {
+            'user_id': line[0],
+            'user_name': line[1],
+            'toot_when': line[2],
+            'card_id': line[3],
+            'text': line[4],
+            'url': line[5],
+            'mode':'drawn'
+        }
+        lines.append(line)
+    result = {
+        'cards': lines
+        }
     return make_response(jsonify(result))
 
 @api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
@@ -75,26 +88,46 @@ def api_anchor(anchor_text):
 
 @api.route('/api/callCard/<int:card_id>', methods=['GET'])
 def api_callCard(card_id):
+    print(card_id)
     cnt_cards = 0
     now_id = card_id
 
-    user_id, user_name, when, card_id, card_text, card_url = gdb.query('\
+    #user_id, user_name, when, card_id, card_text, card_url
+    line = gdb.query('\
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
         '.format(now_id))[0]
-    now_line = '\t'.join([str(user_id), user_name, when, str(card_id), card_text, 'None' if card_url==None else card_url, 'called'])
+    now_line = {
+        'user_id':line[0],
+        'user_name':line[1],
+        'toot_when':line[2],
+        'card_id':line[3],
+        'text':line[4],
+        'url':'None' if line[5]==None else line[5],
+        'mode':'called',
+    }
     cnt_cards+=1
+    print(cnt_cards)
+
 
     pre_id = now_id
     pre_lines = []
     for i in range(100):
         try:
-            user_id, user_name, when, pre_id, pre_text, pre_url = gdb.query('\
+            line = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(pre_id))[0]
-            line = '\t'.join([str(user_id), user_name, when, str(pre_id), pre_text, 'None' if pre_url==None else pre_url, 'drawn'])
-            pre_lines.append(line)
+            pre_lines.append({
+                'user_id':line[0],
+                'user_name':line[1],
+                'toot_when':line[2],
+                'card_id':line[3],
+                'text':line[4],
+                'url':'None' if line[5]==None else line[5],
+                'mode':'winded',
+            })
+            pre_id = line[3]
             cnt_cards+=1
         except:
             break
@@ -103,59 +136,111 @@ def api_callCard(card_id):
     next_lines = []
     for i in range(100):
         try:
-            user_id, user_name, when, next_id, next_text, next_url = gdb.query('\
-                MATCH p=(a)<-[r:Anchor]-(b)<-[t:Toot]-(c) WHERE ID(a)={}\
+            line = gdb.query('\
+                MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(next_id))[0]
-            line = '\t'.join([str(user_id), user_name, when, str(next_id), next_text, 'None' if next_url==None else next_url, 'drawn'])
-            next_lines.append(line)
+            next_lines.append({
+                'user_id':line[0],
+                'user_name':line[1],
+                'toot_when':line[2],
+                'card_id':line[3],
+                'text':line[4],
+                'url':'None' if line[5]==None else line[5],
+                'mode':'winded',
+            })
+            next_id = line[3]
             cnt_cards+=1
+            print(cnt_cards)
         except:
             break
-
 
     drawn_lines = []
     if cnt_cards < 100:
         vec = model.infer_vector(wakati(toot_text))
         sims = cosine_similarity([vec], doc_vecs)
         index = np.argsort(sims[0])[::-1]
-        res_text = ''
         while cnt_cards < 100:
-            line = '\t'.join( doc[index[i]][:-1].split('\t')+['drawn'] ) + '\n'
-            drawn_lines.append(line)
+            line = doc[index[i]][:-1].split('\t')
+            drawn_lines.append({
+                'user_id': line[0],
+                'user_name': line[1],
+                'toot_when': line[2],
+                'card_id': line[3],
+                'text': line[4],
+                'url': line[5],
+                'mode':'drawn'
+            })
             cnt_cards+=1
-
+            print(cnt_cards)
 
     lines = pre_lines[::-1] + [now_line] + next_lines + drawn_lines
-    res_text = '\n'.join(lines)
+
+    print(lines)
     result = {
-        'text': res_text
+        'cards': lines
         }
     return make_response(jsonify(result))
 
 @api.route('/api/askUser/<int:user_id>', methods=['GET'])
 def api_askUser(user_id):
-    user_id, user_name, user_bio = gdb.query('\
-        MATCH (a:User) WHERE ID(a)={} RETURN ID(a), a.name, a.bio\
+    line = gdb.query('\
+        MATCH (a:User) WHERE ID(a)={}\
+        RETURN ID(a), a.alias, a.name, a.bio\
         '.format(user_id))[0]
+    user =  {
+        'id': line[0],
+        'alias': line[1],
+        'name': line[2],
+        'bio': 'None' if line[3]==None else line[3],
+    }
     result = {
-        'text': '\t'.join([str(user_id), user_name, 'None' if user_bio==None else user_bio])
+        'user': user
     }
     return  make_response(jsonify(result))
 
 @api.route('/api/hisToot/<int:user_id>', methods=['GET'])
 def api_hisToot(user_id):
-    res_text = ''
+    cnt_cards = 0
+    lines = []
     for line in gdb.query('\
         MATCH p=(a)-[r:Toot]->(b) WHERE ID(a)={}\
         RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 200\
         '.format(user_id)):
+        lines.append({
+            'user_id': line[0],
+            'user_name': line[1],
+            'toot_when': line[2],
+            'card_id': line[3],
+            'text': line[4],
+            'url': line[5],
+            'mode':'drawn'
+        })
+        cnt_cards+=1
+        print(cnt_cards)
 
-        user_id, user_name, toot_when, card_id, card_text, card_url = line
-        line = '\t'.join([str(user_id), user_name, toot_when, str(card_id), card_text, 'None' if card_url==None else card_url, 'drawn'])
-        res_text+=line+'\n'
+    if cnt_cards < 100:
+        vec = model.infer_vector(wakati(toot_text))
+        sims = cosine_similarity([vec], doc_vecs)
+        index = np.argsort(sims[0])[::-1]
+        i = 0
+        while cnt_cards < 100:
+            line = doc[index[i]][:-1].split('\t')
+            drawn_lines.append({
+                'user_id': line[0],
+                'user_name': line[1],
+                'toot_when': line[2],
+                'card_id': line[3],
+                'text': line[4],
+                'url': line[5],
+                'mode':'drawn'
+            })
+            i+=1
+            cnt_cards+=1
+            print(cnt_cards)
+
     result = {
-        'text': res_text
+        'cards': lines
         }
     return make_response(jsonify(result))
 

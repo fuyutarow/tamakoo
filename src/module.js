@@ -21,6 +21,7 @@ export interface CounterState {
   tasks: Task[];
   phase: string;
   userInfo: any;
+  loginUser: any;
 }
 
 export type ActionTypes =
@@ -33,6 +34,14 @@ const initialState:CounterState = {
   tasks: [],
   phase: 'ground',
   userInfo: {user_id:null, user_name:null, nuser_bio:null},
+  loginUser: {
+    id:10,
+    alias:'test_user',
+    name:'test_user',
+    bio:'I am test user.',
+    color:'#3210561',
+    since:'20170619T234108+0900'
+  },
 };
 
 export default function reducer (
@@ -53,46 +62,54 @@ export default function reducer (
     }
 
     case TOOT:
-      const nextTasks = action.text.split('\n')
-        .slice(0,self.length-1)
-        .map( a => {
-          console.log('$',a.split('\t'))
-          return {
-          user_id:a.split('\t')[0],
-          user_name:a.split('\t')[1],
-          toot_when:a.split('\t')[2],
-          card_id:a.split('\t')[3],
-          text:a.split('\t')[4],
-          url:a.split('\t')[5],
-          mode:a.split('\t')[6]} });
+      const nextTasks = action.cards
+        .map( a => { return {
+          user_id:a.user_id,
+          user_name:a.user_name,
+          toot_when:a.toot_when,
+          card_id:a.card_id,
+          text:a.text,
+          url:a.url,
+          mode:a.mode
+        }});
       return Object.assign({}, state, {
         tasks:state.tasks.concat(nextTasks)
       });
 
     case ADD_TASK:// css -> css-in-js
-      let lis = action.text.split("-");
-      let out = lis[0]
-      lis.slice(1)
-        .map( a => { out+=a[0].toUpperCase()+a.slice(1) })
-      out = out
-        .replace(/: /g, ":").replace(/:/g, ": '")
-        .replace(/ ;/g, ";").replace(/;/g, "',\n")
+      const css2js = (css) => {
+        let lis = css.split("-");
+        let out = lis[0]
+        lis.slice(1)
+          .map( a => { out+=a[0].toUpperCase()+a.slice(1) })
+        out = out
+          .replace(/: /g, ":").replace(/:/g, ": '")
+          .replace(/ ;/g, ";").replace(/;/g, "',\n");
+        return out
+      }
       return Object.assign({}, state, {
         tasks: state.tasks.concat( [{
           card_id: -1,
-          text:out,
-          url:'Noen',
-          mode:'toot'}] )
+          text:css2js(action.text),
+          url:'None',
+          mode:'tooted'}] )
       });
 
     case INSERT_TASK:
       console.log('insert')
-      let insertedTasks = state.tasks;
+      let insertedTasks = state.tasks
+        .map( a => {
+          if(a['mode']=='tooted'){
+            a['mode'] = 'block';
+          }
+          return a;
+        })
+      console.log('***',insertedTasks)
       insertedTasks.splice(action.order+1,0, {
         card_id: -1,
         text: action.text,
         url: 'Noen',
-        mode:'toot'
+        mode:'tooted',
       })
       return Object.assign({}, state, { tasks: insertedTasks });
 
@@ -110,9 +127,10 @@ export default function reducer (
 
     case ANSWER_USER:
       const info = {
-        user_id: action.text.split('\t')[0],
-        user_name: action.text.split('\t')[1],
-        user_bio: action.text.split('\t')[2],
+        user_id: action.user.id,
+        user_alias: action.user.alias,
+        user_name: action.user.name,
+        user_bio: action.user.bio,
       }
       return Object.assign({}, state, { userInfo: info });
 
@@ -150,19 +168,23 @@ export class ActionDispatcher {
 
   async toot( text: string ): Promise<void> {
     this.dispatch({ type:INIT_STATE })
+    console.log('%%%',text)
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
-    const url = '/api/toot/'+encodeURI(text)
+    const url = '/api/toot/'+encodeURI(JSON.stringify({
+      user_id: 10,
+      toot_text: text,
+    }))
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
         headers: this.myHeaders,
       })
+      console.log()
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        console.log('#',json.text)
-        this.dispatch({ type:TOOT, text:json.text });
+        this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -208,7 +230,8 @@ export class ActionDispatcher {
       if (response.status === 200) { //2xx
         this.dispatch({ type:CLEAR_CARDS })
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:TOOT, text:json.text });
+        console.log(json)
+        this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -221,7 +244,6 @@ export class ActionDispatcher {
 
   async askUser( user_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
-
     const url = '/api/askUser/'+user_id;
     try {
       const response:Response = await fetch(url, {
@@ -230,7 +252,7 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:ANSWER_USER, text:json.text });
+        this.dispatch({ type:ANSWER_USER, user:json.user });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -253,7 +275,7 @@ export class ActionDispatcher {
       if (response.status === 200) { //2xx
         this.dispatch({ type:CLEAR_CARDS })
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:TOOT, text:json.text });
+        this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }

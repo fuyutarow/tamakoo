@@ -29,15 +29,17 @@ export default class Todo extends React.Component<Props, void> {
 
   render() {
     const styles = styleOn(screen.width);
-    const cardStyle = this.props.task.mode=='toot' || this.props.task.mode=='called' ?
-      styles.nowToot : styles.card;
 
     const userLeft =
-      <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}
-        onClick={e=>{
-          this.props.actions.askUser(this.props.task.user_id)
-      }}>
-      </Link>
+      this.props.task.mode=='winded'|| this.props.task.mode=='drawn'?
+        <div style={styles.userleft}>
+          <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}
+            onClick={e=>{
+              this.props.actions.askUser(this.props.task.user_id)
+          }}>
+          </Link>
+        </div>
+      :null
 
     const textln = this.props.task.text.split('\n')
       .map( m => (<p style={styles.ln}>{m}</p>) )
@@ -52,11 +54,17 @@ export default class Todo extends React.Component<Props, void> {
       </div>
 
     const cardCenter =
-      this.props.task.mode=='toot'?
+      this.props.task.mode=='tooted'?
         <p style={styles.cardcenter}>
           { textln }
           { responseForm }
         </p>
+
+      :this.props.task.mode=='winded' || this.props.task.mode=='block'?
+          <p style={styles.cardcenter}>
+            ^
+            { textln }
+          </p>
 
       :this.props.task.mode=='drawn' ?
         <p style={styles.cardcenter} onClick={e=>{
@@ -83,11 +91,16 @@ export default class Todo extends React.Component<Props, void> {
        :
        <p style={styles.linkOn}></p>
 
+
+   const cardStyle =
+    this.props.task.mode=='tooted' || this.props.task.mode=='block' || this.props.task.mode=='called' ?
+      styles.nowToot
+    :this.props.task.mode=='winded' || this.props.task.mode=='drawn' ?
+      styles.card
+    :null;
+
     return (
-      <div
-        style={cardStyle}
-        ref='card'
-      >
+      <div style={cardStyle} ref='card'>
         {userLeft}
         {cardCenter}
         {copyRight}

@@ -22,7 +22,7 @@ export default class Todo extends React.Component<Props, void> {
   render() {
 
     const styles = styleOn(screen.width);
-    const cardStyle = this.props.task.mode=='toot' || this.props.task.mode=='called' ?
+    const cardStyle = this.props.task.mode=='tooted' || this.props.task.mode=='called' ?
       styles.nowToot : styles.card;
 
     const userLeft =

@@ -25,7 +25,6 @@ export class Thread extends React.Component<void, Props, void> {
   render() {
     return (
       <div ref='ttt' style={this.styles.wall}>
-        <Cable/>
         <TodoList value={this.props.value} actions={this.props.actions} />
         <Bar value={this.props.value} actions={this.props.actions} />
       </div>
