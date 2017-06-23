@@ -16,12 +16,15 @@ const CLEAR_CARDS = 'counter/clear_cards';
 const CALL = 'counter/call';
 const ANSWER_USER = 'counter/answer_user';
 const INIT_STATE = 'counter/init_state'
+const LOGIN = 'counter/login'
+
 
 export interface CounterState {
   tasks: Task[];
   phase: string;
   userInfo: any;
-  loginUser: any;
+  loginAccount: any;
+  hasAccounts: any;
 }
 
 export type ActionTypes =
@@ -34,14 +37,21 @@ const initialState:CounterState = {
   tasks: [],
   phase: 'ground',
   userInfo: {user_id:null, user_name:null, nuser_bio:null},
-  loginUser: {
-    id:10,
-    alias:'test_user',
-    name:'test_user',
-    bio:'I am test user.',
-    color:'#3210561',
+  loginAccount: {
+    id:1,
+    alias:'tamako',
+    name:'たまこ',
+    bio:'welcome tamakoo',
+    color:'#'+Math.floor(Math.random()*parseInt('ffffff',16)).toString(16),
     since:'20170619T234108+0900'
   },
+  hasAccounts: [
+    {id:1, alias:'tamako'},
+    {id:10, alias:'test_user10'},
+    {id:11, alias:'test_user11'},
+    {id:12, alias:'test_user12'},
+    {id:13, alias:'test_user13'},
+  ]
 };
 
 export default function reducer (
@@ -141,6 +151,10 @@ export default function reducer (
       let calledCard = state.tasks[action.order]
       calledCard['mode'] = 'called'
       return Object.assign({}, state, { tasks:[calledCard] });
+
+    case LOGIN:
+      console.log("@@",action.account)
+      return Object.assign({}, state, { loginAccount:action.account });
 
     default:
       return state
@@ -244,7 +258,7 @@ export class ActionDispatcher {
 
   async askUser( user_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
-    const url = '/api/askUser/'+user_id;
+    const url = '/api/askAccount/'+user_id;
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
@@ -252,7 +266,7 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:ANSWER_USER, user:json.user });
+        this.dispatch({ type:ANSWER_USER, user:json.account });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -285,5 +299,28 @@ export class ActionDispatcher {
       this.dispatch({ type:FETCH_REQUEST_FINISH });
     }
   }
+
+  async login( account_id:number ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/askAccount/'+account_id;
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:LOGIN, account:json.account });
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
 
 }

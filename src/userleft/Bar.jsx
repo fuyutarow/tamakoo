@@ -67,7 +67,7 @@ export default class Bar extends React.Component<Props,{}> {
       <div style={this.styles.login}>
         <div style={this.styles.loginVertical}>
           <div style={this.styles.loginHorizonal}>
-            {this.props.value.loginUser.alias}
+            {this.props.value.loginAccount.alias}
           </div>
         </div>
       </div>

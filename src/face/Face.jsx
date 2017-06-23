@@ -6,7 +6,7 @@ import Image from 'react-image-resizer';
 
 import { CounterState, ActionDispatcher } from "../module";
 import Bar from './bar';
-
+import Tool from './Tool';
 import { styleOn } from './css';
 interface Props {
   value: CounterState;
@@ -27,6 +27,12 @@ export class Face extends React.Component<void, Props, void> {
     note.value = "";
   }
 
+  componentWillUpdate(){
+    console.log('^^^',this.props.value)
+
+  }
+
+
   render() {
 
     console.log("window width: ",window.innerWidth);
@@ -34,7 +40,7 @@ export class Face extends React.Component<void, Props, void> {
     console.log("client width: ",document.documentElement.clientWidth);
 
     const styles = styleOn(screen.width);
-
+//    <Bar value={this.props.value} actions={this.props.actions} />
     return (
       <div style={styles.toot}>
         <input style={styles.textarea} type='text' ref='note'
@@ -42,7 +48,7 @@ export class Face extends React.Component<void, Props, void> {
         <Link to='/thread' style={styles.button} ref="echobtn" onClick={e=>this.toot()}>
           <img draggable="false" style={styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
         </Link>
-        <Bar value={this.props.value} actions={this.props.actions} />
+	      <Tool value={this.props.value} actions={this.props.actions} />
       </div>
     )
   }

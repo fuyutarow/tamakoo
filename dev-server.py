@@ -182,20 +182,20 @@ def api_callCard(card_id):
         }
     return make_response(jsonify(result))
 
-@api.route('/api/askUser/<int:user_id>', methods=['GET'])
-def api_askUser(user_id):
+@api.route('/api/askAccount/<int:account_id>', methods=['GET'])
+def api_askAccount(account_id):
     line = gdb.query('\
         MATCH (a:User) WHERE ID(a)={}\
         RETURN ID(a), a.alias, a.name, a.bio\
-        '.format(user_id))[0]
-    user =  {
+        '.format(account_id))[0]
+    account =  {
         'id': line[0],
         'alias': line[1],
         'name': line[2],
         'bio': 'None' if line[3]==None else line[3],
     }
     result = {
-        'user': user
+        'account': account
     }
     return  make_response(jsonify(result))
 
