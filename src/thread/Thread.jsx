@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import type {CounterState, ActionDispatcher} from "../module"
 import TodoList from './TodoList';
 import Cable from './cable';
-import Bar from './bar';
+import Bar from './Bar';
 import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';

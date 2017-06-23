@@ -6,7 +6,7 @@ import { styleOn } from './css';
 
 import { CounterState, ActionDispatcher } from "../module"
 import TodoList from './TodoList';
-import Bar from './bar';
+import Bar from './Bar';
 
 
 interface Props {

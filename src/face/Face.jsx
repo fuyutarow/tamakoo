@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Image from 'react-image-resizer';
 
 import { CounterState, ActionDispatcher } from "../module";
-import Bar from './bar';
+import Bar from './Bar';
 import Tool from './Tool';
 import { styleOn } from './css';
 interface Props {

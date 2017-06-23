@@ -245,7 +245,7 @@ def api_hisToot(user_id):
     return make_response(jsonify(result))
 
 @api.route('/api/mailentry/<string:mailaddr>', methods=['GET'])
-def api_askAccount(mailaddr):
+def api_mailentry(mailaddr):
     import smtplib
     from email.mime.text import MIMEText
 
