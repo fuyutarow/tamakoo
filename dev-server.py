@@ -244,6 +244,33 @@ def api_hisToot(user_id):
         }
     return make_response(jsonify(result))
 
+@api.route('/api/mailentry/<string:mailaddr>', methods=['GET'])
+def api_askAccount(mailaddr):
+    import smtplib
+    from email.mime.text import MIMEText
+
+    jp='iso-2022-jp'
+    fromaddr = "ytro@tamakoo.com"
+    toaddr = mailaddr
+    subject = "hello from tamakoo.com"
+
+    msg = MIMEText("Body: Hello world!\nfrom tamakoo.com".encode(jp), 'plain', jp,)
+    msg["Subject"] = subject
+    msg["From"] = fromaddr
+    msg["To"] = toaddr
+
+    try:
+        gmail = smtplib.SMTP('localhost')
+        gmail.send_message(msg)
+        print("Successfully sent email to "+mailaddr)
+    except Exception:
+        print("Error: unable to send email to "+mailaddr)
+
+    result = {
+        'mailaddr': mailaddr
+    }
+    return  make_response(jsonify(result))
+
 @api.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)

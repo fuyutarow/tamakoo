@@ -15,23 +15,19 @@ const ONLY_CARD = 'counter/only_card';
 const CLEAR_CARDS = 'counter/clear_cards';
 const CALL = 'counter/call';
 const ANSWER_USER = 'counter/answer_user';
-const INIT_STATE = 'counter/init_state'
-const LOGIN = 'counter/login'
-
-
+const INIT_STATE = 'counter/init_state';
+const LOGIN = 'counter/login';
+const ENTRY = 'counter/entry';
+const SET_PHASE = 'counter/set_phase';
+const SET_STATE = 'counter/set_state';
 export interface CounterState {
   tasks: Task[];
   phase: string;
   userInfo: any;
   loginAccount: any;
   hasAccounts: any;
+  mailaddr: string;
 }
-
-export type ActionTypes =
-    IncrementAction
-  | DecrementAction
-  | FetchRequestStartAction
-  | FetchRequestFinishAction
 
 const initialState:CounterState = {
   tasks: [],
@@ -156,6 +152,14 @@ export default function reducer (
       console.log("@@",action.account)
       return Object.assign({}, state, { loginAccount:action.account });
 
+    case SET_PHASE:
+      console.log('!@#$$%^', action.phase)
+      return Object.assign({}, state, { phase:action.phase });
+
+    case SET_STATE:
+      return Object.assign({}, state, action.state );
+
+
     default:
       return state
   }
@@ -180,9 +184,31 @@ export class ActionDispatcher {
     this.dispatch({ type:INIT_STATE })
   }
 
+  async entry( mailaddr:sring ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/mailentry/'+encodeURI(mailaddr)
+
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:SET_STATE, state:{ mailaddr:json.mailaddr }})
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
   async toot( text: string ): Promise<void> {
     this.dispatch({ type:INIT_STATE })
-    console.log('%%%',text)
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
