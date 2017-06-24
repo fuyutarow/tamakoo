@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory
+from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory, redirect
 import os
 import json
 
@@ -16,11 +16,12 @@ wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
 
 from datetime import datetime
 
-api = Flask(__name__)
+api = Flask(__name__, static_folder='dist')
 
-@api.route('/')
-def index():
-    return open('index.html', encoding='utf-8').read()
+@api.route('/', defaults={'path': ''})
+@api.route('/<path:path>')
+def index(path):
+    return render_template('index.html')
 
 @api.route('/dist/bundle.js')
 def bundle():
@@ -29,7 +30,6 @@ def bundle():
 @api.route('/dist/bundle.js.map')
 def bundle_map():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'bundle.js.map')
-
 @api.route('/tamakoo.png')
 def face():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'tamakoo.png')
@@ -43,7 +43,7 @@ def api_toot(state):
     state = json.loads(state)
     user_id = state['user_id']
     toot_text = state['toot_text']
-    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     access = 'public'
     since = now
     gdb.query('\
@@ -76,7 +76,7 @@ def api_toot(state):
 def api_anchor(anchor_text):
     user_id = 10
     card_id, toot_text = anchor_text.split('\t')
-    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     gdb.query('\
         MATCH (a:User),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
         CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)'\
@@ -92,7 +92,6 @@ def api_callCard(card_id):
     cnt_cards = 0
     now_id = card_id
 
-    #user_id, user_name, when, card_id, card_text, card_url
     line = gdb.query('\
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
@@ -108,7 +107,6 @@ def api_callCard(card_id):
     }
     cnt_cards+=1
     print(cnt_cards)
-
 
     pre_id = now_id
     pre_lines = []
@@ -250,21 +248,32 @@ def api_mailentry(mailaddr):
     from email.mime.text import MIMEText
 
     jp='iso-2022-jp'
-    fromaddr = "ytro@tamakoo.com"
+    fromaddr = 'ytro@tamakoo.com'
     toaddr = mailaddr
-    subject = "hello from tamakoo.com"
+    subject = 'hello from tamakoo.com'
 
-    msg = MIMEText("Body: Hello world!\nfrom tamakoo.com".encode(jp), 'plain', jp,)
-    msg["Subject"] = subject
-    msg["From"] = fromaddr
-    msg["To"] = toaddr
+    resisted = [
+        'sktnkysh@gmail.com',
+        'sktnkysh+11@gmail.com',
+        'sktnkysh+12@gmail.com',
+        'sktnkysh+13@gmail.com',
+    ]
+    url = \
+        'tamakoo.com/signup/'+mailaddr if( not mailaddr in resisted ) else\
+        'tamakoo.com/entry/{}'.format(resisted.index(mailaddr))
+
+    body = 'Click {} to entry tamakoo.com'.format(url)
+    msg = MIMEText(body.encode(jp), 'plain', jp,)
+    msg['Subject'] = subject
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
 
     try:
-        gmail = smtplib.SMTP('localhost')
-        gmail.send_message(msg)
-        print("Successfully sent email to "+mailaddr)
+        mail = smtplib.SMTP('localhost')
+        mail.send_message(msg)
+        print('Successfully sent email to '+mailaddr)
     except Exception:
-        print("Error: unable to send email to "+mailaddr)
+        print('Error: unable to send email to '+mailaddr)
 
     result = {
         'mailaddr': mailaddr

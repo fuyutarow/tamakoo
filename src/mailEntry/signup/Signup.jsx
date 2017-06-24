@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 
 import { CounterState, ActionDispatcher } from "../../module";
 import Tool from '../../Tool';
-
 interface Props {
   value: CounterState;
   actions: ActionDispatcher;
@@ -48,9 +47,21 @@ const styles = (windowWidth) => { return {
     backgroundColor:'#248',
     color: '#fff',
   },
+  textarea: {
+    fontSize: '16px',
+    height: '40px',
+    width: '85%',
+    paddingLeft: '0',
+    position: 'relative',
+    background: 'none',
+    display: 'block',
+    marginTop: '0em',
+    margin: '0px',
+    borderStyle: 'none',
+  },
 }}
 
-export class Sended extends React.Component<Props, void> {
+export class Signup extends React.Component<Props, void> {
   componentWillMount(){
     this.styles = styles(screen.width);
   }
@@ -61,10 +72,10 @@ export class Sended extends React.Component<Props, void> {
   }
 
   render() {
-    console.log('$$%',this.props.mailaddr)
     return (
       <div style={this.styles.toot}>
-        tamakoo.com send email to {this.props.mailaddr}.
+        <input style={styles.textarea} type='text' ref='name' placeholder='name'/>
+        <input style={styles.textarea} type='text' ref='address' placeholder='address'/>
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
 

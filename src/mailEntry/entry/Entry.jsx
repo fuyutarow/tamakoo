@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 
 import { CounterState, ActionDispatcher } from "../../module";
-import Tool from '../Tool';
+import Tool from '../../Tool';
 interface Props {
   value: CounterState;
   actions: ActionDispatcher;

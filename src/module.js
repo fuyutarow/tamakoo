@@ -29,7 +29,7 @@ export interface CounterState {
   mailaddr: string;
 }
 
-const initialState:CounterState = {
+export const initialState:CounterState = {
   tasks: [],
   phase: 'ground',
   userInfo: {user_id:null, user_name:null, nuser_bio:null},
@@ -43,11 +43,8 @@ const initialState:CounterState = {
   },
   hasAccounts: [
     {id:1, alias:'tamako'},
-    {id:10, alias:'test_user10'},
-    {id:11, alias:'test_user11'},
-    {id:12, alias:'test_user12'},
-    {id:13, alias:'test_user13'},
-  ]
+  ],
+  mailaddr: null,
 };
 
 export default function reducer (

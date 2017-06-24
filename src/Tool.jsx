@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AddButtonSVG from '../../assets/svg/add-button-inside-black-circle.svg';
+import AddButtonSVG from '../assets/svg/add-button-inside-black-circle.svg';
 import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
@@ -29,7 +29,6 @@ const styles = (windowWidth) => { return {
     position: 'fixed',
     left: '0',
     bottom: '0',
-
   },
   login: {
     backgroundColor: '#ddd',
@@ -68,6 +67,13 @@ export default class Tool extends React.Component<Props,{}> {
   }
 
   render() {
+    const accountList = this.props.value.hasAccounts
+      .map( account =>
+        <Link to={ '/entry/'+account.id }>
+          <MenuItem value={account.id} primaryText={account.alias} />
+        </Link>
+        )
+
     const newTabBtn =
       <div  style={this.styles.newTab}>
         <Link to='/' onClick={e=>{
@@ -77,19 +83,14 @@ export default class Tool extends React.Component<Props,{}> {
         </Link>
       </div>
 
-    const accountList = this.props.value.hasAccounts
-      .map( account => <MenuItem value={account.id} primaryText={account.alias} /> )
-
-      console.log('!@#',this.props.value)
     return (
       <Toolbar style={this.styles.bar}>
         <ToolbarGroup style={this.styles.login} firstChild={true}>
           <DropDownMenu value={this.props.value.loginAccount.id} onChange={(event, index, value) => {
-            console.log('###',event, index, value)
             this.props.actions.login(value);
           }}>
-            <MenuItem value={334} primaryText='preference' />
-            <Link to='/mailentry/entry'><MenuItem value={334} primaryText='add account' /></Link>
+            <MenuItem primaryText='preference' />
+            <Link to='/mailentry/entry'><MenuItem primaryText='add account' /></Link>
             <hr/>
             { accountList }
           </DropDownMenu>
