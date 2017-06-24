@@ -47,7 +47,8 @@ export const initialState:CounterState = {
     {id:11, alias:'test_user11'},
     {id:12, alias:'test_user12'},
     {id:13, alias:'test_user13'},
-  ]
+  ],
+  mailaddr: null,
 };
 
 export default function reducer (

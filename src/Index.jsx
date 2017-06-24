@@ -28,11 +28,12 @@ ReactDOM.render(
     <Router history={history}>
     <Switch>
       <Route exact path='/' component={Face} />
+      <Route exact path='/entry/:id' component={Face} />
       <Route exact path='/thread' component={Thread} />
       <Route exact path='/user/:id' component={Userleft} />
       <Route exact path='/mailentry/sended' component={MailSended} />
       <Route exact path='/mailentry/entry' component={MailEntry} />
-      <Route exact path='/entry/signup' component={MailEntry} />
+      <Route exact path='/signup' component={Signup} />
       <Redirect from="*" to="/" />
     </Switch>
     </Router>

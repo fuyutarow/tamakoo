@@ -6,7 +6,7 @@ import Image from 'react-image-resizer';
 
 import { CounterState, ActionDispatcher } from "../module";
 import Bar from './Bar';
-import Tool from './Tool';
+import Tool from '../Tool';
 import { styleOn } from './css';
 interface Props {
   value: CounterState;
@@ -40,7 +40,9 @@ export class Face extends React.Component<void, Props, void> {
     console.log("client width: ",document.documentElement.clientWidth);
 
     const styles = styleOn(screen.width);
-//    <Bar value={this.props.value} actions={this.props.actions} />
+
+    console.log('^^^',this.props)
+
     return (
       <div style={styles.toot}>
         <input style={styles.textarea} type='text' ref='note'

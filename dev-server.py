@@ -23,7 +23,6 @@ api = Flask(__name__, static_folder='dist')
 def index(path):
     return render_template('index.html')
 
-'''
 @api.route('/dist/bundle.js')
 def bundle():
     return open('dist/bundle.js', encoding='utf-8').read()
@@ -38,19 +37,18 @@ def face():
 @api.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
-'''
 
 @api.route('/api/toot/<string:state>', methods=['GET'])
 def api_toot(state):
     state = json.loads(state)
     user_id = state['user_id']
     toot_text = state['toot_text']
-    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     access = 'public'
     since = now
     gdb.query('\
         MATCH (a:User) WHERE ID(a)=%s\
-        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",since:"%s",access:"%s"})'\
+        CREATE (a)-[:Toot {when:'%s'}]->(:Card {text:'%s',since:'%s',access:'%s'})'\
         %(user_id,now,toot_text,since,access), data_contents=True)
 
     vec = model.infer_vector(wakati(toot_text))
@@ -78,10 +76,10 @@ def api_toot(state):
 def api_anchor(anchor_text):
     user_id = 10
     card_id, toot_text = anchor_text.split('\t')
-    now = datetime.now().strftime("%Y%m%dT%H%M%S+0900")
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     gdb.query('\
         MATCH (a:User),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
-        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)'\
+        CREATE (a)-[:Toot {when:'%s'}]->(:Card {text:'%s',when:'%s'})-[:Anchor {when:'%s'}]->(b)'\
         %( user_id, card_id, now, toot_text, now, now ), data_contents=True)
     result = {
         'text': 'toot complete'
@@ -250,21 +248,32 @@ def api_mailentry(mailaddr):
     from email.mime.text import MIMEText
 
     jp='iso-2022-jp'
-    fromaddr = "ytro@tamakoo.com"
+    fromaddr = 'ytro@tamakoo.com'
     toaddr = mailaddr
-    subject = "hello from tamakoo.com"
+    subject = 'hello from tamakoo.com'
 
-    msg = MIMEText("Body: Hello world!\nfrom tamakoo.com".encode(jp), 'plain', jp,)
-    msg["Subject"] = subject
-    msg["From"] = fromaddr
-    msg["To"] = toaddr
+    resisted = [
+        'sktnkysh@gmail.com',
+        'sktnkysh+11@gmail.com',
+        'sktnkysh+12@gmail.com',
+        'sktnkysh+13@gmail.com',
+    ]
+    url = \
+        'tamakoo.com/entry/{}'.format(resisted[mailaddr]) if( mailaddr in resisted ) else\
+        'tamakoo.com/signup'
+
+    body = 'Click {} to entry tamakoo.com'.format(url)
+    msg = MIMEText(body.encode(jp), 'plain', jp,)
+    msg['Subject'] = subject
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
 
     try:
-        gmail = smtplib.SMTP('localhost')
-        gmail.send_message(msg)
-        print("Successfully sent email to "+mailaddr)
+        mail = smtplib.SMTP('localhost')
+        mail.send_message(msg)
+        print('Successfully sent email to '+mailaddr)
     except Exception:
-        print("Error: unable to send email to "+mailaddr)
+        print('Error: unable to send email to '+mailaddr)
 
     result = {
         'mailaddr': mailaddr

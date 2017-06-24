@@ -4,7 +4,8 @@ import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 
 import { CounterState, ActionDispatcher } from "../../module";
-import Tool from '../Tool';
+import Tool from '../../Tool';
+
 interface Props {
   value: CounterState;
   actions: ActionDispatcher;
@@ -60,9 +61,10 @@ export class Sended extends React.Component<Props, void> {
   }
 
   render() {
+    console.log('$$%',this.props.mailaddr)
     return (
       <div style={this.styles.toot}>
-        ok1111{this.props.mailaddr}
+        tamakoo.com send email to {this.props.mailaddr}.
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
 
