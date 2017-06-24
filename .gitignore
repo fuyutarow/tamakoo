@@ -13,3 +13,4 @@ dump/
 .ipynb_checkpoints/
 neo4jlab.ipynb
 mail.py
+db/

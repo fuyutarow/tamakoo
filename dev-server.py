@@ -110,7 +110,7 @@ def api_callCard(card_id):
 
     pre_id = now_id
     pre_lines = []
-    for i in range(100):
+    for i in range(50):
         try:
             line = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -132,7 +132,7 @@ def api_callCard(card_id):
 
     next_id = now_id
     next_lines = []
-    for i in range(100):
+    for i in range(50):
         try:
             line = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -197,8 +197,50 @@ def api_askAccount(account_id):
     }
     return  make_response(jsonify(result))
 
+@api.route('/api/face/<int:account_id>', methods=['GET'])
+def api_face(account_id):
+    line = gdb.query('\
+        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={}\
+        RETURN ID(a), a.alias, a.name, a.bio, ID(b)\
+        '.format(account_id))[0]
+    loginAccount =  {
+        'id': line[0],
+        'alias': line[1],
+        'name': line[2],
+        'bio': 'None' if line[3]==None else line[3],
+    }
+    user_id = line[4]
+    has_accounts = []
+    for line in gdb.query('\
+            MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
+            RETURN ID(a), a.alias, a.name, a.bio\
+            '.format(user_id)):
+        account =  {
+            'id': line[0],
+            'alias': line[1],
+            'name': line[2],
+            'bio': 'None' if line[3]==None else line[3],
+        }
+        has_accounts.append(account)
+    result = {
+        'account': loginAccount,
+        'hasAccounts': has_accounts
+    }
+    print(result)
+    return  make_response(jsonify(result))
+
 @api.route('/api/hisToot/<int:user_id>', methods=['GET'])
 def api_hisToot(user_id):
+    line = gdb.query('\
+        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={}\
+        RETURN ID(a), a.alias, a.name, a.bio, ID(b)\
+        '.format(user_id))[0]
+    account =  {
+        'id': line[0],
+        'alias': line[1],
+        'name': line[2],
+        'bio': 'None' if line[3]==None else line[3],
+    }
     cnt_cards = 0
     lines = []
     for line in gdb.query('\
@@ -238,6 +280,7 @@ def api_hisToot(user_id):
             print(cnt_cards)
 
     result = {
+        'account': account,
         'cards': lines
         }
     return make_response(jsonify(result))

@@ -14,10 +14,8 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 const styles = (windowWidth) => { return {
   bar: {
     color: 'rgba(0, 0, 0, 0.87)',
-    backgroundColor: 'rgb(0, 188, 212)',
     boxSizing: 'border-box',
     WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
-    backgroundColor: 'rgb(232, 232, 232)',
     width: '100vw',
     //height: '56px',
     //display: 'flex',
@@ -29,6 +27,7 @@ const styles = (windowWidth) => { return {
     position: 'fixed',
     left: '0',
     bottom: '0',
+    backgroundColor: 'rgb(0, 188, 212)',
   },
   login: {
     backgroundColor: '#ddd',
@@ -55,6 +54,11 @@ const styles = (windowWidth) => { return {
     width: '100%',
     height: '100%',
   },
+  link: {
+    textDecoration:'none',
+    color:'black'
+  },
+
 }}
 
 export default class Tool extends React.Component<Props,{}> {
@@ -62,21 +66,18 @@ export default class Tool extends React.Component<Props,{}> {
     this.styles = styles(screen.width);
   }
 
-  handleChange (event, index, value) {
-
-  }
 
   render() {
     const accountList = this.props.value.hasAccounts
       .map( account =>
-        <Link to={ '/entry/'+account.id }>
+        <Link to={ '/entry/'+account.id } style={this.styles.link}>
           <MenuItem value={account.id} primaryText={account.alias} />
         </Link>
         )
 
     const newTabBtn =
-      <div  style={this.styles.newTab}>
-        <Link to='/' onClick={e=>{
+      <div style={this.styles.newTab}>
+        <Link to='/' style={this.styles.link} onClick={e=>{
             this.props.actions.initState()
         }}>
           <img style={this.styles.newTabBtn} src={AddButtonSVG} />
@@ -90,7 +91,7 @@ export default class Tool extends React.Component<Props,{}> {
             this.props.actions.login(value);
           }}>
             <MenuItem primaryText='preference' />
-            <Link to='/mailentry/entry'><MenuItem primaryText='add account' /></Link>
+            <Link to='/mailentry/entry' style={this.styles.link}><MenuItem primaryText='add account' /></Link>
             <hr/>
             { accountList }
           </DropDownMenu>

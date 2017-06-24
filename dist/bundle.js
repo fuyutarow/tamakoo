@@ -1489,11 +1489,12 @@ function reducer() {
       return Object.assign({}, state, { tasks: [calledCard] });
 
     case LOGIN:
-      console.log("@@", action.account);
-      return Object.assign({}, state, { loginAccount: action.account });
+      return Object.assign({}, state, {
+        loginAccount: action.account,
+        hasAccounts: state.hasAccounts.concat(action.hasAccounts)
+      });
 
     case SET_PHASE:
-      console.log('!@#$$%^', action.phase);
       return Object.assign({}, state, { phase: action.phase });
 
     case SET_STATE:
@@ -1522,9 +1523,9 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
       this.dispatch({ type: INIT_STATE });
     }
   }, {
-    key: 'entry',
+    key: 'face',
     value: function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(mailaddr) {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(account_id) {
         var url, response, json;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -1532,7 +1533,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 0:
                 this.dispatch({ type: FETCH_REQUEST_START });
 
-                url = '/api/mailentry/' + encodeURI(mailaddr);
+                url = '/api/face/' + encodeURI(account_id);
                 _context.prev = 2;
                 _context.next = 5;
                 return fetch(url, {
@@ -1554,7 +1555,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 9:
                 json = _context.sent;
 
-                this.dispatch({ type: SET_STATE, state: { mailaddr: json.mailaddr } });
+                this.dispatch({ type: LOGIN, account: json.account, hasAccounts: json.hasAccounts });
                 _context.next = 14;
                 break;
 
@@ -1585,8 +1586,78 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee, this, [[2, 16, 19, 22]]);
       }));
 
-      function entry(_x2) {
+      function face(_x2) {
         return _ref.apply(this, arguments);
+      }
+
+      return face;
+    }()
+  }, {
+    key: 'entry',
+    value: function () {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(mailaddr) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.dispatch({ type: FETCH_REQUEST_START });
+
+                url = '/api/mailentry/' + encodeURI(mailaddr);
+                _context2.prev = 2;
+                _context2.next = 5;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 5:
+                response = _context2.sent;
+
+                if (!(response.status === 200)) {
+                  _context2.next = 13;
+                  break;
+                }
+
+                _context2.next = 9;
+                return response.json();
+
+              case 9:
+                json = _context2.sent;
+
+                this.dispatch({ type: SET_STATE, state: { mailaddr: json.mailaddr } });
+                _context2.next = 14;
+                break;
+
+              case 13:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 14:
+                _context2.next = 19;
+                break;
+
+              case 16:
+                _context2.prev = 16;
+                _context2.t0 = _context2['catch'](2);
+
+                console.error(_context2.t0);
+
+              case 19:
+                _context2.prev = 19;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH });
+                return _context2.finish(19);
+
+              case 22:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[2, 16, 19, 22]]);
+      }));
+
+      function entry(_x3) {
+        return _ref2.apply(this, arguments);
       }
 
       return entry;
@@ -1594,11 +1665,11 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
   }, {
     key: 'toot',
     value: function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(text) {
+      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(text) {
         var url, response, json;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 this.dispatch({ type: INIT_STATE });
                 this.dispatch({ type: ADD_TASK, text: text });
@@ -1608,62 +1679,62 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                   user_id: 10,
                   toot_text: text
                 }));
-                _context2.prev = 4;
-                _context2.next = 7;
+                _context3.prev = 4;
+                _context3.next = 7;
                 return fetch(url, {
                   method: 'GET',
                   headers: this.myHeaders
                 });
 
               case 7:
-                response = _context2.sent;
+                response = _context3.sent;
 
                 console.log();
 
                 if (!(response.status === 200)) {
-                  _context2.next = 16;
+                  _context3.next = 16;
                   break;
                 }
 
-                _context2.next = 12;
+                _context3.next = 12;
                 return response.json();
 
               case 12:
-                json = _context2.sent;
+                json = _context3.sent;
 
                 this.dispatch({ type: TOOT, cards: json.cards });
-                _context2.next = 17;
+                _context3.next = 17;
                 break;
 
               case 16:
                 throw new Error('illegal status code: ' + response.status);
 
               case 17:
-                _context2.next = 22;
+                _context3.next = 22;
                 break;
 
               case 19:
-                _context2.prev = 19;
-                _context2.t0 = _context2['catch'](4);
+                _context3.prev = 19;
+                _context3.t0 = _context3['catch'](4);
 
-                console.error(_context2.t0);
+                console.error(_context3.t0);
 
               case 22:
-                _context2.prev = 22;
+                _context3.prev = 22;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context2.finish(22);
+                return _context3.finish(22);
 
               case 25:
               case 'end':
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this, [[4, 19, 22, 25]]);
+        }, _callee3, this, [[4, 19, 22, 25]]);
       }));
 
-      function toot(_x3) {
-        return _ref2.apply(this, arguments);
+      function toot(_x4) {
+        return _ref3.apply(this, arguments);
       }
 
       return toot;
@@ -1671,80 +1742,16 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
   }, {
     key: 'anchor',
     value: function () {
-      var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(card_id, order, text) {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(card_id, order, text) {
         var url, response;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 this.dispatch({ type: INSERT_TASK, order: order, text: text });
                 this.dispatch({ type: FETCH_REQUEST_START });
 
                 url = '/api/anchor/' + encodeURI(card_id + '\t' + text);
-                _context3.prev = 3;
-                _context3.next = 6;
-                return fetch(url, {
-                  method: 'GET',
-                  headers: this.myHeaders
-                });
-
-              case 6:
-                response = _context3.sent;
-
-                if (!(response.status === 200)) {
-                  _context3.next = 10;
-                  break;
-                }
-
-                _context3.next = 11;
-                break;
-
-              case 10:
-                throw new Error('illegal status code: ' + response.status);
-
-              case 11:
-                _context3.next = 16;
-                break;
-
-              case 13:
-                _context3.prev = 13;
-                _context3.t0 = _context3['catch'](3);
-
-                console.error(_context3.t0);
-
-              case 16:
-                _context3.prev = 16;
-
-                this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context3.finish(16);
-
-              case 19:
-              case 'end':
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this, [[3, 13, 16, 19]]);
-      }));
-
-      function anchor(_x4, _x5, _x6) {
-        return _ref3.apply(this, arguments);
-      }
-
-      return anchor;
-    }()
-  }, {
-    key: 'callCard',
-    value: function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(card) {
-        var url, response, json;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                this.dispatch({ type: CALL, card: card });
-                this.dispatch({ type: FETCH_REQUEST_START });
-
-                url = '/api/callCard/' + card.card_id;
                 _context4.prev = 3;
                 _context4.next = 6;
                 return fetch(url, {
@@ -1756,127 +1763,122 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 response = _context4.sent;
 
                 if (!(response.status === 200)) {
-                  _context4.next = 16;
+                  _context4.next = 10;
+                  break;
+                }
+
+                _context4.next = 11;
+                break;
+
+              case 10:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 11:
+                _context4.next = 16;
+                break;
+
+              case 13:
+                _context4.prev = 13;
+                _context4.t0 = _context4['catch'](3);
+
+                console.error(_context4.t0);
+
+              case 16:
+                _context4.prev = 16;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH });
+                return _context4.finish(16);
+
+              case 19:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[3, 13, 16, 19]]);
+      }));
+
+      function anchor(_x5, _x6, _x7) {
+        return _ref4.apply(this, arguments);
+      }
+
+      return anchor;
+    }()
+  }, {
+    key: 'callCard',
+    value: function () {
+      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(card) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                this.dispatch({ type: CALL, card: card });
+                this.dispatch({ type: FETCH_REQUEST_START });
+
+                url = '/api/callCard/' + card.card_id;
+                _context5.prev = 3;
+                _context5.next = 6;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 6:
+                response = _context5.sent;
+
+                if (!(response.status === 200)) {
+                  _context5.next = 16;
                   break;
                 }
 
                 //2xx
                 this.dispatch({ type: CLEAR_CARDS });
-                _context4.next = 11;
+                _context5.next = 11;
                 return response.json();
 
               case 11:
-                json = _context4.sent;
+                json = _context5.sent;
 
                 console.log(json);
                 this.dispatch({ type: TOOT, cards: json.cards });
-                _context4.next = 17;
+                _context5.next = 17;
                 break;
 
               case 16:
                 throw new Error('illegal status code: ' + response.status);
 
               case 17:
-                _context4.next = 22;
+                _context5.next = 22;
                 break;
 
               case 19:
-                _context4.prev = 19;
-                _context4.t0 = _context4['catch'](3);
+                _context5.prev = 19;
+                _context5.t0 = _context5['catch'](3);
 
-                console.error(_context4.t0);
+                console.error(_context5.t0);
 
               case 22:
-                _context4.prev = 22;
+                _context5.prev = 22;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context4.finish(22);
+                return _context5.finish(22);
 
               case 25:
               case 'end':
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this, [[3, 19, 22, 25]]);
+        }, _callee5, this, [[3, 19, 22, 25]]);
       }));
 
-      function callCard(_x7) {
-        return _ref4.apply(this, arguments);
+      function callCard(_x8) {
+        return _ref5.apply(this, arguments);
       }
 
       return callCard;
     }()
   }, {
     key: 'askUser',
-    value: function () {
-      var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(user_id) {
-        var url, response, json;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                this.dispatch({ type: FETCH_REQUEST_START });
-                url = '/api/askAccount/' + user_id;
-                _context5.prev = 2;
-                _context5.next = 5;
-                return fetch(url, {
-                  method: 'GET',
-                  headers: this.myHeaders
-                });
-
-              case 5:
-                response = _context5.sent;
-
-                if (!(response.status === 200)) {
-                  _context5.next = 13;
-                  break;
-                }
-
-                _context5.next = 9;
-                return response.json();
-
-              case 9:
-                json = _context5.sent;
-
-                this.dispatch({ type: ANSWER_USER, user: json.account });
-                _context5.next = 14;
-                break;
-
-              case 13:
-                throw new Error('illegal status code: ' + response.status);
-
-              case 14:
-                _context5.next = 19;
-                break;
-
-              case 16:
-                _context5.prev = 16;
-                _context5.t0 = _context5['catch'](2);
-
-                console.error(_context5.t0);
-
-              case 19:
-                _context5.prev = 19;
-
-                this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context5.finish(19);
-
-              case 22:
-              case 'end':
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this, [[2, 16, 19, 22]]);
-      }));
-
-      function askUser(_x8) {
-        return _ref5.apply(this, arguments);
-      }
-
-      return askUser;
-    }()
-  }, {
-    key: 'hisToot',
     value: function () {
       var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(user_id) {
         var url, response, json;
@@ -1885,8 +1887,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
             switch (_context6.prev = _context6.next) {
               case 0:
                 this.dispatch({ type: FETCH_REQUEST_START });
-
-                url = '/api/hisToot/' + user_id;
+                url = '/api/askAccount/' + user_id;
                 _context6.prev = 2;
                 _context6.next = 5;
                 return fetch(url, {
@@ -1898,59 +1899,57 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 response = _context6.sent;
 
                 if (!(response.status === 200)) {
-                  _context6.next = 14;
+                  _context6.next = 13;
                   break;
                 }
 
-                //2xx
-                this.dispatch({ type: CLEAR_CARDS });
-                _context6.next = 10;
+                _context6.next = 9;
                 return response.json();
 
-              case 10:
+              case 9:
                 json = _context6.sent;
 
-                this.dispatch({ type: TOOT, cards: json.cards });
-                _context6.next = 15;
+                this.dispatch({ type: ANSWER_USER, user: json.account });
+                _context6.next = 14;
                 break;
 
-              case 14:
+              case 13:
                 throw new Error('illegal status code: ' + response.status);
 
-              case 15:
-                _context6.next = 20;
+              case 14:
+                _context6.next = 19;
                 break;
 
-              case 17:
-                _context6.prev = 17;
+              case 16:
+                _context6.prev = 16;
                 _context6.t0 = _context6['catch'](2);
 
                 console.error(_context6.t0);
 
-              case 20:
-                _context6.prev = 20;
+              case 19:
+                _context6.prev = 19;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context6.finish(20);
+                return _context6.finish(19);
 
-              case 23:
+              case 22:
               case 'end':
                 return _context6.stop();
             }
           }
-        }, _callee6, this, [[2, 17, 20, 23]]);
+        }, _callee6, this, [[2, 16, 19, 22]]);
       }));
 
-      function hisToot(_x9) {
+      function askUser(_x9) {
         return _ref6.apply(this, arguments);
       }
 
-      return hisToot;
+      return askUser;
     }()
   }, {
-    key: 'login',
+    key: 'hisToot',
     value: function () {
-      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(account_id) {
+      var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(user_id) {
         var url, response, json;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
@@ -1958,7 +1957,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
               case 0:
                 this.dispatch({ type: FETCH_REQUEST_START });
 
-                url = '/api/askAccount/' + account_id;
+                url = '/api/hisToot/' + user_id;
                 _context7.prev = 2;
                 _context7.next = 5;
                 return fetch(url, {
@@ -1970,49 +1969,122 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 response = _context7.sent;
 
                 if (!(response.status === 200)) {
-                  _context7.next = 13;
+                  _context7.next = 15;
                   break;
                 }
 
-                _context7.next = 9;
+                //2xx
+                this.dispatch({ type: CLEAR_CARDS });
+                _context7.next = 10;
+                return response.json();
+
+              case 10:
+                json = _context7.sent;
+
+                this.dispatch({ type: ANSWER_USER, user: json.account });
+                this.dispatch({ type: TOOT, cards: json.cards });
+                _context7.next = 16;
+                break;
+
+              case 15:
+                throw new Error('illegal status code: ' + response.status);
+
+              case 16:
+                _context7.next = 21;
+                break;
+
+              case 18:
+                _context7.prev = 18;
+                _context7.t0 = _context7['catch'](2);
+
+                console.error(_context7.t0);
+
+              case 21:
+                _context7.prev = 21;
+
+                this.dispatch({ type: FETCH_REQUEST_FINISH });
+                return _context7.finish(21);
+
+              case 24:
+              case 'end':
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this, [[2, 18, 21, 24]]);
+      }));
+
+      function hisToot(_x10) {
+        return _ref7.apply(this, arguments);
+      }
+
+      return hisToot;
+    }()
+  }, {
+    key: 'login',
+    value: function () {
+      var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(account_id) {
+        var url, response, json;
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                this.dispatch({ type: FETCH_REQUEST_START });
+
+                url = '/api/askAccount/' + account_id;
+                _context8.prev = 2;
+                _context8.next = 5;
+                return fetch(url, {
+                  method: 'GET',
+                  headers: this.myHeaders
+                });
+
+              case 5:
+                response = _context8.sent;
+
+                if (!(response.status === 200)) {
+                  _context8.next = 13;
+                  break;
+                }
+
+                _context8.next = 9;
                 return response.json();
 
               case 9:
-                json = _context7.sent;
+                json = _context8.sent;
 
                 this.dispatch({ type: LOGIN, account: json.account });
-                _context7.next = 14;
+                _context8.next = 14;
                 break;
 
               case 13:
                 throw new Error('illegal status code: ' + response.status);
 
               case 14:
-                _context7.next = 19;
+                _context8.next = 19;
                 break;
 
               case 16:
-                _context7.prev = 16;
-                _context7.t0 = _context7['catch'](2);
+                _context8.prev = 16;
+                _context8.t0 = _context8['catch'](2);
 
-                console.error(_context7.t0);
+                console.error(_context8.t0);
 
               case 19:
-                _context7.prev = 19;
+                _context8.prev = 19;
 
                 this.dispatch({ type: FETCH_REQUEST_FINISH });
-                return _context7.finish(19);
+                return _context8.finish(19);
 
               case 22:
               case 'end':
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7, this, [[2, 16, 19, 22]]);
+        }, _callee8, this, [[2, 16, 19, 22]]);
       }));
 
-      function login(_x10) {
-        return _ref7.apply(this, arguments);
+      function login(_x11) {
+        return _ref8.apply(this, arguments);
       }
 
       return login;
@@ -8924,18 +8996,25 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var styles = function styles(windowWidth) {
-  var _bar;
-
   return {
-    bar: (_bar = {
+    bar: {
       color: 'rgba(0, 0, 0, 0.87)',
-      backgroundColor: 'rgb(0, 188, 212)',
       boxSizing: 'border-box',
-      WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)'
-    }, _defineProperty(_bar, 'backgroundColor', 'rgb(232, 232, 232)'), _defineProperty(_bar, 'width', '100vw'), _defineProperty(_bar, 'display', 'grid'), _defineProperty(_bar, 'gridGap', '10vw'), _defineProperty(_bar, 'borderRadius', '0px'), _defineProperty(_bar, 'position', 'fixed'), _defineProperty(_bar, 'left', '0'), _defineProperty(_bar, 'bottom', '0'), _bar),
+      WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
+      width: '100vw',
+      //height: '56px',
+      //display: 'flex',
+      display: 'grid',
+      gridGap: '10vw',
+      //justifyContent: 'spaceBetween',
+      borderRadius: '0px',
+      //zIndex: '999',
+      position: 'fixed',
+      left: '0',
+      bottom: '0',
+      backgroundColor: 'rgb(0, 188, 212)'
+    },
     login: {
       backgroundColor: '#ddd',
       width: '30vw',
@@ -8960,7 +9039,12 @@ var styles = function styles(windowWidth) {
     newTabBtn: {
       width: '100%',
       height: '100%'
+    },
+    link: {
+      textDecoration: 'none',
+      color: 'black'
     }
+
   };
 };
 
@@ -8979,9 +9063,6 @@ var Tool = function (_React$Component) {
       this.styles = styles(screen.width);
     }
   }, {
-    key: 'handleChange',
-    value: function handleChange(event, index, value) {}
-  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -8989,7 +9070,7 @@ var Tool = function (_React$Component) {
       var accountList = this.props.value.hasAccounts.map(function (account) {
         return _react2.default.createElement(
           _reactRouterDom.Link,
-          { to: '/entry/' + account.id },
+          { to: '/entry/' + account.id, style: _this2.styles.link },
           _react2.default.createElement(_MenuItem2.default, { value: account.id, primaryText: account.alias })
         );
       });
@@ -8999,7 +9080,7 @@ var Tool = function (_React$Component) {
         { style: this.styles.newTab },
         _react2.default.createElement(
           _reactRouterDom.Link,
-          { to: '/', onClick: function onClick(e) {
+          { to: '/', style: this.styles.link, onClick: function onClick(e) {
               _this2.props.actions.initState();
             } },
           _react2.default.createElement('img', { style: this.styles.newTabBtn, src: _addButtonInsideBlackCircle2.default })
@@ -9017,11 +9098,11 @@ var Tool = function (_React$Component) {
             { value: this.props.value.loginAccount.id, onChange: function onChange(event, index, value) {
                 _this2.props.actions.login(value);
               } },
-            _react2.default.createElement(_MenuItem2.default, { value: 334, primaryText: 'preference' }),
+            _react2.default.createElement(_MenuItem2.default, { primaryText: 'preference' }),
             _react2.default.createElement(
               _reactRouterDom.Link,
-              { to: '/mailentry/entry' },
-              _react2.default.createElement(_MenuItem2.default, { value: 334, primaryText: 'add account' })
+              { to: '/mailentry/entry', style: this.styles.link },
+              _react2.default.createElement(_MenuItem2.default, { primaryText: 'add account' })
             ),
             _react2.default.createElement('hr', null),
             accountList
@@ -31196,6 +31277,14 @@ var Face = exports.Face = function (_React$Component) {
   }
 
   _createClass(Face, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.styles = (0, _css.styleOn)(screen.width);
+      this.props.actions.face(this.props.match.params.id);
+      console.log(this.props.match.params.id);
+      console.log(this.props);
+    }
+  }, {
     key: 'toot',
     value: function toot() {
       var note = ReactDOM.findDOMNode(this.refs.note);
@@ -32431,12 +32520,16 @@ var TodoList = function (_React$Component) {
       var _this2 = this;
 
       var tasks = this.props.value.tasks.map(function (a, idx) {
-        return React.createElement(_Todo2.default, {
-          task: a,
-          order: idx,
-          value: _this2.props.value,
-          actions: _this2.props.actions
-        });
+        return React.createElement(
+          'div',
+          null,
+          React.createElement(_Todo2.default, {
+            task: a,
+            order: idx,
+            value: _this2.props.value,
+            actions: _this2.props.actions
+          })
+        );
       });
       return React.createElement(
         'div',

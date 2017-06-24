@@ -18,12 +18,15 @@ export default class TodoList extends React.Component<Props,{}> {
   render() {
     const tasks = this.props.value.tasks
       .map( (a,idx) =>
+        <div>
           <Todo
             task={a}
             order={idx}
             value={this.props.value}
             actions={this.props.actions}
-          /> )
+          />
+        </div> 
+        )
     return (
       <div style={this.styles.timeline}>
         {tasks}

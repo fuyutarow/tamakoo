@@ -146,11 +146,12 @@ export default function reducer (
       return Object.assign({}, state, { tasks:[calledCard] });
 
     case LOGIN:
-      console.log("@@",action.account)
-      return Object.assign({}, state, { loginAccount:action.account });
+      return Object.assign({}, state, { 
+        loginAccount:action.account,
+        hasAccounts:state.hasAccounts.concat(action.hasAccounts), 
+      });
 
     case SET_PHASE:
-      console.log('!@#$$%^', action.phase)
       return Object.assign({}, state, { phase:action.phase });
 
     case SET_STATE:
@@ -179,6 +180,29 @@ export class ActionDispatcher {
 
   initState(){
     this.dispatch({ type:INIT_STATE })
+  }
+
+  async face( account_id:number ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/face/'+encodeURI(account_id)
+
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:LOGIN, account:json.account, hasAccounts:json.hasAccounts })
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
   }
 
   async entry( mailaddr:sring ): Promise<void> {
@@ -312,6 +336,7 @@ export class ActionDispatcher {
       if (response.status === 200) { //2xx
         this.dispatch({ type:CLEAR_CARDS })
         const json: {amount:number} = await response.json();
+        this.dispatch({ type:ANSWER_USER, user:json.account });
         this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
