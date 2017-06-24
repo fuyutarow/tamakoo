@@ -17,7 +17,6 @@ const styles = (windowWidth) => { return {
     backgroundColor: 'rgb(0, 188, 212)',
     boxSizing: 'border-box',
     WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
-    backgroundColor: 'rgb(232, 232, 232)',
     width: '100vw',
     //height: '56px',
     //display: 'flex',
@@ -89,8 +88,8 @@ export default class Tool extends React.Component<Props,{}> {
           <DropDownMenu value={this.props.value.loginAccount.id} onChange={(event, index, value) => {
             this.props.actions.login(value);
           }}>
-            <MenuItem value={334} primaryText='preference' />
-            <Link to='/mailentry/entry'><MenuItem value={334} primaryText='add account' /></Link>
+            <MenuItem primaryText='preference' />
+            <Link to='/mailentry/signin'><MenuItem primaryText='add account' /></Link>
             <hr/>
             { accountList }
           </DropDownMenu>

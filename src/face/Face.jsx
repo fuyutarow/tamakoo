@@ -20,6 +20,12 @@ if( ('webkitSpeechRecognition' in window) ){
 }
 
 export class Face extends React.Component<void, Props, void> {
+  componentWillMount(){
+    this.styles = styleOn(screen.width);
+    console.log('@@@',this.props.match.params.id)
+    this.props.actions.entry(this.props.match.params.id)
+  }
+
   toot() {
     const note = (ReactDOM.findDOMNode(this.refs.note));
     if( note.value=="" ) return;
@@ -44,11 +50,11 @@ export class Face extends React.Component<void, Props, void> {
     console.log('^^^',this.props)
 
     return (
-      <div style={styles.toot}>
-        <input style={styles.textarea} type='text' ref='note'
+      <div style={this.styles.toot}>
+        <input style={this.styles.textarea} type='text' ref='note'
           placeholder="toot to open tamaKoo"/>
-        <Link to='/thread' style={styles.button} ref="echobtn" onClick={e=>this.toot()}>
-          <img draggable="false" style={styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
+        <Link to='/thread' style={this.styles.button} ref="echobtn" onClick={e=>this.toot()}>
+          <img draggable="false" style={this.styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
         </Link>
 	      <Tool value={this.props.value} actions={this.props.actions} />
       </div>

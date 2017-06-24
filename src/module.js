@@ -43,10 +43,6 @@ export const initialState:CounterState = {
   },
   hasAccounts: [
     {id:1, alias:'tamako'},
-    {id:10, alias:'test_user10'},
-    {id:11, alias:'test_user11'},
-    {id:12, alias:'test_user12'},
-    {id:13, alias:'test_user13'},
   ],
   mailaddr: null,
 };

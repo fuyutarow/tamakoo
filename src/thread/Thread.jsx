@@ -10,7 +10,6 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import {Link, Route} from 'react-router-dom';
 import { styleOn } from './css';
-import { VelocityComponent, VelocityTransitionGroup } from 'velocity-react'
 
 interface Props {
   value: CounterState;

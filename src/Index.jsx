@@ -11,11 +11,11 @@ import Face from './face/Root';
 import Thread from './thread/Root';
 import Userleft from './userleft/Root';
 import MailSended from './mailEntry/sended/Root';
-import MailEntry from './mailEntry/entry/Root';
+import Signin from './mailEntry/signin/Root';
 import Signup from './mailEntry/signup/Root';
 
 import { Router, Switch } from 'react-router';
-import store from "./store";
+import store from "./Store";
 import {Provider} from "react-redux";
 import createBrowserHistory from 'history/createBrowserHistory';
 import {Link, Route,Redirect} from 'react-router-dom';
@@ -32,7 +32,7 @@ ReactDOM.render(
       <Route exact path='/thread' component={Thread} />
       <Route exact path='/user/:id' component={Userleft} />
       <Route exact path='/mailentry/sended' component={MailSended} />
-      <Route exact path='/mailentry/entry' component={MailEntry} />
+      <Route exact path='/mailentry/signin' component={Signin} />
       <Route exact path='/signup' component={Signup} />
       <Redirect from="*" to="/" />
     </Switch>
