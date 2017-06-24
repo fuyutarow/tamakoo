@@ -7,6 +7,13 @@ module.exports = {
   resolve: {
     extensions: [".jsx", ".js"]
   },
+  devServer: {
+    historyApiFallback: true, // ここ追加
+    hot: true,
+    //contentBase: path.join(__dirname, 'public'),
+    //port: 7000,
+    //inline: true
+  },
   module: {
     rules: [
       {

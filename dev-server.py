@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory
+from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory, redirect
 import os
 import json
 
@@ -16,12 +16,14 @@ wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
 
 from datetime import datetime
 
-api = Flask(__name__)
+api = Flask(__name__, static_folder='dist')
 
-@api.route('/')
-def index():
-    return open('index.html', encoding='utf-8').read()
+@api.route('/', defaults={'path': ''})
+@api.route('/<path:path>')
+def index(path):
+    return render_template('index.html')
 
+'''
 @api.route('/dist/bundle.js')
 def bundle():
     return open('dist/bundle.js', encoding='utf-8').read()
@@ -29,7 +31,6 @@ def bundle():
 @api.route('/dist/bundle.js.map')
 def bundle_map():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'bundle.js.map')
-
 @api.route('/tamakoo.png')
 def face():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'tamakoo.png')
@@ -37,6 +38,7 @@ def face():
 @api.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
+'''
 
 @api.route('/api/toot/<string:state>', methods=['GET'])
 def api_toot(state):
@@ -92,7 +94,6 @@ def api_callCard(card_id):
     cnt_cards = 0
     now_id = card_id
 
-    #user_id, user_name, when, card_id, card_text, card_url
     line = gdb.query('\
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
@@ -108,7 +109,6 @@ def api_callCard(card_id):
     }
     cnt_cards+=1
     print(cnt_cards)
-
 
     pre_id = now_id
     pre_lines = []

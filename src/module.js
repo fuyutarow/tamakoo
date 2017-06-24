@@ -29,7 +29,7 @@ export interface CounterState {
   mailaddr: string;
 }
 
-const initialState:CounterState = {
+export const initialState:CounterState = {
   tasks: [],
   phase: 'ground',
   userInfo: {user_id:null, user_name:null, nuser_bio:null},
