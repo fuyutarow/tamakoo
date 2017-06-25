@@ -38,43 +38,6 @@ def face():
 def favicon():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
 
-<<<<<<< HEAD
-@api.route('/api/toot/<string:state>', methods=['GET'])
-def api_toot(state):
-    state = json.loads(state)
-    user_id = state['user_id']
-    toot_text = state['toot_text']
-    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
-    access = 'public'
-    since = now
-    gdb.query('\
-        MATCH (a:User) WHERE ID(a)=%s\
-        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",since:"%s",access:"%s"})'\
-        %(user_id,now,toot_text,since,access), data_contents=True)
-
-    vec = model.infer_vector(wakati(toot_text))
-    sims = cosine_similarity([vec], doc_vecs)
-    index = np.argsort(sims[0])[::-1]
-    lines = []
-    for i in range(20):
-        line = doc[index[i]][:-1].split('\t')
-        line = {
-            'user_id': line[0],
-            'user_name': line[1],
-            'toot_when': line[2],
-            'card_id': line[3],
-            'text': line[4],
-            'url': line[5],
-            'mode':'drawn'
-        }
-        lines.append(line)
-    result = {
-        'cards': lines
-        }
-    return make_response(jsonify(result))
-
-=======
->>>>>>> e647f9ed2d2ae876f12d9e65500e9b1b4912f028
 @api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
 def api_anchor(anchor_text):
     user_id = 10
