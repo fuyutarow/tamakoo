@@ -17,10 +17,12 @@ import Signup from './mailEntry/signup/Root';
 import { Router, Switch } from 'react-router';
 import store from "./Store";
 import {Provider} from "react-redux";
-import createBrowserHistory from 'history/createBrowserHistory';
+import { createBrowserHistory } from 'history';
 import {Link, Route,Redirect} from 'react-router-dom';
 
 const history = createBrowserHistory();
+
+
 
 ReactDOM.render(
 <MuiThemeProvider>

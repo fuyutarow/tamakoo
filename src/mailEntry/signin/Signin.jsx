@@ -49,7 +49,7 @@ const styles = (windowWidth) => { return {
   },
 }}
 
-export class Entry extends React.Component<Props, void> {
+export class Signin extends React.Component<Props, void> {
   componentWillMount(){
     this.styles = styles(screen.width);
   }
