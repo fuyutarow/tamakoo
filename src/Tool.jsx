@@ -27,10 +27,7 @@ const styles = (windowWidth) => { return {
     position: 'fixed',
     left: '0',
     bottom: '0',
-<<<<<<< HEAD:src/Tool.jsx
     backgroundColor: 'rgb(0, 188, 212)',
-=======
->>>>>>> e647f9ed2d2ae876f12d9e65500e9b1b4912f028:src/Tool.jsx
   },
   login: {
     backgroundColor: '#ddd',
@@ -73,23 +70,14 @@ export default class Tool extends React.Component<Props,{}> {
   render() {
     const accountList = this.props.value.hasAccounts
       .map( account =>
-<<<<<<< HEAD:src/Tool.jsx
         <Link to={ '/entry/'+account.id } style={this.styles.link}>
-=======
-        <Link to={ '/entry/'+account.id }>
->>>>>>> e647f9ed2d2ae876f12d9e65500e9b1b4912f028:src/Tool.jsx
           <MenuItem value={account.id} primaryText={account.alias} />
         </Link>
         )
 
     const newTabBtn =
-<<<<<<< HEAD:src/Tool.jsx
       <div style={this.styles.newTab}>
         <Link to='/' style={this.styles.link} onClick={e=>{
-=======
-      <div  style={this.styles.newTab}>
-        <Link to='/' onClick={e=>{
->>>>>>> e647f9ed2d2ae876f12d9e65500e9b1b4912f028:src/Tool.jsx
             this.props.actions.initState()
         }}>
           <img style={this.styles.newTabBtn} src={AddButtonSVG} />
@@ -103,11 +91,7 @@ export default class Tool extends React.Component<Props,{}> {
             this.props.actions.login(value);
           }}>
             <MenuItem primaryText='preference' />
-<<<<<<< HEAD:src/Tool.jsx
             <Link to='/mailentry/entry' style={this.styles.link}><MenuItem primaryText='add account' /></Link>
-=======
-            <Link to='/mailentry/signin'><MenuItem primaryText='add account' /></Link>
->>>>>>> e647f9ed2d2ae876f12d9e65500e9b1b4912f028:src/Tool.jsx
             <hr/>
             { accountList }
           </DropDownMenu>
