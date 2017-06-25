@@ -48,8 +48,16 @@ export class Signup extends React.Component<Props, void> {
     const month = this.refs.month.value;
     const day = this.refs.day.value;
     const gender = this.refs.gender.value;
+
     if(!!(given&&family&&year&&month&&day&&gender)){
-      console.log(!(given&&family&&year&&month&&day&&gender),given,family,year,month,day,gender)
+      const user = {
+        givenname: given,
+        familyname: family,
+        birthday: year+month+day,
+        gender: gender,
+      }
+      console.log(user)
+      this.props.actions.signup(user)
     }
 
     if(!given){
@@ -117,7 +125,6 @@ export class Signup extends React.Component<Props, void> {
   }
 
   render() {
-    console.log(this.refs)
     return (
       <div style={this.styles.signup}>
         <input style={{gridArea:'1/1/2/4'}} type='text' placeholder='Given name' ref='given' spellcheck='false'/>
