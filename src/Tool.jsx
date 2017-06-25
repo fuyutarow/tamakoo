@@ -91,7 +91,7 @@ export default class Tool extends React.Component<Props,{}> {
             this.props.actions.login(value);
           }}>
             <MenuItem primaryText='preference' />
-            <Link to='/mailentry/entry' style={this.styles.link}><MenuItem primaryText='add account' /></Link>
+            <Link to='/mailentry/signin' style={this.styles.link}><MenuItem primaryText='add account' /></Link>
             <hr/>
             { accountList }
           </DropDownMenu>

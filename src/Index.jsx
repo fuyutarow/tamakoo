@@ -12,7 +12,8 @@ import Thread from './thread/Root';
 import Userleft from './userleft/Root';
 import MailSended from './mailEntry/sended/Root';
 import Signin from './mailEntry/signin/Root';
-import Signup from './mailEntry/signup/Root';
+import Signup from './signup/signupUser/Root';
+import SignupSended from './signup/sended/Root';
 
 import { Router, Switch } from 'react-router';
 import store from "./Store";
@@ -36,6 +37,7 @@ ReactDOM.render(
       <Route exact path='/mailentry/sended' component={MailSended} />
       <Route exact path='/mailentry/signin' component={Signin} />
       <Route exact path='/signup' component={Signup} />
+      <Route exact path='/signup/sended' component={SignupSended} />
       <Redirect from="*" to="/" />
     </Switch>
     </Router>

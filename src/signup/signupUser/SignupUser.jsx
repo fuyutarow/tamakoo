@@ -36,7 +36,7 @@ const styles = (windowWidth) => { return {
   }
 }}
 
-export class Signup extends React.Component<Props, void> {
+export class SignupUser extends React.Component<Props, void> {
   componentWillMount(){
     this.styles = styles(screen.width);
   }
@@ -51,13 +51,14 @@ export class Signup extends React.Component<Props, void> {
 
     if(!!(given&&family&&year&&month&&day&&gender)){
       const user = {
+        mailaddr: this.props.match.params.id,
         givenname: given,
         familyname: family,
         birthday: year+month+day,
         gender: gender,
       }
-      console.log(user)
-      this.props.actions.signup(user)
+      this.props.actions.signup(user);
+      location.href='/signup/sended';
     }
 
     if(!given){

@@ -30,7 +30,7 @@ def bundle():
 @api.route('/dist/bundle.js.map')
 def bundle_map():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'bundle.js.map')
-    
+
 @api.route('/tamakoo.png')
 def face():
     return send_from_directory(os.path.join(api.root_path, 'assets'),'tamakoo.png')
@@ -325,6 +325,19 @@ def api_toot(state):
         lines.append(line)
     result = {
         'cards': lines
+        }
+    return make_response(jsonify(result))
+
+@api.route('/api/signup/<string:user>', methods=['GET'])
+def api_signup(user):
+    user = json.loads(user)
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
+    access = 'public'
+    print(user)
+    gdb.query('\
+        CREATE (a:User {mailaddr:"%s",givename:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s", access:"%s"})'\
+        %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now, access), data_contents=True)
+    result = {
         }
     return make_response(jsonify(result))
 
