@@ -9045,7 +9045,7 @@ var _expandMore = __webpack_require__(341);
 
 var _expandMore2 = _interopRequireDefault(_expandMore);
 
-var _MenuItem = __webpack_require__(150);
+var _MenuItem = __webpack_require__(149);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
@@ -9638,6 +9638,26 @@ exports.default = _FontIcon2.default;
 
 /***/ }),
 /* 149 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = undefined;
+
+var _MenuItem = __webpack_require__(217);
+
+var _MenuItem2 = _interopRequireDefault(_MenuItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _MenuItem2.default;
+
+/***/ }),
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10339,26 +10359,6 @@ Menu.propTypes = process.env.NODE_ENV !== "production" ? {
 } : {};
 exports.default = Menu;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 150 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = undefined;
-
-var _MenuItem = __webpack_require__(217);
-
-var _MenuItem2 = _interopRequireDefault(_MenuItem);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _MenuItem2.default;
 
 /***/ }),
 /* 151 */
@@ -14489,7 +14489,7 @@ var _ListItem = __webpack_require__(216);
 
 var _ListItem2 = _interopRequireDefault(_ListItem);
 
-var _Menu = __webpack_require__(149);
+var _Menu = __webpack_require__(150);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -22174,11 +22174,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = exports.MenuItem = exports.Menu = undefined;
 
-var _Menu2 = __webpack_require__(149);
+var _Menu2 = __webpack_require__(150);
 
 var _Menu3 = _interopRequireDefault(_Menu2);
 
-var _MenuItem2 = __webpack_require__(150);
+var _MenuItem2 = __webpack_require__(149);
 
 var _MenuItem3 = _interopRequireDefault(_MenuItem2);
 
@@ -25323,7 +25323,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__Menu__ = __webpack_require__(320);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31__Menu__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "Menu", function() { return __WEBPACK_IMPORTED_MODULE_31__Menu___default.a; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem__ = __webpack_require__(150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem__ = __webpack_require__(149);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32__MenuItem__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "MenuItem", function() { return __WEBPACK_IMPORTED_MODULE_32__MenuItem___default.a; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__styles_MuiThemeProvider__ = __webpack_require__(247);
@@ -31847,60 +31847,34 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 ;
 
 var styles = function styles(windowWidth) {
-  return _defineProperty({
-    toot: {
+  return {
+    signup: {
       color: 'rgba(0, 0, 0, 0.87)',
-      position: 'relative',
-      display: 'block',
+      //position: 'absolute',
+      position: 'fixed',
+      left: '50vw',
+      width: '234px',
       background: 'none',
       textAlign: 'center',
-      margin: '30vh 10% 0% 10%'
+      margin: '30vh auto 0% -141px',
+      fontSize: '28px',
+      display: 'grid',
+      gridTemplateRows: '40px 40px 40px 40px',
+      gridTemplateColumns: 'calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6)',
+      gridGap: '10px'
     },
-    textarea: {
-      fontSize: '16px',
-      height: '40px',
-      width: '85%',
-      paddingLeft: '0',
-      position: 'relative',
-      background: 'none',
-      display: 'block',
-      marginTop: '0em',
-      margin: '0px',
-      borderStyle: 'none'
-    },
-    button: {
-      width: '40px',
-      height: '30px',
-      display: 'flex',
-      borderRadius: '0',
-      margin: '5px 0 5px 0',
-      position: 'absolute',
-      right: '0',
-      top: '0',
-      fontSize: '14px',
-      fontWeight: 'bold',
-      padding: '4px 1px 4px 2px',
+    btn: {
+      gridArea: '4/1/5/7',
+      color: '#fff',
+      backgroundColor: 'rgb(0, 188, 212)',
       borderStyle: 'none',
-      backgroundColor: '#248',
-      color: '#fff'
+      WebkitBorderRadius: '10px',
+      fontSize: '20px'
     }
-  }, 'textarea', {
-    fontSize: '16px',
-    height: '40px',
-    width: '85%',
-    paddingLeft: '0',
-    position: 'relative',
-    background: 'none',
-    display: 'block',
-    marginTop: '0em',
-    margin: '0px',
-    borderStyle: 'none'
-  });
+  };
 };
 
 var Signup = exports.Signup = function (_React$Component) {
@@ -31918,19 +31892,193 @@ var Signup = exports.Signup = function (_React$Component) {
       this.styles = styles(screen.width);
     }
   }, {
-    key: 'send',
-    value: function send() {
-      var mailaddr = this.refs.note.value;
-      this.props.actions.entry(mailaddr);
+    key: 'signup',
+    value: function signup() {
+      var given = this.refs.given.value;
+      var family = this.refs.family.value;
+      var year = this.refs.year.value;
+      var month = this.refs.month.value;
+      var day = this.refs.day.value;
+      var gender = this.refs.gender.value;
+      if (!!(given && family && year && month && day && gender)) {
+        console.log(!(given && family && year && month && day && gender), given, family, year, month, day, gender);
+      }
+
+      if (!given) {
+        this.refs.given.style['borderStyle'] = 'all';
+        this.refs.given.style['borderWidth'] = '1px';
+        this.refs.given.style['borderColor'] = 'rgb(248, 6, 6)';
+        this.refs.given.style['backgroundColor'] = 'rgb(255, 178, 220)';
+      }
+      if (!family) {
+        this.refs.family.style['borderStyle'] = 'all';
+        this.refs.family.style['borderWidth'] = '1px';
+        this.refs.family.style['borderColor'] = 'rgb(248, 6, 6)';
+        this.refs.family.style['backgroundColor'] = 'rgb(255, 178, 220)';
+      }
+      if (!year) {
+        this.refs.year.style['borderStyle'] = 'all';
+        this.refs.year.style['borderWidth'] = '1px';
+        this.refs.year.style['borderColor'] = 'rgb(248, 6, 6)';
+        this.refs.year.style['backgroundColor'] = 'rgb(255, 178, 220)';
+      }
+      if (!month) {
+        this.refs.month.style['borderStyle'] = 'all';
+        this.refs.month.style['borderWidth'] = '1px';
+        this.refs.month.style['borderColor'] = 'rgb(248, 6, 6)';
+        this.refs.month.style['backgroundColor'] = 'rgb(255, 178, 220)';
+      }
+      if (!day) {
+        this.refs.day.style['borderStyle'] = 'all';
+        this.refs.day.style['borderWidth'] = '1px';
+        this.refs.day.style['borderColor'] = 'rgb(248, 6, 6)';
+        this.refs.day.style['backgroundColor'] = 'rgb(255, 178, 220)';
+      }
+      if (!gender) {
+        this.refs.gender.style['borderStyle'] = 'all';
+        this.refs.gender.style['borderWidth'] = '1px';
+        this.refs.gender.style['borderColor'] = 'rgb(248, 6, 6)';
+        this.refs.gender.style['backgroundColor'] = 'rgb(255, 178, 220)';
+      }
+
+      if (given) {
+        this.refs.given.style['background'] = 'none';
+        this.refs.given.style['borderColor'] = '#A9A9A9';
+      }
+      if (family) {
+        this.refs.family.style['background'] = 'none';
+        this.refs.family.style['borderColor'] = '#A9A9A9';
+      }
+      if (year) {
+        this.refs.year.style['background'] = 'none';
+        this.refs.year.style['borderColor'] = '#A9A9A9';
+      }
+      if (month) {
+        this.refs.month.style['background'] = 'none';
+        this.refs.month.style['borderColor'] = '#A9A9A9';
+      }
+      if (day) {
+        this.refs.day.style['background'] = 'none';
+        this.refs.day.style['borderColor'] = '#A9A9A9';
+      }
+      if (gender) {
+        this.refs.gender.style['background'] = 'none';
+        this.refs.gender.style['borderColor'] = '#A9A9A9';
+      }
     }
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
+      console.log(this.refs);
       return React.createElement(
         'div',
-        { style: this.styles.toot },
-        React.createElement('input', { style: styles.textarea, type: 'text', ref: 'name', placeholder: 'name' }),
-        React.createElement('input', { style: styles.textarea, type: 'text', ref: 'address', placeholder: 'address' }),
+        { style: this.styles.signup },
+        React.createElement('input', { style: { gridArea: '1/1/2/4' }, type: 'text', placeholder: 'Given name', ref: 'given', spellcheck: 'false' }),
+        React.createElement('input', { style: { gridArea: '1/4/2/7' }, type: 'text', placeholder: 'Family name', ref: 'family', spellcheck: 'false' }),
+        React.createElement('input', { style: { gridArea: '2/1/3/3' }, type: 'number', min: '1990', max: '2100', maxlength: '4', placeholder: 'Year', ref: 'year' }),
+        React.createElement(
+          'select',
+          { style: { gridArea: '2/3/3/5' }, placeholder: 'Month', ref: 'month' },
+          React.createElement(
+            'option',
+            { value: '', disabled: 'disabled', selected: true },
+            'Month'
+          ),
+          React.createElement(
+            'option',
+            { value: '01' },
+            'January'
+          ),
+          React.createElement(
+            'option',
+            { value: '02' },
+            'February'
+          ),
+          React.createElement(
+            'option',
+            { value: '03' },
+            'March'
+          ),
+          React.createElement(
+            'option',
+            { value: '04' },
+            'April'
+          ),
+          React.createElement(
+            'option',
+            { value: '05' },
+            'May'
+          ),
+          React.createElement(
+            'option',
+            { value: '06' },
+            'June'
+          ),
+          React.createElement(
+            'option',
+            { value: '07' },
+            'July'
+          ),
+          React.createElement(
+            'option',
+            { value: '08' },
+            'August'
+          ),
+          React.createElement(
+            'option',
+            { value: '09' },
+            'September'
+          ),
+          React.createElement(
+            'option',
+            { value: '10' },
+            'October'
+          ),
+          React.createElement(
+            'option',
+            { value: '11' },
+            'November'
+          ),
+          React.createElement(
+            'option',
+            { value: '12' },
+            'December'
+          )
+        ),
+        React.createElement('input', { style: { gridArea: '2/5/3/7' }, type: 'number', min: '1', max: '31', maxlength: '2', placeholder: 'Day', ref: 'day' }),
+        React.createElement(
+          'select',
+          { style: { gridArea: '3/1/4/7' }, name: 'Gender', ref: 'gender' },
+          React.createElement(
+            'option',
+            { value: '', disabled: 'disabled', selected: true },
+            'Gender'
+          ),
+          React.createElement(
+            'option',
+            { value: 'FEMALE' },
+            'Female'
+          ),
+          React.createElement(
+            'option',
+            { value: 'MALE' },
+            'Male'
+          ),
+          React.createElement(
+            'option',
+            { value: 'OTHER' },
+            'Other'
+          )
+        ),
+        React.createElement(
+          'button',
+          { style: this.styles.btn, placeholder: 'Signup', onClick: function onClick(e) {
+              return _this2.signup();
+            } },
+          'Sign up'
+        ),
         React.createElement(_Tool2.default, { value: this.props.value, actions: this.props.actions })
       );
     }
@@ -45360,7 +45508,7 @@ var _Menu = __webpack_require__(320);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
-var _MenuItem = __webpack_require__(150);
+var _MenuItem = __webpack_require__(149);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
@@ -51486,7 +51634,7 @@ var _arrowDropDown = __webpack_require__(801);
 
 var _arrowDropDown2 = _interopRequireDefault(_arrowDropDown);
 
-var _Menu = __webpack_require__(149);
+var _Menu = __webpack_require__(150);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -53668,7 +53816,7 @@ var _propTypes3 = __webpack_require__(43);
 
 var _propTypes4 = _interopRequireDefault(_propTypes3);
 
-var _Menu = __webpack_require__(149);
+var _Menu = __webpack_require__(150);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 

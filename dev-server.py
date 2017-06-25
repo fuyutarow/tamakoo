@@ -30,13 +30,14 @@ def bundle():
 @api.route('/dist/bundle.js.map')
 def bundle_map():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'bundle.js.map')
+    
 @api.route('/tamakoo.png')
 def face():
-    return send_from_directory(os.path.join(api.root_path, 'dist'),'tamakoo.png')
+    return send_from_directory(os.path.join(api.root_path, 'assets'),'tamakoo.png')
 
 @api.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
+    return send_from_directory(os.path.join(api.root_path, 'assets'),'favicon.ico')
 
 @api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
 def api_anchor(anchor_text):
