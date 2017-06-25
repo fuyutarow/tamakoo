@@ -36,7 +36,7 @@ ReactDOM.render(
       <Route exact path='/user/:id' component={Userleft} />
       <Route exact path='/mailentry/sended' component={MailSended} />
       <Route exact path='/mailentry/signin' component={Signin} />
-      <Route exact path='/signup' component={Signup} />
+      <Route exact path='/signup/:id' component={Signup} />
       <Route exact path='/signup/sended' component={SignupSended} />
       <Redirect from="*" to="/" />
     </Switch>

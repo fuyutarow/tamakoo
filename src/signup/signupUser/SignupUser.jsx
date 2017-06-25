@@ -46,10 +46,11 @@ export class SignupUser extends React.Component<Props, void> {
     const family = this.refs.family.value;
     const year = this.refs.year.value;
     const month = this.refs.month.value;
-    const day = this.refs.day.value;
+    const day = (this.refs.day.value.length < 2)? '0'+this.refs.day.value : this.refs.day.value;
     const gender = this.refs.gender.value;
+    console.log(year >= 1900 , year <= 2100 , day.length==2)
 
-    if(!!(given&&family&&year&&month&&day&&gender)){
+    if(!!(given&&family&&year&&month&&day&&gender) && year >= 1900 && year <= 2100 && day.length==2){
       const user = {
         mailaddr: this.props.match.params.id,
         givenname: given,
@@ -57,6 +58,7 @@ export class SignupUser extends React.Component<Props, void> {
         birthday: year+month+day,
         gender: gender,
       }
+      console.log(user)
       this.props.actions.signup(user);
       location.href='/signup/sended';
     }

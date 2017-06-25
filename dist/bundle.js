@@ -8112,7 +8112,7 @@ var _expandMore = __webpack_require__(341);
 
 var _expandMore2 = _interopRequireDefault(_expandMore);
 
-var _MenuItem = __webpack_require__(149);
+var _MenuItem = __webpack_require__(150);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
@@ -9708,26 +9708,6 @@ exports.default = _FontIcon2.default;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = undefined;
-
-var _MenuItem = __webpack_require__(217);
-
-var _MenuItem2 = _interopRequireDefault(_MenuItem);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _MenuItem2.default;
-
-/***/ }),
-/* 150 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 Object.defineProperty(exports, "__esModule", {
@@ -10426,6 +10406,26 @@ Menu.propTypes = process.env.NODE_ENV !== "production" ? {
 } : {};
 exports.default = Menu;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 150 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = undefined;
+
+var _MenuItem = __webpack_require__(217);
+
+var _MenuItem2 = _interopRequireDefault(_MenuItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _MenuItem2.default;
 
 /***/ }),
 /* 151 */
@@ -14556,7 +14556,7 @@ var _ListItem = __webpack_require__(216);
 
 var _ListItem2 = _interopRequireDefault(_ListItem);
 
-var _Menu = __webpack_require__(150);
+var _Menu = __webpack_require__(149);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -22241,11 +22241,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = exports.MenuItem = exports.Menu = undefined;
 
-var _Menu2 = __webpack_require__(150);
+var _Menu2 = __webpack_require__(149);
 
 var _Menu3 = _interopRequireDefault(_Menu2);
 
-var _MenuItem2 = __webpack_require__(149);
+var _MenuItem2 = __webpack_require__(150);
 
 var _MenuItem3 = _interopRequireDefault(_MenuItem2);
 
@@ -25390,7 +25390,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__Menu__ = __webpack_require__(320);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31__Menu__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "Menu", function() { return __WEBPACK_IMPORTED_MODULE_31__Menu___default.a; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem__ = __webpack_require__(150);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32__MenuItem__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "MenuItem", function() { return __WEBPACK_IMPORTED_MODULE_32__MenuItem___default.a; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__styles_MuiThemeProvider__ = __webpack_require__(247);
@@ -31284,7 +31284,7 @@ _reactDom2.default.render(_react2.default.createElement(
         _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/user/:id', component: _Root6.default }),
         _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/mailentry/sended', component: _Root8.default }),
         _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/mailentry/signin', component: _Root10.default }),
-        _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/signup', component: _Root12.default }),
+        _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/signup/:id', component: _Root12.default }),
         _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/signup/sended', component: _Root14.default }),
         _react2.default.createElement(_reactRouterDom.Redirect, { from: '*', to: '/' })
       )
@@ -32116,10 +32116,11 @@ var SignupUser = exports.SignupUser = function (_React$Component) {
       var family = this.refs.family.value;
       var year = this.refs.year.value;
       var month = this.refs.month.value;
-      var day = this.refs.day.value;
+      var day = this.refs.day.value.length < 2 ? '0' + this.refs.day.value : this.refs.day.value;
       var gender = this.refs.gender.value;
+      console.log(year >= 1900, year <= 2100, day.length == 2);
 
-      if (!!(given && family && year && month && day && gender)) {
+      if (!!(given && family && year && month && day && gender) && year >= 1900 && year <= 2100 && day.length == 2) {
         var user = {
           mailaddr: this.props.match.params.id,
           givenname: given,
@@ -32127,6 +32128,7 @@ var SignupUser = exports.SignupUser = function (_React$Component) {
           birthday: year + month + day,
           gender: gender
         };
+        console.log(user);
         this.props.actions.signup(user);
         location.href = '/signup/sended';
       }
@@ -45734,7 +45736,7 @@ var _Menu = __webpack_require__(320);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
-var _MenuItem = __webpack_require__(149);
+var _MenuItem = __webpack_require__(150);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
@@ -51860,7 +51862,7 @@ var _arrowDropDown = __webpack_require__(803);
 
 var _arrowDropDown2 = _interopRequireDefault(_arrowDropDown);
 
-var _Menu = __webpack_require__(150);
+var _Menu = __webpack_require__(149);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -54042,7 +54044,7 @@ var _propTypes3 = __webpack_require__(43);
 
 var _propTypes4 = _interopRequireDefault(_propTypes3);
 
-var _Menu = __webpack_require__(150);
+var _Menu = __webpack_require__(149);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
