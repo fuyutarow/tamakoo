@@ -2,7 +2,6 @@
 node_modules/
 .idea/
 dist/
-dist/bundle.js
 npm-debug.log
 toots/
 tamakoo_model/
@@ -14,4 +13,3 @@ dump/
 .ipynb_checkpoints/
 neo4jlab.ipynb
 mail.py
-db/

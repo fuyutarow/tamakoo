@@ -20,13 +20,13 @@ const LOGIN = 'counter/login';
 const ENTRY = 'counter/entry';
 const SET_PHASE = 'counter/set_phase';
 const SET_STATE = 'counter/set_state';
-
 export interface CounterState {
   tasks: Task[];
   phase: string;
   userInfo: any;
   loginAccount: any;
   hasAccounts: any;
+  loginUser: any;
   mailaddr: string;
 }
 
@@ -108,6 +108,7 @@ export default function reducer (
           }
           return a;
         })
+      console.log('***',insertedTasks)
       insertedTasks.splice(action.order+1,0, {
         card_id: -1,
         text: action.text,
@@ -146,16 +147,16 @@ export default function reducer (
       return Object.assign({}, state, { tasks:[calledCard] });
 
     case LOGIN:
-      return Object.assign({}, state, {
-        loginAccount:action.account,
-        hasAccounts:state.hasAccounts.concat(action.hasAccounts),
-      });
+      console.log("@@",action.account)
+      return Object.assign({}, state, { loginAccount:action.account });
 
     case SET_PHASE:
+      console.log('!@#$$%^', action.phase)
       return Object.assign({}, state, { phase:action.phase });
 
     case SET_STATE:
       return Object.assign({}, state, action.state );
+
 
     default:
       return state
@@ -181,32 +182,11 @@ export class ActionDispatcher {
     this.dispatch({ type:INIT_STATE })
   }
 
-  async face( account_id:number ): Promise<void> {
-    this.dispatch({ type:FETCH_REQUEST_START });
-
-    const url = '/api/face/'+encodeURI(account_id)
-
-    try {
-      const response:Response = await fetch(url, {
-        method: 'GET',
-        headers: this.myHeaders,
-      })
-      if (response.status === 200) { //2xx
-        const json: {amount:number} = await response.json();
-        this.dispatch({ type:LOGIN, account:json.account, hasAccounts:json.hasAccounts })
-      } else {
-        throw new Error(`illegal status code: ${response.status}`)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      this.dispatch({ type:FETCH_REQUEST_FINISH });
-    }
-  }
-
   async entry( mailaddr:sring ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
+
     const url = '/api/mailentry/'+encodeURI(mailaddr)
+
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
@@ -225,10 +205,35 @@ export class ActionDispatcher {
     }
   }
 
+  async send( mailaddr:sring ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+
+    const url = '/api/login/'+encodeURI(mailaddr)
+
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:SET_STATE, state:{ mailaddr:json.mailaddr }})
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
+
   async toot( text: string ): Promise<void> {
     this.dispatch({ type:INIT_STATE })
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
+
     const url = '/api/toot/'+encodeURI(JSON.stringify({
       user_id: 10,
       toot_text: text,
@@ -322,6 +327,7 @@ export class ActionDispatcher {
 
   async hisToot( user_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
+
     const url = '/api/hisToot/'+user_id;
     try {
       const response:Response = await fetch(url, {
@@ -331,7 +337,6 @@ export class ActionDispatcher {
       if (response.status === 200) { //2xx
         this.dispatch({ type:CLEAR_CARDS })
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:ANSWER_USER, user:json.account });
         this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
@@ -345,6 +350,7 @@ export class ActionDispatcher {
 
   async login( account_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
+
     const url = '/api/askAccount/'+account_id;
     try {
       const response:Response = await fetch(url, {
@@ -367,7 +373,6 @@ export class ActionDispatcher {
   async signup( user:any ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
     const url = '/api/signup/'+encodeURI(JSON.stringify(user))
-    console.log('@@@')
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
@@ -375,7 +380,6 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        console.log('^%$#fsds')
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -385,6 +389,5 @@ export class ActionDispatcher {
       this.dispatch({ type:FETCH_REQUEST_FINISH });
     }
   }
-
 
 }

@@ -2,6 +2,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import { history } from '../../Index';
+import { browserHistory } from 'react-router';
 
 import { CounterState, ActionDispatcher } from "../../module";
 import Tool from '../../Tool';
@@ -22,12 +24,12 @@ const styles = (windowWidth) => { return {
     margin: '30vh auto 0% -141px',
     fontSize: '28px',
     display: 'grid',
-    gridTemplateRows: '40px 40px 40px 40px',
+    gridTemplateRows: '40px 40px 40px 40px 40px',
     gridTemplateColumns: 'calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6)',
     gridGap: '10px',
   },
   btn: {
-    gridArea:'4/1/5/7',
+    gridArea:'5/1/6/7',
     color: '#fff',
     backgroundColor: 'rgb(0, 188, 212)',
     borderStyle: 'none',
@@ -39,6 +41,7 @@ const styles = (windowWidth) => { return {
 export class SignupUser extends React.Component<Props, void> {
   componentWillMount(){
     this.styles = styles(screen.width);
+    console.log("REFS", this.refs)
   }
 
   signup(){
@@ -46,21 +49,27 @@ export class SignupUser extends React.Component<Props, void> {
     const family = this.refs.family.value;
     const year = this.refs.year.value;
     const month = this.refs.month.value;
-    const day = (this.refs.day.value.length < 2)? '0'+this.refs.day.value : this.refs.day.value;
+    const day = this.refs.day.value.length;
+    const day_ = (this.refs.day.value.length < 2)? '0'+this.refs.day.value : this.refs.day.value;
     const gender = this.refs.gender.value;
+    const handle = this.refs.handle.value;
     console.log(year >= 1900 , year <= 2100 , day.length==2)
 
-    if(!!(given&&family&&year&&month&&day&&gender) && year >= 1900 && year <= 2100 && day.length==2){
+    if(!!(given&&family&&year&&month&&day&&gender) && year >= 1900 && year <= 2100 && day_.length==2){
       const user = {
         mailaddr: this.props.match.params.id,
         givenname: given,
         familyname: family,
-        birthday: year+month+day,
+        birthday: year+month+day_,
         gender: gender,
+        hasAcc: [
+          {name:handle}
+        ]
       }
       console.log(user)
       this.props.actions.signup(user);
-      location.href='/signup/sended';
+      //browserHistory.push('/signup-sended')
+      history.push('/signup-sended')
     }
 
     if(!given){
@@ -99,30 +108,40 @@ export class SignupUser extends React.Component<Props, void> {
       this.refs.gender.style['borderColor'] = 'rgb(248, 6, 6)';
       this.refs.gender.style['backgroundColor'] = 'rgb(255, 178, 220)';
     }
+    if(!handle){
+      this.refs.handle.style['borderStyle'] = 'all';
+      this.refs.handle.style['borderWidth'] = '1px';
+      this.refs.handle.style['borderColor'] = 'rgb(248, 6, 6)';
+      this.refs.handle.style['backgroundColor'] = 'rgb(255, 178, 220)';
+    }
 
     if(given){
-      this.refs.given.style['background'] = 'none';
+      this.refs.given.style['background'] = '#fff';
       this.refs.given.style['borderColor'] = '#A9A9A9';
     }
     if(family){
-      this.refs.family.style['background'] = 'none';
+      this.refs.family.style['background'] = '#fff';
       this.refs.family.style['borderColor'] = '#A9A9A9';
     }
     if(year){
-      this.refs.year.style['background'] = 'none';
+      this.refs.year.style['background'] = '#fff';
       this.refs.year.style['borderColor'] = '#A9A9A9';
     }
     if(month){
-      this.refs.month.style['background'] = 'none';
+      this.refs.month.style['background'] = '#fff';
       this.refs.month.style['borderColor'] = '#A9A9A9';
     }
     if(day){
-      this.refs.day.style['background'] = 'none';
+      this.refs.day.style['background'] = '#fff';
       this.refs.day.style['borderColor'] = '#A9A9A9';
     }
     if(gender){
-      this.refs.gender.style['background'] = 'none';
+      this.refs.gender.style['background'] = '#fff';
       this.refs.gender.style['borderColor'] = '#A9A9A9';
+    }
+    if(handle){
+      this.refs.handle.style['background'] = '#fff';
+      this.refs.handle.style['borderColor'] = '#A9A9A9';
     }
 
   }
@@ -155,6 +174,7 @@ export class SignupUser extends React.Component<Props, void> {
           <option value='MALE'>Male</option>
           <option value='OTHER'>Other</option>
         </select>
+        <input style={{gridArea:'4/1/5/7'}} type='text' placeholder='handle name' ref='handle' />
         <button style={this.styles.btn} placeholder='Signup' onClick={e=>this.signup()}>Sign up</button>
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>

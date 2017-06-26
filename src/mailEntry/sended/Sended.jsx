@@ -55,16 +55,20 @@ export class Sended extends React.Component<Props, void> {
     this.styles = styles(screen.width);
   }
 
-  send(){
-    const mailaddr = this.refs.note.value;
-    this.props.actions.entry(mailaddr)
-  }
-
   render() {
-    console.log('$$%',this.props.mailaddr)
+    const view =
+      this.props.value.mailaddr?
+        <div>
+          tamakoo.com send email to {this.props.value.mailaddr}.
+        </div>
+      :
+        <div>
+          please wait.
+        </div>
+
     return (
       <div style={this.styles.toot}>
-        tamakoo.com send email to {this.props.mailaddr}.
+        { view }
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
 

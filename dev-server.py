@@ -2,6 +2,10 @@
 from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory, redirect
 import os
 import json
+import string
+import random
+from random import randint
+randstr = lambda n : ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
 
 import secure
 from neo4jrestclient.client import GraphDatabase
@@ -94,7 +98,7 @@ def api_callCard(card_id):
 
     pre_id = now_id
     pre_lines = []
-    for i in range(50):
+    for i in range(100):
         try:
             line = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -116,7 +120,7 @@ def api_callCard(card_id):
 
     next_id = now_id
     next_lines = []
-    for i in range(50):
+    for i in range(100):
         try:
             line = gdb.query('\
                 MATCH p=(a)-[r:Anchor]->(b)<-[t:Toot]-(c) WHERE ID(a)={}\
@@ -168,50 +172,8 @@ def api_callCard(card_id):
 #def api_entry(accout_id):
 
 
-@api.route('/api/face/<int:account_id>', methods=['GET'])
-def api_face(account_id):
-    line = gdb.query('\
-        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={}\
-        RETURN ID(a), a.alias, a.name, a.bio, ID(b)\
-        '.format(account_id))[0]
-    loginAccount =  {
-        'id': line[0],
-        'alias': line[1],
-        'name': line[2],
-        'bio': 'None' if line[3]==None else line[3],
-    }
-    user_id = line[4]
-    has_accounts = []
-    for line in gdb.query('\
-            MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
-            RETURN ID(a), a.alias, a.name, a.bio\
-            '.format(user_id)):
-        account =  {
-            'id': line[0],
-            'alias': line[1],
-            'name': line[2],
-            'bio': 'None' if line[3]==None else line[3],
-        }
-        has_accounts.append(account)
-    result = {
-        'account': loginAccount,
-        'hasAccounts': has_accounts
-    }
-    print(result)
-    return  make_response(jsonify(result))
-
 @api.route('/api/hisToot/<int:user_id>', methods=['GET'])
 def api_hisToot(user_id):
-    line = gdb.query('\
-        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={}\
-        RETURN ID(a), a.alias, a.name, a.bio, ID(b)\
-        '.format(user_id))[0]
-    account =  {
-        'id': line[0],
-        'alias': line[1],
-        'name': line[2],
-        'bio': 'None' if line[3]==None else line[3],
-    }
     cnt_cards = 0
     lines = []
     for line in gdb.query('\
@@ -251,30 +213,52 @@ def api_hisToot(user_id):
             print(cnt_cards)
 
     result = {
-        'account': account,
         'cards': lines
         }
     return make_response(jsonify(result))
 
-@api.route('/api/mailentry/<string:mailaddr>', methods=['GET'])
-def api_mailentry(mailaddr):
+@api.route('/api/login/<string:mailaddr>', methods=['GET'])
+def api_login(mailaddr):
     import smtplib
     from email.mime.text import MIMEText
+
+    try:
+        line = gdb.query('\
+            MATCH (a:User) WHERE a.mailaddr="%s"\
+            RETURN ID(a), a.mailaddr, a.givenname, a.familyname, a.birthday, a.gender, a.since, a.access', data_contents=True)[0]
+        user = {
+            'id': line[0],
+            'mailaddr': line[1],
+            'givenname': line[2],
+            'familyname': line[3],
+            'birthday': line[4],
+            'gender': line[5],
+            'since': line[6],
+            'access': line[7],
+        }
+        has_accounts = []
+        for line in gdb.query('\
+                MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
+                RETURN ID(a), a.alias, a.name, a.bio'\
+                .format(user['id'])):
+            account =  {
+                'id': line[0],
+                'alias': line[1],
+                'name': line[2],
+                'bio': 'None' if line[3]==None else line[3],
+            }
+            has_accounts.append(account)
+        user['hasAcc'] = has_accounts
+
+        url = 'tamakoo.com/entry/{}'.format(user['hasAcc'][0]['id'])
+
+    except:
+        url = 'tamakoo.com/signup/'+mailaddr
 
     jp='iso-2022-jp'
     fromaddr = 'ytro@tamakoo.com'
     toaddr = mailaddr
     subject = 'hello from tamakoo.com'
-
-    resisted = [
-        'sktnkysh@gmail.com',
-        'sktnkysh+11@gmail.com',
-        'sktnkysh+12@gmail.com',
-        'sktnkysh+13@gmail.com',
-    ]
-    url = \
-        'tamakoo.com/signup/'+mailaddr if( not mailaddr in resisted ) else\
-        'tamakoo.com/entry/{}'.format(resisted.index(mailaddr))
 
     body = 'Click {} to entry tamakoo.com'.format(url)
     msg = MIMEText(body.encode(jp), 'plain', jp,)
@@ -334,9 +318,17 @@ def api_signup(user):
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     access = 'public'
     print(user)
+    user_id = gdb.query('\
+        CREATE (a:User {mailaddr:"%s",givenname:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s"})\
+        RETURN ID(a)'\
+        %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now), data_contents=True)[0][0]
+    alias = randstr(randint(6,12))
+
+    print(user_id, user['hasAcc'][0]['name'], alias, now, access)
     gdb.query('\
-        CREATE (a:User {mailaddr:"%s",givename:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s", access:"%s"})'\
-        %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now, access), data_contents=True)
+        MATCH (a:User) WHERE ID(a)=%s\
+        CREATE (a)-[:Have]->(:Account {name:"%s", alias:"%s", since:"%s", access:"%s"})'\
+        %(user_id, user['hasAcc'][0]['name'], alias, now, access), data_contents=True)
     result = {
         }
     return make_response(jsonify(result))

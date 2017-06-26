@@ -14,6 +14,7 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 const styles = (windowWidth) => { return {
   bar: {
     color: 'rgba(0, 0, 0, 0.87)',
+    backgroundColor: 'rgb(0, 188, 212)',
     boxSizing: 'border-box',
     WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
     width: '100vw',
@@ -27,7 +28,6 @@ const styles = (windowWidth) => { return {
     position: 'fixed',
     left: '0',
     bottom: '0',
-    backgroundColor: 'rgb(0, 188, 212)',
   },
   login: {
     backgroundColor: '#ddd',
@@ -54,11 +54,6 @@ const styles = (windowWidth) => { return {
     width: '100%',
     height: '100%',
   },
-  link: {
-    textDecoration:'none',
-    color:'black'
-  },
-
 }}
 
 export default class Tool extends React.Component<Props,{}> {
@@ -66,18 +61,21 @@ export default class Tool extends React.Component<Props,{}> {
     this.styles = styles(screen.width);
   }
 
+  handleChange (event, index, value) {
+
+  }
 
   render() {
     const accountList = this.props.value.hasAccounts
       .map( account =>
-        <Link to={ '/entry/'+account.id } style={this.styles.link}>
+        <Link to={ '/entry/'+account.id }>
           <MenuItem value={account.id} primaryText={account.alias} />
         </Link>
         )
 
     const newTabBtn =
-      <div style={this.styles.newTab}>
-        <Link to='/' style={this.styles.link} onClick={e=>{
+      <div  style={this.styles.newTab}>
+        <Link to='/' onClick={e=>{
             this.props.actions.initState()
         }}>
           <img style={this.styles.newTabBtn} src={AddButtonSVG} />
@@ -91,7 +89,7 @@ export default class Tool extends React.Component<Props,{}> {
             this.props.actions.login(value);
           }}>
             <MenuItem primaryText='preference' />
-            <Link to='/mailentry/signin' style={this.styles.link}><MenuItem primaryText='add account' /></Link>
+            <Link to='/mailentry/signin'><MenuItem primaryText='add account' /></Link>
             <hr/>
             { accountList }
           </DropDownMenu>

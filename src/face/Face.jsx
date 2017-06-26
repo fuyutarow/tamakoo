@@ -22,9 +22,8 @@ if( ('webkitSpeechRecognition' in window) ){
 export class Face extends React.Component<void, Props, void> {
   componentWillMount(){
     this.styles = styleOn(screen.width);
-    this.props.actions.face(this.props.match.params.id)
-    console.log(this.props.match.params.id);
-    console.log(this.props);
+    console.log('@@@',this.props.match.params.id)
+    this.props.actions.entry(this.props.match.params.id)
   }
 
   toot() {

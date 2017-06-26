@@ -2,6 +2,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import { history } from '../../Index';
+import { browserHistory } from 'react-router';
 
 import { CounterState, ActionDispatcher } from "../../module";
 import Tool from '../../Tool';
@@ -56,7 +58,8 @@ export class Signin extends React.Component<Props, void> {
 
   send(){
     const mailaddr = this.refs.note.value;
-    this.props.actions.entry(mailaddr)
+    this.props.actions.send(mailaddr)
+    history.push('/mailentry/sended')
   }
 
   render() {
@@ -64,10 +67,8 @@ export class Signin extends React.Component<Props, void> {
       <div style={this.styles.toot}>
         <input style={this.styles.textarea} type='text' ref='note'
           placeholder="  your Email address"/>
-        <Link to='/mailentry/sended'>
           <button style={this.styles.button}
              onClick={e=>this.send()}>send</button>
-        </Link>
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
 

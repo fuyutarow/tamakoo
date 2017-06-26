@@ -21,9 +21,7 @@ import {Provider} from "react-redux";
 import { createBrowserHistory } from 'history';
 import {Link, Route,Redirect} from 'react-router-dom';
 
-const history = createBrowserHistory();
-
-
+export const history = createBrowserHistory();
 
 ReactDOM.render(
 <MuiThemeProvider>
@@ -37,7 +35,7 @@ ReactDOM.render(
       <Route exact path='/mailentry/sended' component={MailSended} />
       <Route exact path='/mailentry/signin' component={Signin} />
       <Route exact path='/signup/:id' component={Signup} />
-      <Route exact path='/signup/sended' component={SignupSended} />
+      <Route exact path='/signup-sended' component={SignupSended} />
       <Redirect from="*" to="/" />
     </Switch>
     </Router>
