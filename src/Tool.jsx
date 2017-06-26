@@ -9,7 +9,7 @@ import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
-
+import { history } from './Index';
 
 const styles = (windowWidth) => { return {
   bar: {
@@ -31,7 +31,7 @@ const styles = (windowWidth) => { return {
   },
   login: {
     backgroundColor: '#ddd',
-    width: '30vw',
+    width: '20vw',
     //height: '56px',
     position: 'fixed',
     left: '0',
@@ -59,22 +59,27 @@ const styles = (windowWidth) => { return {
 export default class Tool extends React.Component<Props,{}> {
   componentWillMount(){
     this.styles = styles(screen.width);
+    this.props.actions.entry(this.props.match.params.id)
+    //if(this.props.match.path!='/'){
   }
 
-  handleChange (event, index, value) {
-
+  componentWillReceiveProps() {
+    //if(this.props.match.path!='/'){
+    //    history.push('/')
+    //}
+    console.log("componentWillReceiveProps",this.props);
   }
 
   render() {
-    const accountList = this.props.value.hasAccounts
+    console.log(this.props.value)
+    const accountList = this.props.value.loginUser.hasAcc
       .map( account =>
-        <Link to={ '/entry/'+account.id }>
-          <MenuItem value={account.id} primaryText={account.alias} />
-        </Link>
+        <MenuItem value={account.id} primaryText={account.alias} 
+          containerElement={<Link to={'/entry/'+account.id}/>}/>
         )
 
     const newTabBtn =
-      <div  style={this.styles.newTab}>
+      <div style={this.styles.newTab}>
         <Link to='/' onClick={e=>{
             this.props.actions.initState()
         }}>
@@ -84,12 +89,12 @@ export default class Tool extends React.Component<Props,{}> {
 
     return (
       <Toolbar style={this.styles.bar}>
-        <ToolbarGroup style={this.styles.login} firstChild={true}>
-          <DropDownMenu value={this.props.value.loginAccount.id} onChange={(event, index, value) => {
+        <ToolbarGroup style={this.styles.login} containerStyle={{padding:'0'}} firstChild={true}>
+          <DropDownMenu containerStyle={{width:'20vw'}} value={this.props.value.signinAcc.id} onChange={(event, index, value) => {
             this.props.actions.login(value);
           }}>
             <MenuItem primaryText='preference' />
-            <Link to='/mailentry/signin'><MenuItem primaryText='add account' /></Link>
+            <MenuItem primaryText='add account' containerElement={<Link to='/mailentry/signin'/>}/>
             <hr/>
             { accountList }
           </DropDownMenu>

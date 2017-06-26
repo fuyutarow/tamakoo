@@ -37,11 +37,11 @@ def bundle_map():
 
 @api.route('/tamakoo.png')
 def face():
-    return send_from_directory(os.path.join(api.root_path, 'assets'),'tamakoo.png')
+    return send_from_directory(os.path.join(api.root_path, 'dist'),'tamakoo.png')
 
 @api.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(api.root_path, 'assets'),'favicon.ico')
+    return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
 
 @api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
 def api_anchor(anchor_text):
@@ -168,9 +168,54 @@ def api_callCard(card_id):
         }
     return make_response(jsonify(result))
 
-#@api.route('/entry/<int:account_id>', methods=['GET'])
-#def api_entry(accout_id):
+@api.route('/api/entry/<int:account_id>', methods=['GET'])
+def api_entry(account_id):
+    line = gdb.query('\
+        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={}\
+        RETURN ID(a), a.alias, a.name, a.bio, ID(b)\
+        '.format(account_id))[0]
+    signin_acc =  {
+        'id': line[0],
+        'alias': line[1],
+        'name': line[2],
+        'bio': 'None' if line[3]==None else line[3],
+    }
+    user_id = line[4]
+    line =  gdb.query('\
+        MATCH (a:User) WHERE ID(a)={}\
+        RETURN ID(a), a.mailaddr, a.givenname, a.familyname, a.birthday, a.gender, a.since'\
+        .format(user_id))[0]
+    loginUser = {
+        'id': line[0],
+        'mailaddr': line[1],
+        'givename': line[2],
+        'familyname': line[3],
+        'birthday': line[4],
+        'gender': line[5],
+        'since': line[6],
+    }
 
+    has_accounts = []
+    for line in gdb.query('\
+            MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
+            RETURN ID(a), a.alias, a.name, a.bio, a.since, a.access\
+            '.format(user_id)):
+        account =  {
+            'id': line[0],
+            'alias': line[1],
+            'name': line[2],
+            'bio': 'None' if line[3]==None else line[3],
+            'since': line[4],
+            'access': line[5],
+        }
+        has_accounts.append(account)
+    loginUser['hasAcc'] = has_accounts
+    result = {
+        'signinAcc': signin_acc,
+        'loginUser': loginUser,
+    }
+    print(result)
+    return  make_response(jsonify(result))
 
 @api.route('/api/hisToot/<int:user_id>', methods=['GET'])
 def api_hisToot(user_id):

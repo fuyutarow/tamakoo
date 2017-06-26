@@ -22,8 +22,7 @@ if( ('webkitSpeechRecognition' in window) ){
 export class Face extends React.Component<void, Props, void> {
   componentWillMount(){
     this.styles = styleOn(screen.width);
-    console.log('@@@',this.props.match.params.id)
-    this.props.actions.entry(this.props.match.params.id)
+    //this.props.actions.entry(this.props.match.params.id)
   }
 
   toot() {
@@ -56,7 +55,7 @@ export class Face extends React.Component<void, Props, void> {
         <Link to='/thread' style={this.styles.button} ref="echobtn" onClick={e=>this.toot()}>
           <img draggable="false" style={this.styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
         </Link>
-	      <Tool value={this.props.value} actions={this.props.actions} />
+	      <Tool value={this.props.value} actions={this.props.actions} match={this.props.match}/>
       </div>
     )
   }

@@ -17,24 +17,26 @@ const CALL = 'counter/call';
 const ANSWER_USER = 'counter/answer_user';
 const INIT_STATE = 'counter/init_state';
 const LOGIN = 'counter/login';
+const LOGOUT = 'counter/logout';
 const ENTRY = 'counter/entry';
 const SET_PHASE = 'counter/set_phase';
 const SET_STATE = 'counter/set_state';
 export interface CounterState {
+  isLoggedin : boolean;
   tasks: Task[];
   phase: string;
   userInfo: any;
-  loginAccount: any;
-  hasAccounts: any;
+  signinAcc: any;
   loginUser: any;
   mailaddr: string;
 }
 
 export const initialState:CounterState = {
+  isLoggedin: false,
   tasks: [],
   phase: 'ground',
   userInfo: {user_id:null, user_name:null, nuser_bio:null},
-  loginAccount: {
+  signinAcc: {
     id:1,
     alias:'tamako',
     name:'たまこ',
@@ -42,9 +44,11 @@ export const initialState:CounterState = {
     color:'#'+Math.floor(Math.random()*parseInt('ffffff',16)).toString(16),
     since:'20170619T234108+0900'
   },
-  hasAccounts: [
-    {id:1, alias:'tamako'},
-  ],
+  loginUser: {
+    hasAcc: [
+        {id:1, alias:'tamako'},
+    ],
+  },
   mailaddr: null,
 };
 
@@ -55,7 +59,11 @@ export default function reducer (
   switch (action.type) {
 
     case INIT_STATE:
-      return Object.assign({}, state, initialState );
+      return Object.assign({}, initialState, {
+        isLoggedin:state.isLoggedin,
+        signinAcc: state.signinAcc, 
+        loginUser: state.loginUser, 
+      });
 
     case FETCH_REQUEST_START: {
       return Object.assign({}, state, { phase:'loading' })
@@ -63,6 +71,14 @@ export default function reducer (
 
     case FETCH_REQUEST_FINISH: {
       return Object.assign({}, state, { phase:'ground' })
+    }
+
+    case LOGIN: {
+      return Object.assign({}, state, { isLoggedin: true })
+    }
+
+    case LOGOUT: {
+      return Object.assign({}, state, { isLoggedin: false })
     }
 
     case TOOT:
@@ -148,15 +164,22 @@ export default function reducer (
 
     case LOGIN:
       console.log("@@",action.account)
-      return Object.assign({}, state, { loginAccount:action.account });
+      return Object.assign({}, state, { signinAcc:action.account });
 
     case SET_PHASE:
       console.log('!@#$$%^', action.phase)
       return Object.assign({}, state, { phase:action.phase });
 
     case SET_STATE:
+      console.log(action.state)
       return Object.assign({}, state, action.state );
-
+   
+    case ENTRY:
+      console.log(action)
+      return Object.assign({}, state, { 
+        signinAcc: action.signinAcc,
+        loginUser: action.loginUser,
+      })
 
     default:
       return state
@@ -182,10 +205,11 @@ export class ActionDispatcher {
     this.dispatch({ type:INIT_STATE })
   }
 
-  async entry( mailaddr:sring ): Promise<void> {
+  async entry( account_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
+    //this.dispatch({ type:LOGIN })
 
-    const url = '/api/mailentry/'+encodeURI(mailaddr)
+    const url = '/api/entry/'+encodeURI(account_id)
 
     try {
       const response:Response = await fetch(url, {
@@ -194,7 +218,9 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:SET_STATE, state:{ mailaddr:json.mailaddr }})
+        console.log('recieve!!!!!')
+        this.dispatch({ type:LOGIN })
+        this.dispatch({ type:ENTRY, signinAcc:json.signinAcc, loginUser:json.loginUser })
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
