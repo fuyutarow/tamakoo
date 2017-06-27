@@ -1,14 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import AddButtonSVG from '../assets/svg/add-button-inside-black-circle.svg';
-import IconMenu from 'material-ui/IconMenu';
-import IconButton from 'material-ui/IconButton';
-import FontIcon from 'material-ui/FontIcon';
-import NavigationExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
-import RaisedButton from 'material-ui/RaisedButton';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
 import { history } from './Index';
 
 const styles = (windowWidth) => { return {
@@ -59,22 +54,21 @@ const styles = (windowWidth) => { return {
 export default class Tool extends React.Component<Props,{}> {
   componentWillMount(){
     this.styles = styles(screen.width);
-    this.props.actions.entry(this.props.match.params.id)
-    //if(this.props.match.path!='/'){
-  }
-
-  componentWillReceiveProps() {
-    //if(this.props.match.path!='/'){
-    //    history.push('/')
-    //}
-    console.log("componentWillReceiveProps",this.props);
+    try{
+      this.props.actions.entry(this.props.match.params.id)
+    } catch (err) {
+    } finally {
+    }
+  //  console.log(this.props)
+  //  if(this.props.match.path!='/'){
+  //  }
   }
 
   render() {
     console.log(this.props.value)
     const accountList = this.props.value.loginUser.hasAcc
       .map( account =>
-        <MenuItem value={account.id} primaryText={account.alias} 
+        <MenuItem value={account.id} primaryText={account.alias}
           containerElement={<Link to={'/entry/'+account.id}/>}/>
         )
 

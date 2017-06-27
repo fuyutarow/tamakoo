@@ -13,41 +13,28 @@ interface Props {
 };
 
 const styles = (windowWidth) => { return {
-  toot: {
+  signin: {
     color: 'rgba(0, 0, 0, 0.87)',
-    position: 'relative',
-    display: 'block',
+    //position: 'absolute',
+    position: 'fixed',
+    left: '50vw',
+    width: '234px',
     background: 'none',
     textAlign: 'center',
-    margin: '30vh 10% 0% 10%',
-  },
-  textarea: {
-    fontSize: '16px',
-    height: '40px',
-    width: '85%',
-    paddingLeft: '0',
-    position: 'relative',
-    background: 'none',
-    display: 'block',
-    marginTop: '0em',
-    margin: '0px',
-    borderStyle: 'none',
+    margin: '30vh auto 0% -117px',
+    fontSize: '28px',
+    display: 'grid',
+    gridTemplateRows: '40px 40px',
+    gridTemplateColumns: '100%',
+    gridGap: '10px',
   },
   button: {
-    width: '40px',
-    height: '30px',
-    display: 'flex',
-    borderRadius: '0',
-    margin: '5px 0 5px 0',
-    position: 'absolute',
-    right: '0',
-    top: '0',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '4px 1px 4px 2px',
-    borderStyle: 'none',
-    backgroundColor:'#248',
+    gridArea:'2/1/3/2',
     color: '#fff',
+    backgroundColor: 'rgb(0, 188, 212)',
+    borderStyle: 'none',
+    WebkitBorderRadius: '20px',
+    fontSize: '20px',
   },
 }}
 
@@ -57,20 +44,40 @@ export class Signin extends React.Component<Props, void> {
   }
 
   send(){
-    const mailaddr = this.refs.note.value;
+    const mailaddr = this.refs.mailaddr.value;
     this.props.actions.send(mailaddr)
     history.push('/mailentry/sended')
   }
 
+  addAcc(){
+    const handle = this.refs.handle.value;
+    this.props.actions.addAcc(this.props.value.loginUser.id,handle);
+    history.push('/mailentry/sended');
+  }
+
+
   render() {
+    const mailForm =
+      <div style={this.styles.signin}>
+       <input style={{gridArea:'1/1/2/2'}} type='text' placeholder='your Email address' ref='mailaddr' />
+       <button style={this.styles.button} onClick={e=>this.send()}>Send</button>
+      </div>
+
+    const handleForm =
+      <div style={this.styles.signin}>
+       <input style={{gridArea:'1/1/2/2'}} type='text' placeholder='handle name' ref='handle' />
+       <button style={this.styles.button} onClick={e=>this.addAcc()}>Add account</button>
+      </div>
+
+    const form =
+      this.props.value.isLoggedin? handleForm : mailForm
+
     return (
-      <div style={this.styles.toot}>
-        <input style={this.styles.textarea} type='text' ref='note'
-          placeholder="  your Email address"/>
-          <button style={this.styles.button}
-             onClick={e=>this.send()}>send</button>
+      <div>
+        { form }
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
+
 
     )
   }

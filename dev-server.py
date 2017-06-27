@@ -6,6 +6,7 @@ import string
 import random
 from random import randint
 randstr = lambda n : ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
+randcolor = lambda : '#'+str(random.randint(0,16777215))#ffffff
 
 import secure
 from neo4jrestclient.client import GraphDatabase
@@ -21,6 +22,38 @@ wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
 from datetime import datetime
 
 api = Flask(__name__, static_folder='dist')
+
+def get_user(user_id):
+    line =  gdb.query('\
+        MATCH (a:User) WHERE ID(a)={}\
+        RETURN ID(a), a.mailaddr, a.givenname, a.familyname, a.birthday, a.gender, a.since'\
+        .format(user_id))[0]
+    user = {
+        'id': line[0],
+        'mailaddr': line[1],
+        'givename': line[2],
+        'familyname': line[3],
+        'birthday': line[4],
+        'gender': line[5],
+        'since': line[6],
+    }
+
+    has_accounts = []
+    for line in gdb.query('\
+            MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
+            RETURN ID(a), a.alias, a.handle, a.bio, a.since, a.access\
+            '.format(user_id)):
+        account =  {
+            'id': line[0],
+            'alias': line[1],
+            'handle': line[2],
+            'bio': 'None' if line[3]==None else line[3],
+            'since': line[4],
+            'access': line[5],
+        }
+        has_accounts.append(account)
+    user['hasAcc'] = has_accounts
+    return user
 
 @api.route('/', defaults={'path': ''})
 @api.route('/<path:path>')
@@ -43,17 +76,36 @@ def face():
 def favicon():
     return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
 
-@api.route('/api/anchor/<string:anchor_text>', methods=['GET'])
-def api_anchor(anchor_text):
-    user_id = 10
-    card_id, toot_text = anchor_text.split('\t')
+@api.route('/api/addAcc/<string:state>', methods=['GET'])
+def api_addAcc(state):
+    state = json.loads(state)
+    user_id = state['user_id']
+    handle = state['handle']
+    access = 'public'
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
+    alias = randstr(randint(6,8))
+    print(user_id, handle, now, alias, now, randcolor)
+    gdb.query('\
+        MATCH (a:User) WHERE ID(a)=%s\
+        CREATE (a)-[:Have]->(:Account {handle:"%s",alias:"%s",since:"%s",color:"%s"})'\
+        %( user_id, handle, alias, now, randcolor() ), data_contents=True)
+    result = {
+        'user': get_user(user_id)
+        }
+    return make_response(jsonify(result))
+
+@api.route('/api/anchor/<string:state>', methods=['GET'])
+def api_anchor(state):
+    state = json.loads(state)
+    account_id = state['account_id']
+    card_id = state['card_id']
+    toot_text: state['toot_text']
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     gdb.query('\
-        MATCH (a:User),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
+        MATCH (a:Account),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
         CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)'\
-        %( user_id, card_id, now, toot_text, now, now ), data_contents=True)
+        %( account_id, card_id, now, toot_text, now, now ), data_contents=True)
     result = {
-        'text': 'toot complete'
         }
     return make_response(jsonify(result))
 
@@ -268,32 +320,10 @@ def api_login(mailaddr):
     from email.mime.text import MIMEText
 
     try:
-        line = gdb.query('\
-            MATCH (a:User) WHERE a.mailaddr="%s"\
-            RETURN ID(a), a.mailaddr, a.givenname, a.familyname, a.birthday, a.gender, a.since, a.access', data_contents=True)[0]
-        user = {
-            'id': line[0],
-            'mailaddr': line[1],
-            'givenname': line[2],
-            'familyname': line[3],
-            'birthday': line[4],
-            'gender': line[5],
-            'since': line[6],
-            'access': line[7],
-        }
-        has_accounts = []
-        for line in gdb.query('\
-                MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
-                RETURN ID(a), a.alias, a.name, a.bio'\
-                .format(user['id'])):
-            account =  {
-                'id': line[0],
-                'alias': line[1],
-                'name': line[2],
-                'bio': 'None' if line[3]==None else line[3],
-            }
-            has_accounts.append(account)
-        user['hasAcc'] = has_accounts
+        user_id = gdb.query('\
+            MATCH (a:User) WHERE a.mailaddr="%s" RETURN ID(a)'\
+            %(mailaddr), data_contents=True)[0]
+        user = get_user(user_id)
 
         url = 'tamakoo.com/entry/{}'.format(user['hasAcc'][0]['id'])
 
@@ -323,40 +353,6 @@ def api_login(mailaddr):
     }
     return  make_response(jsonify(result))
 
-@api.route('/api/toot/<string:state>', methods=['GET'])
-def api_toot(state):
-    state = json.loads(state)
-    user_id = state['user_id']
-    toot_text = state['toot_text']
-    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
-    access = 'public'
-    since = now
-    gdb.query('\
-        MATCH (a:User) WHERE ID(a)=%s\
-        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",since:"%s",access:"%s"})'\
-        %(user_id,now,toot_text,since,access), data_contents=True)
-
-    vec = model.infer_vector(wakati(toot_text))
-    sims = cosine_similarity([vec], doc_vecs)
-    index = np.argsort(sims[0])[::-1]
-    lines = []
-    for i in range(20):
-        line = doc[index[i]][:-1].split('\t')
-        line = {
-            'user_id': line[0],
-            'user_name': line[1],
-            'toot_when': line[2],
-            'card_id': line[3],
-            'text': line[4],
-            'url': line[5],
-            'mode':'drawn'
-        }
-        lines.append(line)
-    result = {
-        'cards': lines
-        }
-    return make_response(jsonify(result))
-
 @api.route('/api/signup/<string:user>', methods=['GET'])
 def api_signup(user):
     user = json.loads(user)
@@ -367,14 +363,48 @@ def api_signup(user):
         CREATE (a:User {mailaddr:"%s",givenname:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s"})\
         RETURN ID(a)'\
         %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now), data_contents=True)[0][0]
-    alias = randstr(randint(6,12))
+    alias = randstr(randint(6,8))
 
     print(user_id, user['hasAcc'][0]['name'], alias, now, access)
     gdb.query('\
         MATCH (a:User) WHERE ID(a)=%s\
-        CREATE (a)-[:Have]->(:Account {name:"%s", alias:"%s", since:"%s", access:"%s"})'\
+        CREATE (a)-[:Have]->(:Account {handle:"%s", alias:"%s", since:"%s", access:"%s"})'\
         %(user_id, user['hasAcc'][0]['name'], alias, now, access), data_contents=True)
     result = {
+        }
+    return make_response(jsonify(result))
+
+@api.route('/api/toot/<string:state>', methods=['GET'])
+def api_toot(state):
+    state = json.loads(state)
+    account_id = state['account_id']
+    toot_text = state['toot_text']
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
+    access = 'public'
+    since = now
+    gdb.query('\
+        MATCH (a:Account) WHERE ID(a)=%s\
+        CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",since:"%s",access:"%s"})'\
+        %(account_id,now,toot_text,since,access), data_contents=True)
+
+    vec = model.infer_vector(wakati(toot_text))
+    sims = cosine_similarity([vec], doc_vecs)
+    index = np.argsort(sims[0])[::-1]
+    lines = []
+    for i in range(20):
+        line = doc[index[i]][:-1].split('\t')
+        line = {
+            'account_id': line[0],
+            'account_name': line[1],
+            'toot_when': line[2],
+            'card_id': line[3],
+            'text': line[4],
+            'url': line[5],
+            'mode':'drawn'
+        }
+        lines.append(line)
+    result = {
+        'cards': lines
         }
     return make_response(jsonify(result))
 

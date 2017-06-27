@@ -3,8 +3,9 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import Image from 'react-image-resizer';
+import { history } from '../Index';
 
-import { CounterState, ActionDispatcher } from "../module";
+import { CounterState, ActionDispatcher } from '../module';
 import Bar from './Bar';
 import Tool from '../Tool';
 import { styleOn } from './css';
@@ -27,9 +28,10 @@ export class Face extends React.Component<void, Props, void> {
 
   toot() {
     const note = (ReactDOM.findDOMNode(this.refs.note));
-    if( note.value=="" ) return;
+    if( note.value=='' ) return;
     this.props.actions.toot(note.value);
-    note.value = "";
+    history.push('/thread')
+    note.value = '';
   }
 
   componentWillUpdate(){
@@ -40,9 +42,9 @@ export class Face extends React.Component<void, Props, void> {
 
   render() {
 
-    console.log("window width: ",window.innerWidth);
-    console.log("screen width: ",screen.width,screen.height);
-    console.log("client width: ",document.documentElement.clientWidth);
+    console.log('window width: ',window.innerWidth);
+    console.log('screen width: ',screen.width,screen.height);
+    console.log('client width: ',document.documentElement.clientWidth);
 
     const styles = styleOn(screen.width);
 
@@ -51,11 +53,16 @@ export class Face extends React.Component<void, Props, void> {
     return (
       <div style={this.styles.toot}>
         <input style={this.styles.textarea} type='text' ref='note'
-          placeholder="toot to open tamaKoo"/>
-        <Link to='/thread' style={this.styles.button} ref="echobtn" onClick={e=>this.toot()}>
-          <img draggable="false" style={this.styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
-        </Link>
-	      <Tool value={this.props.value} actions={this.props.actions} match={this.props.match}/>
+          placeholder='toot to open tamaKoo'/>
+        <img draggable='false' style={this.styles.button}
+          alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
+          onClick={e=>this.toot()}
+        />
+	      <Tool
+          match={this.props.match}
+          value={this.props.value}
+          actions={this.props.actions}
+        />
       </div>
     )
   }

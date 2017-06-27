@@ -59,10 +59,15 @@ export default function reducer (
   switch (action.type) {
 
     case INIT_STATE:
+      console.log('iniit',Object.assign({}, initialState, {
+        isLoggedin:state.isLoggedin,
+        signinAcc: state.signinAcc,
+        loginUser: state.loginUser,
+      }))
       return Object.assign({}, initialState, {
         isLoggedin:state.isLoggedin,
-        signinAcc: state.signinAcc, 
-        loginUser: state.loginUser, 
+        signinAcc: state.signinAcc,
+        loginUser: state.loginUser,
       });
 
     case FETCH_REQUEST_START: {
@@ -84,8 +89,8 @@ export default function reducer (
     case TOOT:
       const nextTasks = action.cards
         .map( a => { return {
-          user_id:a.user_id,
-          user_name:a.user_name,
+          account_id:a.account_id,
+          account_name:a.account_name,
           toot_when:a.toot_when,
           card_id:a.card_id,
           text:a.text,
@@ -116,7 +121,6 @@ export default function reducer (
       });
 
     case INSERT_TASK:
-      console.log('insert')
       let insertedTasks = state.tasks
         .map( a => {
           if(a['mode']=='tooted'){
@@ -136,8 +140,8 @@ export default function reducer (
     case CALL:
       return Object.assign({}, state, {
         tasks: [{
-          user_id: action.card.user_id,
-          user_name: action.card.user_name,
+          account_id: action.card.account_id,
+          account_name: action.card.account_name,
           card_id: action.card.card_id,
           text: action.card.text,
           url: action.card.url,
@@ -173,10 +177,10 @@ export default function reducer (
     case SET_STATE:
       console.log(action.state)
       return Object.assign({}, state, action.state );
-   
+
     case ENTRY:
       console.log(action)
-      return Object.assign({}, state, { 
+      return Object.assign({}, state, {
         signinAcc: action.signinAcc,
         loginUser: action.loginUser,
       })
@@ -205,12 +209,34 @@ export class ActionDispatcher {
     this.dispatch({ type:INIT_STATE })
   }
 
+  async addAcc( user_id:number, handle:string ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+    const url = '/api/addAcc/'+encodeURI(JSON.stringify({
+      user_id: user_id,
+      handle: handle,
+    }))
+
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:SET_STATE, STATE:{ loginUser:json.user }})
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
   async entry( account_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
-    //this.dispatch({ type:LOGIN })
-
     const url = '/api/entry/'+encodeURI(account_id)
-
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
@@ -283,11 +309,15 @@ export class ActionDispatcher {
     }
   }
 
-  async anchor( card_id:number, order:number, text:string ): Promise<void> {
+  async anchor( account_id:number, card_id:number, order:number, text:string ): Promise<void> {
     this.dispatch({ type:INSERT_TASK, order:order, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
-    const url = '/api/anchor/'+encodeURI(card_id+'\t'+text)
+    const url = '/api/anchor/'+encodeURI(JSON.stringify({
+      account_id: account_id,
+      card_id: card_id,
+      toot_text: text,
+    }))
     try {
       const response:Response = await fetch(url, {
         method: 'GET',

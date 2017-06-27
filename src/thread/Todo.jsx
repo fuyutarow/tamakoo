@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { ActionDispatcher, Task } from '../module';
+import { history } from '../Index';
 import {
   AppBar, MenuItem,
   Card, CardHeader, CardText, CardActions,
@@ -16,9 +17,10 @@ export default class Todo extends React.Component<Props, void> {
 
   anchor() {
     const note = (ReactDOM.findDOMNode(this.refs.note)).value;
-    if( note=="" ) return;
-    this.props.actions.anchor(this.props.task.card_id, this.props.order, note);
-    (ReactDOM.findDOMNode(this.refs.note)).value = "";
+    if( note=='' ) return;
+    this.props.actions.anchor(this.props.value.signinAcc.id, this.props.task.card_id, this.props.order, note);
+    history.push('/thread');
+    (ReactDOM.findDOMNode(this.refs.note)).value = '';
   }
 
   componentWillMount(){
@@ -47,10 +49,11 @@ export default class Todo extends React.Component<Props, void> {
     const responseForm =
       <div style={styles.toot}>
         <input style={styles.textarea} type='text' ref='note'
-          placeholder=">> response"/>
-        <Link to='/thread' style={styles.button} ref="echobtn" onClick={e=>this.anchor()}>
-          <img draggable="false" style={styles.emoji} alt="🗨" src="https://twemoji.maxcdn.com/2/72x72/1f5e8.png"/>
-        </Link>
+          placeholder='>> response'/>
+        <img draggable='false' style={styles.button}
+          alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
+          onClick={e=>this.anchor()}
+        />
       </div>
 
     const cardCenter =

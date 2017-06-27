@@ -25,7 +25,7 @@ export default class TodoList extends React.Component<Props,{}> {
             value={this.props.value}
             actions={this.props.actions}
           />
-          {a.mode=='tooted'||a.mode=='called'? null: <hr/>}
+          {a.mode=='tooted'||a.mode=='block'||a.mode=='called'? null: <hr/>}
         </div>
         )
     return (

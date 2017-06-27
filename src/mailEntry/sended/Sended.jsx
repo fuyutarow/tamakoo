@@ -20,34 +20,29 @@ const styles = (windowWidth) => { return {
     textAlign: 'center',
     margin: '30vh 10% 0% 10%',
   },
-  textarea: {
-    fontSize: '16px',
-    height: '40px',
-    width: '85%',
-    paddingLeft: '0',
-    position: 'relative',
+  signup: {
+    color: 'rgba(0, 0, 0, 0.87)',
+    //position: 'absolute',
+    position: 'fixed',
+    left: '50vw',
+    width: '234px',
     background: 'none',
-    display: 'block',
-    marginTop: '0em',
-    margin: '0px',
-    borderStyle: 'none',
+    textAlign: 'center',
+    margin: '30vh auto 0% -141px',
+    fontSize: '28px',
+    display: 'grid',
+    gridTemplateRows: '40px 40px',
+    gridTemplateColumns: '100%',
+    gridGap: '10px',
   },
   button: {
-    width: '40px',
-    height: '30px',
-    display: 'flex',
-    borderRadius: '0',
-    margin: '5px 0 5px 0',
-    position: 'absolute',
-    right: '0',
-    top: '0',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '4px 1px 4px 2px',
-    borderStyle: 'none',
-    backgroundColor:'#248',
+    gridArea:'2/1/3/2',
     color: '#fff',
-  },
+    backgroundColor: 'rgb(0, 188, 212)',
+    borderStyle: 'none',
+    WebkitBorderRadius: '10px',
+    fontSize: '20px',
+  }
 }}
 
 export class Sended extends React.Component<Props, void> {
@@ -56,7 +51,7 @@ export class Sended extends React.Component<Props, void> {
   }
 
   render() {
-    const view =
+    const mailSended =
       this.props.value.mailaddr?
         <div>
           tamakoo.com send email to {this.props.value.mailaddr}.
@@ -66,9 +61,17 @@ export class Sended extends React.Component<Props, void> {
           please wait.
         </div>
 
+    const handleSended =
+        <div>
+          added account.
+        </div>
+
+    const sended =
+      this.props.value.isLoggedin? handleSended : mailSended
+
     return (
       <div style={this.styles.toot}>
-        { view }
+        { sended }
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
 
