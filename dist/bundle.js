@@ -1663,7 +1663,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
   }, {
     key: 'toot',
     value: function () {
-      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(text) {
+      var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(account_id, text) {
         var url, response, json;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
@@ -1674,7 +1674,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
                 this.dispatch({ type: FETCH_REQUEST_START });
 
                 url = '/api/toot/' + encodeURI(JSON.stringify({
-                  user_id: 10,
+                  account_id: account_id,
                   toot_text: text
                 }));
                 _context4.prev = 4;
@@ -1731,7 +1731,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee4, this, [[4, 19, 22, 25]]);
       }));
 
-      function toot(_x6) {
+      function toot(_x6, _x7) {
         return _ref4.apply(this, arguments);
       }
 
@@ -1799,7 +1799,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee5, this, [[3, 13, 16, 19]]);
       }));
 
-      function anchor(_x7, _x8, _x9, _x10) {
+      function anchor(_x8, _x9, _x10, _x11) {
         return _ref5.apply(this, arguments);
       }
 
@@ -1873,7 +1873,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee6, this, [[3, 19, 22, 25]]);
       }));
 
-      function callCard(_x11) {
+      function callCard(_x12) {
         return _ref6.apply(this, arguments);
       }
 
@@ -1942,7 +1942,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee7, this, [[2, 16, 19, 22]]);
       }));
 
-      function askUser(_x12) {
+      function askUser(_x13) {
         return _ref7.apply(this, arguments);
       }
 
@@ -2014,7 +2014,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee8, this, [[2, 17, 20, 23]]);
       }));
 
-      function hisToot(_x13) {
+      function hisToot(_x14) {
         return _ref8.apply(this, arguments);
       }
 
@@ -2084,7 +2084,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee9, this, [[2, 16, 19, 22]]);
       }));
 
-      function login(_x14) {
+      function login(_x15) {
         return _ref9.apply(this, arguments);
       }
 
@@ -2151,7 +2151,7 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
         }, _callee10, this, [[2, 15, 18, 21]]);
       }));
 
-      function signup(_x15) {
+      function signup(_x16) {
         return _ref10.apply(this, arguments);
       }
 
@@ -31544,7 +31544,7 @@ var Face = exports.Face = function (_React$Component) {
     value: function toot() {
       var note = ReactDOM.findDOMNode(this.refs.note);
       if (note.value == '') return;
-      this.props.actions.toot(note.value);
+      this.props.actions.toot(this.props.value.signinAcc.id, note.value);
       _Index.history.push('/thread');
       note.value = '';
     }

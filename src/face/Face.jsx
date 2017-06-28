@@ -29,7 +29,7 @@ export class Face extends React.Component<void, Props, void> {
   toot() {
     const note = (ReactDOM.findDOMNode(this.refs.note));
     if( note.value=='' ) return;
-    this.props.actions.toot(note.value);
+    this.props.actions.toot(this.props.value.signinAcc.id, note.value);
     history.push('/thread')
     note.value = '';
   }

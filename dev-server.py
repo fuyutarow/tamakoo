@@ -377,6 +377,7 @@ def api_signup(user):
 @api.route('/api/toot/<string:state>', methods=['GET'])
 def api_toot(state):
     state = json.loads(state)
+    print(state)
     account_id = state['account_id']
     toot_text = state['toot_text']
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')

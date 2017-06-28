@@ -281,13 +281,13 @@ export class ActionDispatcher {
   }
 
 
-  async toot( text: string ): Promise<void> {
+  async toot( account_id:number, text:string ): Promise<void> {
     this.dispatch({ type:INIT_STATE })
     this.dispatch({ type:ADD_TASK, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
     const url = '/api/toot/'+encodeURI(JSON.stringify({
-      user_id: 10,
+      account_id: account_id,
       toot_text: text,
     }))
     try {
