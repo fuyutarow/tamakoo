@@ -54,21 +54,16 @@ const styles = (windowWidth) => { return {
 export default class Tool extends React.Component<Props,{}> {
   componentWillMount(){
     this.styles = styles(screen.width);
-    try{
-      this.props.actions.entry(this.props.match.params.id)
-    } catch (err) {
-    } finally {
-    }
+
   //  console.log(this.props)
   //  if(this.props.match.path!='/'){
   //  }
   }
 
   render() {
-    console.log(this.props.value)
     const accountList = this.props.value.loginUser.hasAcc
       .map( account =>
-        <MenuItem value={account.id} primaryText={account.alias}
+        <MenuItem value={account.id} primaryText={'@'+account.alias}
           containerElement={<Link to={'/entry/'+account.id}/>}/>
         )
 
@@ -81,13 +76,18 @@ export default class Tool extends React.Component<Props,{}> {
         </Link>
       </div>
 
+    const preference =
+      this.props.value.isLoggedin?
+        <MenuItem primaryText='preference' containerElement={<Link to='/preference/index'/>}/>
+      :null
+
     return (
       <Toolbar style={this.styles.bar}>
         <ToolbarGroup style={this.styles.login} containerStyle={{padding:'0'}} firstChild={true}>
           <DropDownMenu containerStyle={{width:'20vw'}} value={this.props.value.signinAcc.id} onChange={(event, index, value) => {
             this.props.actions.login(value);
           }}>
-            <MenuItem primaryText='preference' />
+            { preference }
             <MenuItem primaryText='add account' containerElement={<Link to='/mailentry/signin'/>}/>
             <hr/>
             { accountList }

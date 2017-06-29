@@ -2,6 +2,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import { history } from '../../Index';
 
 import { CounterState, ActionDispatcher } from "../../module";
 import Tool from '../../Tool';
@@ -14,11 +15,18 @@ interface Props {
 const styles = (windowWidth) => { return {
   toot: {
     color: 'rgba(0, 0, 0, 0.87)',
-    position: 'relative',
-    display: 'block',
+    //position: 'absolute',
+    position: 'fixed',
+    left: '50vw',
+    width: '234px',
     background: 'none',
     textAlign: 'center',
-    margin: '30vh 10% 0% 10%',
+    margin: '30vh auto 0% -141px',
+    fontSize: '28px',
+    display: 'grid',
+    gridTemplateRows: '40px 40px 40px 40px 40px',
+    gridTemplateColumns: 'calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6)',
+    gridGap: '10px',
   },
   textarea: {
     fontSize: '16px',
@@ -33,21 +41,14 @@ const styles = (windowWidth) => { return {
     borderStyle: 'none',
   },
   button: {
-    width: '40px',
-    height: '30px',
-    display: 'flex',
-    borderRadius: '0',
-    margin: '5px 0 5px 0',
-    position: 'absolute',
-    right: '0',
-    top: '0',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    padding: '4px 1px 4px 2px',
-    borderStyle: 'none',
-    backgroundColor:'#248',
+    gridArea:'3/1/4/7',
     color: '#fff',
+    backgroundColor: 'rgb(0, 188, 212)',
+    borderStyle: 'none',
+    WebkitBorderRadius: '10px',
+    fontSize: '20px',
   },
+
 }}
 
 export class Sended extends React.Component<Props, void> {
@@ -55,11 +56,19 @@ export class Sended extends React.Component<Props, void> {
     this.styles = styles(screen.width);
   }
 
+  signin(){
+    history.push('/entry/'+this.props.value.signinAcc.id)
+  }
+
   render() {
     console.log('$$%',this.props.mailaddr)
     return (
       <div style={this.styles.toot}>
-        tamakoo.com send email to {this.props.mailaddr}.
+        <div style={{gridArea:'1/1/2/7'}}>Thanks sign up.</div>
+        <input style={{gridArea:'2/1/3/3'}} type='text' placeholder={this.props.value.signinAcc.handle} ref='handle' />
+        <dev style={{gridArea:'2/3/3/4'}}>@</dev>
+        <input style={{gridArea:'2/4/3/7'}} type='text' placeholder={this.props.value.signinAcc.alias} ref='alias' />
+        <button style={this.styles.button} onClick={e=>this.signin()}>Sign in</button>
         <Tool value={this.props.value} actions={this.props.actions} />
       </div>
 

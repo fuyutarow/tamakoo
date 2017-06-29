@@ -14,7 +14,7 @@ const FETCH_REQUEST_FINISH = 'counter/fetch_request_finish'
 const ONLY_CARD = 'counter/only_card';
 const CLEAR_CARDS = 'counter/clear_cards';
 const CALL = 'counter/call';
-const ANSWER_USER = 'counter/answer_user';
+const ANSWER_ACC = 'counter/ANSWER_ACC';
 const INIT_STATE = 'counter/init_state';
 const LOGIN = 'counter/login';
 const LOGOUT = 'counter/logout';
@@ -25,7 +25,7 @@ export interface CounterState {
   isLoggedin : boolean;
   tasks: Task[];
   phase: string;
-  userInfo: any;
+  whoisAcc: any;
   signinAcc: any;
   loginUser: any;
   mailaddr: string;
@@ -35,11 +35,18 @@ export const initialState:CounterState = {
   isLoggedin: false,
   tasks: [],
   phase: 'ground',
-  userInfo: {user_id:null, user_name:null, nuser_bio:null},
+  whoisAcc: {
+    id:null,
+    alias:null,
+    handle:null,
+    bio:null,
+    color:null,
+    since:null,
+  },
   signinAcc: {
     id:1,
     alias:'tamako',
-    name:'たまこ',
+    handle:'たまこ',
     bio:'welcome tamakoo',
     color:'#'+Math.floor(Math.random()*parseInt('ffffff',16)).toString(16),
     since:'20170619T234108+0900'
@@ -89,12 +96,9 @@ export default function reducer (
     case TOOT:
       const nextTasks = action.cards
         .map( a => { return {
-          account_id:a.account_id,
-          account_name:a.account_name,
-          toot_when:a.toot_when,
-          card_id:a.card_id,
-          text:a.text,
-          url:a.url,
+          account:a.account,
+          toot:a.toot,
+          card:a.card,
           mode:a.mode
         }});
       return Object.assign({}, state, {
@@ -114,10 +118,13 @@ export default function reducer (
       }
       return Object.assign({}, state, {
         tasks: state.tasks.concat( [{
-          card_id: -1,
-          text:css2js(action.text),
-          url:'None',
-          mode:'tooted'}] )
+          card: {
+            id: -1,
+            text:css2js(action.text),
+            url:'None',
+          },
+          mode:'tooted',
+        }])
       });
 
     case INSERT_TASK:
@@ -128,7 +135,6 @@ export default function reducer (
           }
           return a;
         })
-      console.log('***',insertedTasks)
       insertedTasks.splice(action.order+1,0, {
         card_id: -1,
         text: action.text,
@@ -140,23 +146,15 @@ export default function reducer (
     case CALL:
       return Object.assign({}, state, {
         tasks: [{
-          account_id: action.card.account_id,
-          account_name: action.card.account_name,
-          card_id: action.card.card_id,
-          text: action.card.text,
-          url: action.card.url,
-          mode: 'called'
+          account:action.task.account,
+  //ftoot        toot:action.task.toot,
+          card:action.task.card,
+          mode:'called',
         }]
       });
 
-    case ANSWER_USER:
-      const info = {
-        user_id: action.user.id,
-        user_alias: action.user.alias,
-        user_name: action.user.name,
-        user_bio: action.user.bio,
-      }
-      return Object.assign({}, state, { userInfo: info });
+    case ANSWER_ACC:
+      return Object.assign({}, state, { whoisAcc: action.account });
 
     case CLEAR_CARDS:
       return Object.assign({}, state, { tasks: [] });
@@ -179,7 +177,7 @@ export default function reducer (
       return Object.assign({}, state, action.state );
 
     case ENTRY:
-      console.log(action)
+      console.log('>>',action)
       return Object.assign({}, state, {
         signinAcc: action.signinAcc,
         loginUser: action.loginUser,
@@ -218,87 +216,12 @@ export class ActionDispatcher {
 
     try {
       const response:Response = await fetch(url, {
-        method: 'GET',
+        method: 'POST',
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
         this.dispatch({ type:SET_STATE, STATE:{ loginUser:json.user }})
-      } else {
-        throw new Error(`illegal status code: ${response.status}`)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      this.dispatch({ type:FETCH_REQUEST_FINISH });
-    }
-  }
-
-  async entry( account_id:number ): Promise<void> {
-    this.dispatch({ type:FETCH_REQUEST_START });
-    const url = '/api/entry/'+encodeURI(account_id)
-    try {
-      const response:Response = await fetch(url, {
-        method: 'GET',
-        headers: this.myHeaders,
-      })
-      if (response.status === 200) { //2xx
-        const json: {amount:number} = await response.json();
-        console.log('recieve!!!!!')
-        this.dispatch({ type:LOGIN })
-        this.dispatch({ type:ENTRY, signinAcc:json.signinAcc, loginUser:json.loginUser })
-      } else {
-        throw new Error(`illegal status code: ${response.status}`)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      this.dispatch({ type:FETCH_REQUEST_FINISH });
-    }
-  }
-
-  async send( mailaddr:sring ): Promise<void> {
-    this.dispatch({ type:FETCH_REQUEST_START });
-
-    const url = '/api/login/'+encodeURI(mailaddr)
-
-    try {
-      const response:Response = await fetch(url, {
-        method: 'GET',
-        headers: this.myHeaders,
-      })
-      if (response.status === 200) { //2xx
-        const json: {amount:number} = await response.json();
-        this.dispatch({ type:SET_STATE, state:{ mailaddr:json.mailaddr }})
-      } else {
-        throw new Error(`illegal status code: ${response.status}`)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      this.dispatch({ type:FETCH_REQUEST_FINISH });
-    }
-  }
-
-
-  async toot( account_id:number, text:string ): Promise<void> {
-    this.dispatch({ type:INIT_STATE })
-    this.dispatch({ type:ADD_TASK, text:text })
-    this.dispatch({ type:FETCH_REQUEST_START });
-
-    const url = '/api/toot/'+encodeURI(JSON.stringify({
-      account_id: account_id,
-      toot_text: text,
-    }))
-    try {
-      const response:Response = await fetch(url, {
-        method: 'GET',
-        headers: this.myHeaders,
-      })
-      console.log()
-      if (response.status === 200) { //2xx
-        const json: {amount:number} = await response.json();
-        this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -335,20 +258,21 @@ export class ActionDispatcher {
     }
   }
 
-  async callCard( card:any ): Promise<void> {
-    this.dispatch({ type:CALL, card:card });
+  async askAcc( account_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
-
-    const url = '/api/callCard/'+card.card_id;
+    const url = '/api/account/'+encodeURI(JSON.stringify({
+      account_id: account_id,
+      amount: 100,
+    }));
+    console.log('hear')
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
-        this.dispatch({ type:CLEAR_CARDS })
         const json: {amount:number} = await response.json();
-        console.log(json)
+        this.dispatch({ type:ANSWER_ACC, account:json.account });
         this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
@@ -360,17 +284,26 @@ export class ActionDispatcher {
     }
   }
 
-  async askUser( user_id:number ): Promise<void> {
+  async callCard( task:any ): Promise<void> {
+    console.log('#########',task)
+    this.dispatch({ type:CALL, task:task });
+    console.log('over')
     this.dispatch({ type:FETCH_REQUEST_START });
-    const url = '/api/askAccount/'+user_id;
+
+    const url = '/api/callCard/'+encodeURI(JSON.stringify({
+      card_id: task.card.id,
+      amount: 100,
+    }))
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
+        this.dispatch({ type:CLEAR_CARDS })
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:ANSWER_USER, user:json.account });
+        console.log('!!!!!!!!!!!!!!',json)
+        this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -381,19 +314,31 @@ export class ActionDispatcher {
     }
   }
 
-  async hisToot( user_id:number ): Promise<void> {
+  async entry( account_id:number ): Promise<void> {
+    const date = new Date()
+    console.log('--------------'+date+'------------')
     this.dispatch({ type:FETCH_REQUEST_START });
 
-    const url = '/api/hisToot/'+user_id;
+    const url = '/api/entry/'+encodeURI(JSON.stringify({
+      account_id: account_id,
+    }))
     try {
+      console.log(url)
       const response:Response = await fetch(url, {
         method: 'GET',
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
-        this.dispatch({ type:CLEAR_CARDS })
+        const d = new Date()
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:TOOT, cards:json.cards });
+        console.log('recieve!!!!!',json)
+        this.dispatch({ type:LOGIN })
+        this.dispatch({ type:ENTRY,
+          signinAcc:json.user.hasAcc
+            .filter( a => a['id']==account_id )[0],
+          loginUser:json.user
+        })
+        console.log('++++++'+d+'+++++++++++')
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -426,6 +371,27 @@ export class ActionDispatcher {
     }
   }
 
+  async send( mailaddr:sring ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
+    const url = '/api/login/'+encodeURI(mailaddr)
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:SET_STATE, state:{ mailaddr:json.mailaddr }})
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
   async signup( user:any ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
     const url = '/api/signup/'+encodeURI(JSON.stringify(user))
@@ -436,6 +402,35 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
+        this.dispatch({ type:ENTRY, signinAcc:json.signinAcc, loginUser:json.loginUser })
+      } else {
+        throw new Error(`illegal status code: ${response.status}`)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.dispatch({ type:FETCH_REQUEST_FINISH });
+    }
+  }
+
+  async toot( account_id:number, text:string ): Promise<void> {
+    this.dispatch({ type:INIT_STATE })
+    this.dispatch({ type:ADD_TASK, text:text })
+    this.dispatch({ type:FETCH_REQUEST_START });
+    const url = '/api/echo/'+encodeURI(JSON.stringify({
+      account_id: account_id,
+      toot_text: text,
+      amount: 30,
+    }))
+    try {
+      const response:Response = await fetch(url, {
+        method: 'GET',
+        headers: this.myHeaders,
+      })
+      console.log()
+      if (response.status === 200) { //2xx
+        const json: {amount:number} = await response.json();
+        this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }

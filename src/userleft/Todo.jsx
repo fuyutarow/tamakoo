@@ -26,13 +26,13 @@ export default class Todo extends React.Component<Props, void> {
       styles.nowToot : styles.card;
 
     const userLeft =
-      <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}>
+      <Link to={'/user/'+this.props.task.account.id} style={styles.userleft}>
         <p onClick={e=>{
-          this.props.actions.askUser(this.props.task.user_id)
+          this.props.actions.askUser(this.props.task.account.id)
         }}></p>
       </Link>
 
-    const textln = this.props.task.text.split('\n')
+    const textln = this.props.task.card.text.split('\n')
       .map( m => (<p style={styles.ln}>{m}</p>) )
 
     const cardCenter =
@@ -46,7 +46,7 @@ export default class Todo extends React.Component<Props, void> {
         </p>
       :null
 
-    const copyRight = this.props.task.url=='None'?
+    const copyRight = this.props.task.card.url=='None'?
        <p style={styles.linkOff}></p>
        :
        <p style={styles.linkOn}></p>

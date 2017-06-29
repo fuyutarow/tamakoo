@@ -18,7 +18,7 @@ export default class Todo extends React.Component<Props, void> {
   anchor() {
     const note = (ReactDOM.findDOMNode(this.refs.note)).value;
     if( note=='' ) return;
-    this.props.actions.anchor(this.props.value.signinAcc.id, this.props.task.card_id, this.props.order, note);
+    this.props.actions.anchor(this.props.value.signinAcc.id, this.props.task.card.id, this.props.order, note);
     history.push('/thread');
     (ReactDOM.findDOMNode(this.refs.note)).value = '';
   }
@@ -34,16 +34,13 @@ export default class Todo extends React.Component<Props, void> {
 
     const userLeft =
       this.props.task.mode=='winded'|| this.props.task.mode=='drawn'?
-        <div style={styles.userleft}>
-          <Link to={'/user/'+this.props.task.user_id} style={styles.userleft}
-            onClick={e=>{
-              this.props.actions.askUser(this.props.task.user_id)
-          }}>
-          </Link>
-        </div>
+        <Link style={styles.userleft} to={'/account/'+this.props.task.account.id}>
+          <div onClick={e=>{
+          }}/>
+        </Link>
       :null
 
-    const textln = this.props.task.text.split('\n')
+    const textln = this.props.task.card.text.split('\n')
       .map( m => (<p style={styles.ln}>{m}</p>) )
 
     const responseForm =
@@ -78,10 +75,9 @@ export default class Todo extends React.Component<Props, void> {
 
       :this.props.task.mode=='called' ?
         <p style={styles.cardcenter}>
-          <Link to={'/user/'+this.props.task.user_id}>
+          <Link to={'/account/'+this.props.task.account.id}>
             <h3 onClick={e=>{
-              this.props.actions.askUser(this.props.task.user_id)
-            }}>{this.props.task.user_name}</h3>
+            }}>{this.props.task.account.name}</h3>
           </Link>
           { textln }
           { responseForm }
@@ -89,7 +85,7 @@ export default class Todo extends React.Component<Props, void> {
 
       :null
 
-    const copyRight = this.props.task.url=='None'?
+    const copyRight = this.props.task.card.url=='None'?
        <p style={styles.linkOff}></p>
        :
        <p style={styles.linkOn}></p>

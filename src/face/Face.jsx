@@ -6,7 +6,6 @@ import Image from 'react-image-resizer';
 import { history } from '../Index';
 
 import { CounterState, ActionDispatcher } from '../module';
-import Bar from './Bar';
 import Tool from '../Tool';
 import { styleOn } from './css';
 interface Props {
@@ -23,7 +22,11 @@ if( ('webkitSpeechRecognition' in window) ){
 export class Face extends React.Component<void, Props, void> {
   componentWillMount(){
     this.styles = styleOn(screen.width);
-    //this.props.actions.entry(this.props.match.params.id)
+    try{
+      this.props.actions.entry(this.props.match.params.id)
+    } catch (err) {
+    } finally {
+    }
   }
 
   toot() {
@@ -36,11 +39,13 @@ export class Face extends React.Component<void, Props, void> {
 
   componentWillUpdate(){
     console.log('^^^',this.props.value)
+    this.props.actions.entry(this.props.match.params.id)
 
   }
 
 
   render() {
+    console.log()
 
     console.log('window width: ',window.innerWidth);
     console.log('screen width: ',screen.width,screen.height);
@@ -52,17 +57,15 @@ export class Face extends React.Component<void, Props, void> {
 
     return (
       <div style={this.styles.toot}>
+        <button onClick={e=>{    this.props.actions.entry(this.props.match.params.id)
+}}>GO</button>
         <input style={this.styles.textarea} type='text' ref='note'
           placeholder='toot to open tamaKoo'/>
         <img draggable='false' style={this.styles.button}
           alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
           onClick={e=>this.toot()}
         />
-	      <Tool
-          match={this.props.match}
-          value={this.props.value}
-          actions={this.props.actions}
-        />
+        <Tool actions={this.props.actions} match={this.props.match} value={this.props.value} />
       </div>
     )
   }

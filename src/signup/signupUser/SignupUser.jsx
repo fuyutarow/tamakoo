@@ -63,13 +63,12 @@ export class SignupUser extends React.Component<Props, void> {
         birthday: year+month+day_,
         gender: gender,
         hasAcc: [
-          {name:handle}
+          { handle:handle }
         ]
       }
       console.log(user)
       this.props.actions.signup(user);
-      //browserHistory.push('/signup-sended')
-      history.push('/signup-sended')
+      history.push('/thanks-signup')
     }
 
     if(!given){

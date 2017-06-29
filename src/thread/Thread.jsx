@@ -5,6 +5,8 @@ import type {CounterState, ActionDispatcher} from "../module"
 import TodoList from './TodoList';
 import Cable from './cable';
 import Bar from './Bar';
+import Tool from '../Tool';
+
 import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
@@ -25,7 +27,7 @@ export class Thread extends React.Component<void, Props, void> {
     return (
       <div ref='ttt' style={this.styles.wall}>
         <TodoList value={this.props.value} actions={this.props.actions} />
-        <Bar value={this.props.value} actions={this.props.actions} />
+        <Tool actions={this.props.actions} match={this.props.match} value={this.props.value} />
       </div>
     )
   }
