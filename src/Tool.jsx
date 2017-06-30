@@ -81,6 +81,13 @@ export default class Tool extends React.Component<Props,{}> {
         <MenuItem primaryText='preference' containerElement={<Link to='/preference/index'/>}/>
       :null
 
+    const signin =
+      this.props.value.isLoggedin?
+        <MenuItem primaryText='add account' containerElement={<Link to='/mailentry/signin'/>}/>
+      :
+        <MenuItem primaryText='sign in' containerElement={<Link to='/mailentry/signin'/>}/>
+
+
     return (
       <Toolbar style={this.styles.bar}>
         <ToolbarGroup style={this.styles.login} containerStyle={{padding:'0'}} firstChild={true}>
@@ -88,7 +95,8 @@ export default class Tool extends React.Component<Props,{}> {
             this.props.actions.login(value);
           }}>
             { preference }
-            <MenuItem primaryText='add account' containerElement={<Link to='/mailentry/signin'/>}/>
+            { signin }
+            { this.props.value.isLoggedin }
             <hr/>
             { accountList }
           </DropDownMenu>

@@ -5263,6 +5263,8 @@ var Tool = function (_React$Component) {
 
       var preference = this.props.value.isLoggedin ? _react2.default.createElement(_MenuItem2.default, { primaryText: 'preference', containerElement: _react2.default.createElement(_reactRouterDom.Link, { to: '/preference/index' }) }) : null;
 
+      var signin = this.props.value.isLoggedin ? _react2.default.createElement(_MenuItem2.default, { primaryText: 'add account', containerElement: _react2.default.createElement(_reactRouterDom.Link, { to: '/mailentry/signin' }) }) : _react2.default.createElement(_MenuItem2.default, { primaryText: 'sign in', containerElement: _react2.default.createElement(_reactRouterDom.Link, { to: '/mailentry/signin' }) });
+
       return _react2.default.createElement(
         _Toolbar.Toolbar,
         { style: this.styles.bar },
@@ -5275,7 +5277,8 @@ var Tool = function (_React$Component) {
                 _this2.props.actions.login(value);
               } },
             preference,
-            _react2.default.createElement(_MenuItem2.default, { primaryText: 'add account', containerElement: _react2.default.createElement(_reactRouterDom.Link, { to: '/mailentry/signin' }) }),
+            signin,
+            this.props.value.isLoggedin,
             _react2.default.createElement('hr', null),
             accountList
           ),
@@ -31362,8 +31365,9 @@ var Face = exports.Face = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this.styles = (0, _css.styleOn)(screen.width);
-      this.props.actions.entry(this.props.match.params.id);
-      try {} catch (err) {} finally {}
+      try {
+        this.props.actions.entry(this.props.match.params.id);
+      } catch (err) {} finally {}
     }
   }, {
     key: 'toot',
