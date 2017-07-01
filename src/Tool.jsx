@@ -61,7 +61,9 @@ export default class Tool extends React.Component<Props,{}> {
   }
 
   render() {
-    const accountList = this.props.value.loginUser.hasAcc
+  
+    console.log('>>>',this.props.value)
+   const accountList = this.props.value.loginUser.hasAcc
       .map( account =>
         <MenuItem value={account.id} primaryText={'@'+account.alias}
           containerElement={<Link to={'/entry/'+account.id}/>}/>

@@ -1,6 +1,13 @@
-# -*- coding: utf-8 -*-
-from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory
+#( -*- coding: utf-8 -*-
+from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory, redirect
 import os
+import json
+import string
+import random
+from random import randint
+randstr = lambda n : ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
+randcolor = lambda : '#'+str(random.randint(0,16777215))#ffffff
+
 import secure
 from neo4jrestclient.client import GraphDatabase
 url = secure.url
@@ -16,39 +23,9 @@ wakati = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), 
 
 from datetime import datetime
 
-api = Flask(__name__)
+api = Flask(__name__, static_folder='dist')
 
-def get_user(user_id):
-    line =  gdb.query('\
-        MATCH (a:User) WHERE ID(a)={}\
-        RETURN ID(a), a.mailaddr, a.givenname, a.familyname, a.birthday, a.gender, a.since'\
-        .format(user_id))[0]
-    user = {
-        'id': line[0],
-        'mailaddr': line[1],
-        'givename': line[2],
-        'familyname': line[3],
-        'birthday': line[4],
-        'gender': line[5],
-        'since': line[6],
-    }
 
-    has_accounts = []
-    for line in gdb.query('\
-            MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
-            RETURN ID(a), a.alias, a.handle, a.bio, a.since, a.access\
-            '.format(user_id)):
-        account =  {
-            'id': line[0],
-            'alias': line[1],
-            'handle': line[2],
-            'bio': 'None' if line[3]==None else line[3],
-            'since': line[4],
-            'access': line[5],
-        }
-        has_accounts.append(account)
-    user['hasAcc'] = has_accounts
-    return user
 
 @api.route('/', defaults={'path': ''})
 @api.route('/<path:path>')
@@ -94,7 +71,7 @@ def api_anchor(state):
     state = json.loads(state)
     account_id = state['account_id']
     card_id = state['card_id']
-    toot_text: state['toot_text']
+    toot_text = state['toot_text']
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     gdb.query('\
         MATCH (a:Account),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
@@ -104,10 +81,9 @@ def api_anchor(state):
         }
     return make_response(jsonify(result))
 
-@api.route('/api/askAccount/<int:account_id>', methods=['GET'])
-def api_askAccount(account_id):
+def get_account(account_id):
     line = gdb.query('\
-        MATCH (a:User) WHERE ID(a)={}\
+        MATCH (a:Account) WHERE ID(a)={}\
         RETURN ID(a), a.alias, a.name, a.bio\
         '.format(account_id))[0]
     account =  {
@@ -116,30 +92,71 @@ def api_askAccount(account_id):
         'name': line[2],
         'bio': 'None' if line[3]==None else line[3],
     }
+    return account
+
+def get_hiscards(account_id,amount):
+    lines = []
+    for line in gdb.query('\
+        MATCH p=(a)-[r:Toot]->(b) WHERE ID(a)={}\
+        RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 200\
+        '.format(account_id))[:amount]:
+        lines.append({
+            'account': {
+                'id': line[0],
+                'name': line[1],
+            },
+            'toot': {
+                'when': line[2],
+            },
+            'card': {
+                'id': line[3],
+                'text': line[4],
+                'url':'None' if line[5]==None else line[5],
+            },
+            'mode': 'called',
+        })
+    return lines
+
+@api.route('/api/account/<string:state>', methods=['GET'])
+def api_get_account(state):
+    state = json.loads(state)
+    account_id = state['account_id']
+    amount = 0 if not 'amount' in state or state['amount'] < 0 or state['amount'] > 1000 else\
+        state['amount']
     result = {
-        'account': account
+        'account': get_account(account_id),
+        'cards': get_hiscards(account_id,amount)
     }
+    print(result)
     return  make_response(jsonify(result))
 
-@api.route('/api/callCard/<int:card_id>', methods=['GET'])
-def api_callCard(card_id):
-    print(card_id)
-    cnt_cards = 0
-    now_id = card_id
-
+def get_card(card_id):
     line = gdb.query('\
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
-        '.format(now_id))[0]
-    now_line = {
-        'user_id':line[0],
-        'user_name':line[1],
-        'toot_when':line[2],
-        'card_id':line[3],
-        'text':line[4],
-        'url':'None' if line[5]==None else line[5],
-        'mode':'called',
+        '.format(card_id))[0]
+    line = {
+        'account': {
+            'id': line[0],
+            'name': line[1],
+        },
+        'toot': {
+            'when': line[2],
+        },
+        'card': {
+            'id': line[3],
+            'text': line[4],
+            'url':'None' if line[5]==None else line[5],
+        },
+        'mode': 'called',
     }
+    return line
+
+def wind_card(card_id, amount):
+    cnt_cards = 0
+    now_id = card_id
+
+    now_line = get_card(card_id)
     cnt_cards+=1
     print(cnt_cards)
 
@@ -152,12 +169,18 @@ def api_callCard(card_id):
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(pre_id))[0]
             pre_lines.append({
-                'user_id':line[0],
-                'user_name':line[1],
-                'toot_when':line[2],
-                'card_id':line[3],
-                'text':line[4],
-                'url':'None' if line[5]==None else line[5],
+                'account': {
+                    'id': line[0],
+                    'name': line[1],
+                },
+                'toot': {
+                    'when': line[2],
+                },
+                'card': {
+                    'id': line[3],
+                    'text': line[4],
+                    'url':'None' if line[5]==None else line[5],
+                },
                 'mode':'winded',
             })
             pre_id = line[3]
@@ -174,12 +197,18 @@ def api_callCard(card_id):
                 RETURN ID(c), c.name, t.when, ID(b), b.text, b.url\
                 '.format(next_id))[0]
             next_lines.append({
-                'user_id':line[0],
-                'user_name':line[1],
-                'toot_when':line[2],
-                'card_id':line[3],
-                'text':line[4],
-                'url':'None' if line[5]==None else line[5],
+                'account': {
+                    'id': line[0],
+                    'name': line[1],
+                },
+                'toot': {
+                    'when': line[2],
+                },
+                'card': {
+                    'id': line[3],
+                    'text': line[4],
+                    'url':'None' if line[5]==None else line[5],
+                },
                 'mode':'winded',
             })
             next_id = line[3]
@@ -188,54 +217,49 @@ def api_callCard(card_id):
         except:
             break
 
-    drawn_lines = []
-    if cnt_cards < 100:
-        vec = model.infer_vector(wakati(toot_text))
-        sims = cosine_similarity([vec], doc_vecs)
-        index = np.argsort(sims[0])[::-1]
-        while cnt_cards < 100:
-            line = doc[index[i]][:-1].split('\t')
-            drawn_lines.append({
-                'user_id': line[0],
-                'user_name': line[1],
-                'toot_when': line[2],
-                'card_id': line[3],
-                'text': line[4],
-                'url': line[5],
-                'mode':'drawn'
-            })
-            cnt_cards+=1
-            print(cnt_cards)
+    lines = pre_lines[::-1] + [now_line] + next_lines
+    return lines
 
-    lines = pre_lines[::-1] + [now_line] + next_lines + drawn_lines
+@api.route('/api/callCard/<string:state>', methods=['GET'])
+def api_callCard(state):
+    print(state)
+    state = json.loads(state)
+    card_id = state['card_id']
+    amount = 100 if not 'amount' in state or state['amount'] < 0 or state['amount'] > 1000 else\
+        state['amount']
 
-    print(lines)
+    cards = wind_card(card_id, amount)
+    if len(cards) < amount:
+        cards+=draw_card(card_id, amount-len(cards))
+
     result = {
-        'cards': lines
+        'cards': cards
         }
+    print(result)
     return make_response(jsonify(result))
 
-@api.route('/api/entry/<int:account_id>', methods=['GET'])
-def api_entry(account_id):
-    line = gdb.query('\
-        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={}\
-        RETURN ID(a), a.alias, a.name, a.bio, ID(b)\
-        '.format(account_id))[0]
-    signin_acc =  {
-        'id': line[0],
-        'alias': line[1],
-        'name': line[2],
-        'bio': 'None' if line[3]==None else line[3],
+@api.route('/api/entry/<string:state>', methods=['GET'])
+def api_entry(state):
+    state = json.loads(state)
+    print(state)
+    account_id = state['account_id']
+    user_id = gdb.query('\
+        MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={} RETURN ID(b)\
+        '.format(account_id))[0][0]
+    result = {
+        'user': get_user(user_id),
     }
-    user_id = line[4]
+    return  make_response(jsonify(result))
+
+def get_user(user_id):
     line =  gdb.query('\
         MATCH (a:User) WHERE ID(a)={}\
         RETURN ID(a), a.mailaddr, a.givenname, a.familyname, a.birthday, a.gender, a.since'\
         .format(user_id))[0]
-    loginUser = {
+    user = {
         'id': line[0],
         'mailaddr': line[1],
-        'givename': line[2],
+        'givenname': line[2],
         'familyname': line[3],
         'birthday': line[4],
         'gender': line[5],
@@ -245,69 +269,27 @@ def api_entry(account_id):
     has_accounts = []
     for line in gdb.query('\
             MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(b)={}\
-            RETURN ID(a), a.alias, a.name, a.bio, a.since, a.access\
+            RETURN ID(a), a.alias, a.handle, a.bio, a.since, a.access\
             '.format(user_id)):
         account =  {
             'id': line[0],
             'alias': line[1],
-            'name': line[2],
+            'handle': line[2],
             'bio': 'None' if line[3]==None else line[3],
             'since': line[4],
             'access': line[5],
         }
         has_accounts.append(account)
-    loginUser['hasAcc'] = has_accounts
+    user['hasAcc'] = has_accounts
+    return user
+
+@api.route('/api/user/<int:user_id>', methods=['GET'])
+def api_get_user(user_id):
     result = {
-        'signinAcc': signin_acc,
-        'loginUser': loginUser,
+        'user': get_user(user_id)
     }
-    print(result)
-    return  make_response(jsonify(result))
-
-@api.route('/api/hisToot/<int:user_id>', methods=['GET'])
-def api_hisToot(user_id):
-    cnt_cards = 0
-    lines = []
-    for line in gdb.query('\
-        MATCH p=(a)-[r:Toot]->(b) WHERE ID(a)={}\
-        RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT 200\
-        '.format(user_id)):
-        lines.append({
-            'user_id': line[0],
-            'user_name': line[1],
-            'toot_when': line[2],
-            'card_id': line[3],
-            'text': line[4],
-            'url': line[5],
-            'mode':'drawn'
-        })
-        cnt_cards+=1
-        print(cnt_cards)
-
-    if cnt_cards < 100:
-        vec = model.infer_vector(wakati(toot_text))
-        sims = cosine_similarity([vec], doc_vecs)
-        index = np.argsort(sims[0])[::-1]
-        i = 0
-        while cnt_cards < 100:
-            line = doc[index[i]][:-1].split('\t')
-            drawn_lines.append({
-                'user_id': line[0],
-                'user_name': line[1],
-                'toot_when': line[2],
-                'card_id': line[3],
-                'text': line[4],
-                'url': line[5],
-                'mode':'drawn'
-            })
-            i+=1
-            cnt_cards+=1
-            print(cnt_cards)
-
-    result = {
-        'cards': lines
-        }
     return make_response(jsonify(result))
+
 
 @api.route('/api/login/<string:mailaddr>', methods=['GET'])
 def api_login(mailaddr):
@@ -348,32 +330,61 @@ def api_login(mailaddr):
     }
     return  make_response(jsonify(result))
 
-@api.route('/api/signup/<string:user>', methods=['GET'])
+@api.route('/api/signup/<string:user>', methods=['POST'])
 def api_signup(user):
     user = json.loads(user)
+    print('signup..',user)
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     access = 'public'
-    print(user)
     user_id = gdb.query('\
         CREATE (a:User {mailaddr:"%s",givenname:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s"})\
         RETURN ID(a)'\
         %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now), data_contents=True)[0][0]
     alias = randstr(randint(6,8))
 
-    print(user_id, user['hasAcc'][0]['name'], alias, now, access)
     gdb.query('\
         MATCH (a:User) WHERE ID(a)=%s\
         CREATE (a)-[:Have]->(:Account {handle:"%s", alias:"%s", since:"%s", access:"%s"})'\
-        %(user_id, user['hasAcc'][0]['name'], alias, now, access), data_contents=True)
-    result = {
-        }
+        %(user_id, user['hasAcc'][0]['handle'], alias, now, access), data_contents=True)
+
+
+    result = {}
     return make_response(jsonify(result))
 
-@api.route('/api/toot/<string:state>', methods=['GET'])
-def api_toot(state):
+def draw_card(text, amount):
+    vec = model.infer_vector(wakati(text))
+    sims = cosine_similarity([vec], doc_vecs)
+    index = np.argsort(sims[0])[::-1]
+    lines = []
+    for i in range(amount):
+        line = doc[index[i]][:-1].split('\t')
+        line = {
+            'account': {
+                'id': line[0],
+                'name': line[1],
+            },
+            'toot': {
+                'when': line[2],
+            },
+            'card': {
+                'id': line[3],
+                'text': line[4],
+                'url': line[5],
+            },
+            'mode': 'drawn',
+        }
+        lines.append(line)
+    return lines
+
+@api.route('/api/echo/<string:state>', methods=['GET'])
+def api_echo(state):
     state = json.loads(state)
+
     account_id = state['account_id']
     toot_text = state['toot_text']
+    amount = 100 if not 'amount' in state or state['amount'] < 0 or state['amount'] > 1000 else\
+        state['amount']
+
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     access = 'public'
     since = now
@@ -382,25 +393,10 @@ def api_toot(state):
         CREATE (a)-[:Toot {when:"%s"}]->(:Card {text:"%s",since:"%s",access:"%s"})'\
         %(account_id,now,toot_text,since,access), data_contents=True)
 
-    vec = model.infer_vector(wakati(toot_text))
-    sims = cosine_similarity([vec], doc_vecs)
-    index = np.argsort(sims[0])[::-1]
-    lines = []
-    for i in range(20):
-        line = doc[index[i]][:-1].split('\t')
-        line = {
-            'account_id': line[0],
-            'account_name': line[1],
-            'toot_when': line[2],
-            'card_id': line[3],
-            'text': line[4],
-            'url': line[5],
-            'mode':'drawn'
-        }
-        lines.append(line)
     result = {
-        'cards': lines
+        'cards': draw_card(toot_text, amount)
         }
+    print(result)
     return make_response(jsonify(result))
 
 @api.errorhandler(404)
@@ -408,8 +404,8 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
-    model_name = 'echo_model/doc2vec.20170611T223642.model'
-    toots_fname = 'dump/tamakoo.dump.running.tsv'
+    model_name = 'echo_models/tamakoo.running.doc2vec.model'
+    toots_fname = 'dump_toots/tamakoo.running.dump.tsv'
 
     model = gensim.models.Doc2Vec.load(model_name)
     doc = open(toots_fname, encoding='utf-8').readlines()

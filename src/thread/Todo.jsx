@@ -18,6 +18,7 @@ export default class Todo extends React.Component<Props, void> {
   anchor() {
     const note = (ReactDOM.findDOMNode(this.refs.note)).value;
     if( note=='' ) return;
+    console.log('anchor',note)
     this.props.actions.anchor(this.props.value.signinAcc.id, this.props.task.card.id, this.props.order, note);
     history.push('/thread');
     (ReactDOM.findDOMNode(this.refs.note)).value = '';
@@ -60,13 +61,7 @@ export default class Todo extends React.Component<Props, void> {
           { responseForm }
         </p>
 
-      :this.props.task.mode=='winded' || this.props.task.mode=='block'?
-          <p style={styles.cardcenter}>
-            ^
-            { textln }
-          </p>
-
-      :this.props.task.mode=='drawn' ?
+      :this.props.task.mode=='winded' || this.props.task.mode=='block' || this.props.task.mode=='drawn'?
         <p style={styles.cardcenter} onClick={e=>{
           this.props.actions.callCard(this.props.task);
         }}>

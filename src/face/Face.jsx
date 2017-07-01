@@ -22,10 +22,8 @@ if( ('webkitSpeechRecognition' in window) ){
 export class Face extends React.Component<void, Props, void> {
   componentWillMount(){
     this.styles = styleOn(screen.width);
-    try{
+    if( this.props.match.path=='/entry/:id' ){
       this.props.actions.entry(this.props.match.params.id)
-    } catch (err) {
-    } finally {
     }
   }
 
@@ -57,8 +55,6 @@ export class Face extends React.Component<void, Props, void> {
 
     return (
       <div style={this.styles.toot}>
-        <button onClick={e=>{    this.props.actions.entry(this.props.match.params.id)
-}}>GO</button>
         <input style={this.styles.textarea} type='text' ref='note'
           placeholder='toot to open tamaKoo'/>
         <img draggable='false' style={this.styles.button}

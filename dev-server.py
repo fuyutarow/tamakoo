@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#( -*- coding: utf-8 -*-
 from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory, redirect
 import os
 import json
@@ -69,7 +69,7 @@ def api_anchor(state):
     state = json.loads(state)
     account_id = state['account_id']
     card_id = state['card_id']
-    toot_text: state['toot_text']
+    toot_text = state['toot_text']
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     gdb.query('\
         MATCH (a:Account),(b:Card) WHERE ID(a)=%s AND ID(b)=%s\
@@ -132,7 +132,7 @@ def get_card(card_id):
     line = gdb.query('\
         MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(a), a.text, a.url\
-        '.format(now_id))[0]
+        '.format(card_id))[0]
     line = {
         'account': {
             'id': line[0],
@@ -154,7 +154,7 @@ def wind_card(card_id, amount):
     cnt_cards = 0
     now_id = card_id
 
-    get_card(card_id)
+    now_line = get_card(card_id)
     cnt_cards+=1
     print(cnt_cards)
 
@@ -218,8 +218,9 @@ def wind_card(card_id, amount):
     lines = pre_lines[::-1] + [now_line] + next_lines
     return lines
 
-@api.route('/api/callCard/<int:state>', methods=['GET'])
+@api.route('/api/callCard/<string:state>', methods=['GET'])
 def api_callCard(state):
+    print(state)
     state = json.loads(state)
     card_id = state['card_id']
     amount = 100 if not 'amount' in state or state['amount'] < 0 or state['amount'] > 1000 else\
@@ -232,11 +233,13 @@ def api_callCard(state):
     result = {
         'cards': cards
         }
+    print(result)
     return make_response(jsonify(result))
 
 @api.route('/api/entry/<string:state>', methods=['GET'])
 def api_entry(state):
     state = json.loads(state)
+    print(state)
     account_id = state['account_id']
     user_id = gdb.query('\
         MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={} RETURN ID(b)\
@@ -399,9 +402,9 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
-    model_name = 'echo_model/doc2vec.20170611T223642.model'
-    toots_fname = 'dump/tamakoo.dump.running.tsv'
-
+    model_name = 'echo_models/tamakoo.running.doc2vec.model'
+    toots_fname = 'dump_toots/tamakoo.running.dump.tsv'
+    
     model = gensim.models.Doc2Vec.load(model_name)
     doc = open(toots_fname, encoding='utf-8').readlines()
     doc_vecs = [ model.infer_vector(wakati(line.split('\t')[4])) for line in doc ]

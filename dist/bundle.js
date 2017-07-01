@@ -1356,18 +1356,24 @@ function reducer() {
         return a;
       });
       insertedTasks.splice(action.order + 1, 0, {
-        card_id: -1,
-        text: action.text,
-        url: 'Noen',
+        account: {
+          id: action.account_id
+        },
+        card: {
+          id: -1,
+          text: action.toot_text,
+          url: 'Noen'
+        },
         mode: 'tooted'
       });
+      console.log('...', insertedTasks);
       return Object.assign({}, state, { tasks: insertedTasks });
 
     case CALL:
       return Object.assign({}, state, {
         tasks: [{
           account: action.task.account,
-          //ftoot        toot:action.task.toot,
+          toot: action.task.toot,
           card: action.task.card,
           mode: 'called'
         }]
@@ -1500,19 +1506,19 @@ var ActionDispatcher = exports.ActionDispatcher = function () {
   }, {
     key: 'anchor',
     value: function () {
-      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(account_id, card_id, order, text) {
+      var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(account_id, card_id, order, toot_text) {
         var url, response;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                this.dispatch({ type: INSERT_TASK, order: order, text: text });
+                this.dispatch({ type: INSERT_TASK, order: order, account_id: account_id, toot_text: toot_text });
                 this.dispatch({ type: FETCH_REQUEST_START });
 
                 url = '/api/anchor/' + encodeURI(JSON.stringify({
                   account_id: account_id,
                   card_id: card_id,
-                  toot_text: text
+                  toot_text: toot_text
                 }));
                 _context2.prev = 3;
                 _context2.next = 6;
@@ -5154,7 +5160,7 @@ var _addButtonInsideBlackCircle = __webpack_require__(246);
 
 var _addButtonInsideBlackCircle2 = _interopRequireDefault(_addButtonInsideBlackCircle);
 
-var _MenuItem = __webpack_require__(149);
+var _MenuItem = __webpack_require__(150);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
@@ -5244,6 +5250,7 @@ var Tool = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
+      console.log('>>>', this.props.value);
       var accountList = this.props.value.loginUser.hasAcc.map(function (account) {
         return _react2.default.createElement(_MenuItem2.default, { value: account.id, primaryText: '@' + account.alias,
           containerElement: _react2.default.createElement(_reactRouterDom.Link, { to: '/entry/' + account.id }) });
@@ -9832,26 +9839,6 @@ exports.default = _FlatButton2.default;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = undefined;
-
-var _MenuItem = __webpack_require__(217);
-
-var _MenuItem2 = _interopRequireDefault(_MenuItem);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _MenuItem2.default;
-
-/***/ }),
-/* 150 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 Object.defineProperty(exports, "__esModule", {
@@ -10550,6 +10537,26 @@ Menu.propTypes = process.env.NODE_ENV !== "production" ? {
 } : {};
 exports.default = Menu;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 150 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = undefined;
+
+var _MenuItem = __webpack_require__(217);
+
+var _MenuItem2 = _interopRequireDefault(_MenuItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _MenuItem2.default;
 
 /***/ }),
 /* 151 */
@@ -14694,7 +14701,7 @@ var _ListItem = __webpack_require__(216);
 
 var _ListItem2 = _interopRequireDefault(_ListItem);
 
-var _Menu = __webpack_require__(150);
+var _Menu = __webpack_require__(149);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -18795,6 +18802,7 @@ var Todo = function (_React$Component) {
     value: function anchor() {
       var note = ReactDOM.findDOMNode(this.refs.note).value;
       if (note == '') return;
+      console.log('anchor', note);
       this.props.actions.anchor(this.props.value.signinAcc.id, this.props.task.card.id, this.props.order, note);
       _Index.history.push('/thread');
       ReactDOM.findDOMNode(this.refs.note).value = '';
@@ -18845,12 +18853,7 @@ var Todo = function (_React$Component) {
         { style: styles.cardcenter },
         textln,
         responseForm
-      ) : this.props.task.mode == 'winded' || this.props.task.mode == 'block' ? React.createElement(
-        'p',
-        { style: styles.cardcenter },
-        '^',
-        textln
-      ) : this.props.task.mode == 'drawn' ? React.createElement(
+      ) : this.props.task.mode == 'winded' || this.props.task.mode == 'block' || this.props.task.mode == 'drawn' ? React.createElement(
         'p',
         { style: styles.cardcenter, onClick: function onClick(e) {
             _this2.props.actions.callCard(_this2.props.task);
@@ -22336,11 +22339,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = exports.MenuItem = exports.Menu = undefined;
 
-var _Menu2 = __webpack_require__(150);
+var _Menu2 = __webpack_require__(149);
 
 var _Menu3 = _interopRequireDefault(_Menu2);
 
-var _MenuItem2 = __webpack_require__(149);
+var _MenuItem2 = __webpack_require__(150);
 
 var _MenuItem3 = _interopRequireDefault(_MenuItem2);
 
@@ -25505,7 +25508,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__Menu__ = __webpack_require__(319);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__Menu___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_31__Menu__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "Menu", function() { return __WEBPACK_IMPORTED_MODULE_31__Menu___default.a; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem__ = __webpack_require__(150);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__MenuItem___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_32__MenuItem__);
 /* harmony reexport (default from non-hamory) */ __webpack_require__.d(__webpack_exports__, "MenuItem", function() { return __WEBPACK_IMPORTED_MODULE_32__MenuItem___default.a; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__styles_MuiThemeProvider__ = __webpack_require__(247);
@@ -31365,9 +31368,9 @@ var Face = exports.Face = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this.styles = (0, _css.styleOn)(screen.width);
-      try {
+      if (this.props.match.path == '/entry/:id') {
         this.props.actions.entry(this.props.match.params.id);
-      } catch (err) {} finally {}
+      }
     }
   }, {
     key: 'toot',
@@ -31402,13 +31405,6 @@ var Face = exports.Face = function (_React$Component) {
       return React.createElement(
         'div',
         { style: this.styles.toot },
-        React.createElement(
-          'button',
-          { onClick: function onClick(e) {
-              _this2.props.actions.entry(_this2.props.match.params.id);
-            } },
-          'GO'
-        ),
         React.createElement('input', { style: this.styles.textarea, type: 'text', ref: 'note',
           placeholder: 'toot to open tamaKoo' }),
         React.createElement('img', { draggable: 'false', style: this.styles.button,
@@ -45796,7 +45792,7 @@ var _Menu = __webpack_require__(319);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
-var _MenuItem = __webpack_require__(149);
+var _MenuItem = __webpack_require__(150);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
@@ -51922,7 +51918,7 @@ var _arrowDropDown = __webpack_require__(803);
 
 var _arrowDropDown2 = _interopRequireDefault(_arrowDropDown);
 
-var _Menu = __webpack_require__(150);
+var _Menu = __webpack_require__(149);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -54104,7 +54100,7 @@ var _propTypes3 = __webpack_require__(43);
 
 var _propTypes4 = _interopRequireDefault(_propTypes3);
 
-var _Menu = __webpack_require__(150);
+var _Menu = __webpack_require__(149);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 

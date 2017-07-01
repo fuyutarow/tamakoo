@@ -136,18 +136,24 @@ export default function reducer (
           return a;
         })
       insertedTasks.splice(action.order+1,0, {
-        card_id: -1,
-        text: action.text,
-        url: 'Noen',
+        account: {
+          id: action.account_id,
+        },
+        card: {
+          id: -1,
+          text: action.toot_text,
+          url: 'Noen',
+        },
         mode:'tooted',
       })
+      console.log('...',insertedTasks)
       return Object.assign({}, state, { tasks: insertedTasks });
 
     case CALL:
       return Object.assign({}, state, {
         tasks: [{
           account:action.task.account,
-  //ftoot        toot:action.task.toot,
+          toot:action.task.toot,
           card:action.task.card,
           mode:'called',
         }]
@@ -232,14 +238,14 @@ export class ActionDispatcher {
     }
   }
 
-  async anchor( account_id:number, card_id:number, order:number, text:string ): Promise<void> {
-    this.dispatch({ type:INSERT_TASK, order:order, text:text })
+  async anchor( account_id:number, card_id:number, order:number, toot_text:string ): Promise<void> {
+    this.dispatch({ type:INSERT_TASK, order:order, account_id:account_id, toot_text:toot_text })
     this.dispatch({ type:FETCH_REQUEST_START });
 
     const url = '/api/anchor/'+encodeURI(JSON.stringify({
       account_id: account_id,
       card_id: card_id,
-      toot_text: text,
+      toot_text: toot_text,
     }))
     try {
       const response:Response = await fetch(url, {
