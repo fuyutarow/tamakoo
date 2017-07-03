@@ -47,7 +47,8 @@ const styles = (windowWidth) => { return {
 
 export class Sended extends React.Component<Props, void> {
   componentWillMount(){
-    this.styles = styles(screen.width);
+    this.styles = styles(screen.width);   
+    this.props.actions.initState();
   }
 
   render() {

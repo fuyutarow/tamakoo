@@ -56,7 +56,6 @@ def api_addAcc(state):
     access = 'public'
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     alias = randstr(randint(6,8))
-    print(user_id, handle, now, alias, now, randcolor)
     gdb.query('\
         MATCH (a:User) WHERE ID(a)=%s\
         CREATE (a)-[:Have]->(:Account {handle:"%s",alias:"%s",since:"%s",color:"%s"})'\
@@ -127,7 +126,6 @@ def api_get_account(state):
         'account': get_account(account_id),
         'cards': get_hiscards(account_id,amount)
     }
-    print(result)
     return  make_response(jsonify(result))
 
 def get_card(card_id):
@@ -158,7 +156,6 @@ def wind_card(card_id, amount):
 
     now_line = get_card(card_id)
     cnt_cards+=1
-    print(cnt_cards)
 
     pre_id = now_id
     pre_lines = []
@@ -213,7 +210,6 @@ def wind_card(card_id, amount):
             })
             next_id = line[3]
             cnt_cards+=1
-            print(cnt_cards)
         except:
             break
 
@@ -222,7 +218,6 @@ def wind_card(card_id, amount):
 
 @api.route('/api/callCard/<string:state>', methods=['GET'])
 def api_callCard(state):
-    print(state)
     state = json.loads(state)
     card_id = state['card_id']
     amount = 100 if not 'amount' in state or state['amount'] < 0 or state['amount'] > 1000 else\
@@ -235,13 +230,11 @@ def api_callCard(state):
     result = {
         'cards': cards
         }
-    print(result)
     return make_response(jsonify(result))
 
 @api.route('/api/entry/<string:state>', methods=['GET'])
 def api_entry(state):
     state = json.loads(state)
-    print(state)
     account_id = state['account_id']
     user_id = gdb.query('\
         MATCH (a:Account)<-[:Have]-(b:User) WHERE ID(a)={} RETURN ID(b)\
@@ -330,10 +323,10 @@ def api_login(mailaddr):
     }
     return  make_response(jsonify(result))
 
-@api.route('/api/signup/<string:user>', methods=['POST'])
+@api.route('/api/signup/<string:user>', methods=['GET'])
 def api_signup(user):
     user = json.loads(user)
-    print('signup..',user)
+    handle = user['hasAcc'][0]['handle']
     now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
     access = 'public'
     user_id = gdb.query('\
@@ -347,8 +340,13 @@ def api_signup(user):
         CREATE (a)-[:Have]->(:Account {handle:"%s", alias:"%s", since:"%s", access:"%s"})'\
         %(user_id, user['hasAcc'][0]['handle'], alias, now, access), data_contents=True)
 
-
-    result = {}
+    result = {
+        'user': {
+            'id': user_id,
+            'alias': alias,
+            'handle': handle,
+            },
+        }
     return make_response(jsonify(result))
 
 def draw_card(text, amount):
@@ -396,7 +394,6 @@ def api_echo(state):
     result = {
         'cards': draw_card(toot_text, amount)
         }
-    print(result)
     return make_response(jsonify(result))
 
 @api.errorhandler(404)

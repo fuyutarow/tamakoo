@@ -30,8 +30,7 @@ export class Face extends React.Component<void, Props, void> {
   toot() {
     const note = (ReactDOM.findDOMNode(this.refs.note));
     if( note.value=='' ) return;
-    this.props.actions.toot(this.props.value.signinAcc.id, note.value);
-    history.push('/thread')
+    history.push('/echo/'+note.value)
     note.value = '';
   }
 
@@ -55,6 +54,7 @@ export class Face extends React.Component<void, Props, void> {
 
     return (
       <div style={this.styles.toot}>
+        fksmlfm
         <input style={this.styles.textarea} type='text' ref='note'
           placeholder='toot to open tamaKoo'/>
         <img draggable='false' style={this.styles.button}

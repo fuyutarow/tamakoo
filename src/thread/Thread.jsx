@@ -21,6 +21,10 @@ interface Props {
 export class Thread extends React.Component<void, Props, void> {
   componentWillMount(){
     this.styles = styleOn(screen.width);
+    if( this.props.match.path=='/echo/:text' ){
+      this.props.actions.toot(
+        this.props.value.signinAcc.id, this.props.match.params.text)
+    }
   }
 
   render() {

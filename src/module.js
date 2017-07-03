@@ -29,6 +29,7 @@ export interface CounterState {
   signinAcc: any;
   loginUser: any;
   mailaddr: string;
+  user4signup: any;
 }
 
 export const initialState:CounterState = {
@@ -56,6 +57,7 @@ export const initialState:CounterState = {
         {id:1, alias:'tamako'},
     ],
   },
+  user4signup: null,
   mailaddr: null,
 };
 
@@ -408,7 +410,8 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        this.dispatch({ type:ENTRY, signinAcc:json.signinAcc, loginUser:json.loginUser })
+        console.log(json)
+        this.dispatch({ type:SET_STATE, state:{ user4signup: json.user }})
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }

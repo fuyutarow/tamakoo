@@ -22,23 +22,14 @@ const styles = (windowWidth) => { return {
     background: 'none',
     textAlign: 'center',
     margin: '30vh auto 0% -141px',
+  },
+  form: {
+    width: '100%',
     fontSize: '28px',
     display: 'grid',
     gridTemplateRows: '40px 40px 40px 40px 40px',
     gridTemplateColumns: 'calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6) calc(100%/6)',
     gridGap: '10px',
-  },
-  textarea: {
-    fontSize: '16px',
-    height: '40px',
-    width: '85%',
-    paddingLeft: '0',
-    position: 'relative',
-    background: 'none',
-    display: 'block',
-    marginTop: '0em',
-    margin: '0px',
-    borderStyle: 'none',
   },
   button: {
     gridArea:'3/1/4/7',
@@ -60,16 +51,28 @@ export class Sended extends React.Component<Props, void> {
     history.push('/entry/'+this.props.value.signinAcc.id)
   }
 
+
   render() {
-    console.log('$$%',this.props.mailaddr)
+    const form = 
+      this.props.value.user4signup?
+       <div style={this.styles.form}>
+         <div style={{gridArea:'1/1/2/7'}}>Thanks sign up.</div>
+         <input style={{gridArea:'2/1/3/3'}} type='text'
+           placeholder={this.props.value.user4signup.handle} ref='handle' />
+         <dev style={{gridArea:'2/3/3/4'}}>@</dev>
+         <input style={{gridArea:'2/4/3/7'}} type='text'
+           placeholder={this.props.value.user4signup.alias} ref='alias' />
+         <button style={this.styles.button} onClick={e=>this.signin()}>Sign in</button>
+         <Tool value={this.props.value} actions={this.props.actions} />
+        </div>
+      :
+        <div style={this.styles.form}>
+          please wait.
+        </div>
+
     return (
       <div style={this.styles.toot}>
-        <div style={{gridArea:'1/1/2/7'}}>Thanks sign up.</div>
-        <input style={{gridArea:'2/1/3/3'}} type='text' placeholder={this.props.value.signinAcc.handle} ref='handle' />
-        <dev style={{gridArea:'2/3/3/4'}}>@</dev>
-        <input style={{gridArea:'2/4/3/7'}} type='text' placeholder={this.props.value.signinAcc.alias} ref='alias' />
-        <button style={this.styles.button} onClick={e=>this.signin()}>Sign in</button>
-        <Tool value={this.props.value} actions={this.props.actions} />
+        { form }
       </div>
 
     )

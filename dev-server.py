@@ -328,26 +328,30 @@ def api_login(mailaddr):
     }
     return  make_response(jsonify(result))
 
-@api.route('/api/signup/<string:user>', methods=['POST'])
-def api_signup(user):
-    user = json.loads(user)
-    print('signup..',user)
-    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')
-    access = 'public'
-    user_id = gdb.query('\
-        CREATE (a:User {mailaddr:"%s",givenname:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s"})\
-        RETURN ID(a)'\
-        %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now), data_contents=True)[0][0]
-    alias = randstr(randint(6,8))
-
-    gdb.query('\
-        MATCH (a:User) WHERE ID(a)=%s\
-        CREATE (a)-[:Have]->(:Account {handle:"%s", alias:"%s", since:"%s", access:"%s"})'\
-        %(user_id, user['hasAcc'][0]['handle'], alias, now, access), data_contents=True)
-
-
-    result = {}
-    return make_response(jsonify(result))
+@api.route('/api/signup/<string:user>', methods=['POST'])^M
+def api_signup(user):^M
+    user = json.loads(user)^M
+    now = datetime.now().strftime('%Y%m%dT%H%M%S+0900')^M
+    access = 'public'^M
+    user_id = gdb.query('\^M
+        CREATE (a:User {mailaddr:"%s",givenname:"%s",familyname:"%s",birthday:"%s",gender:"%s",since:"%s"})\^M
+        RETURN ID(a)'\^M
+        %(user['mailaddr'], user['givenname'], user['familyname'], user['birthday'], user['gender'], now), data_    contents=True)[0][0]^M
+    alias = randstr(randint(6,8))^M
+^M
+    gdb.query('\^M
+        MATCH (a:User) WHERE ID(a)=%s\^M
+        CREATE (a)-[:Have]->(:Account {handle:"%s", alias:"%s", since:"%s", access:"%s"})'\^M
+        %(user_id, user['hasAcc'][0]['handle'], alias, now, access), data_contents=True)^M
+^M
+    result = {
+        user: {
+            'id': user_id,
+            'alias': alias,
+            'handle': user['hasAcc'][0]['handle'],
+            },
+        }^M
+    return make_response(jsonify(result))^M
 
 def draw_card(text, amount):
     vec = model.infer_vector(wakati(text))
