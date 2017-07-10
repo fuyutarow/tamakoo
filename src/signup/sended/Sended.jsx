@@ -48,7 +48,7 @@ export class Sended extends React.Component<Props, void> {
   }
 
   signin(){
-    history.push('/entry/'+this.props.value.signinAcc.id)
+    history.push('/entry/'+this.props.value.user4signup.alias)
   }
 
 

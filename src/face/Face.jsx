@@ -21,6 +21,9 @@ if( ('webkitSpeechRecognition' in window) ){
 
 export class Face extends React.Component<void, Props, void> {
   componentWillMount(){
+    console.log('window width: ',window.innerWidth);
+    console.log('screen width: ',screen.width,screen.height);
+    console.log('client width: ',document.documentElement.clientWidth);
     this.styles = styleOn(screen.width);
     if( this.props.match.path=='/entry/:id' ){
       this.props.actions.entry(this.props.match.params.id)
@@ -35,26 +38,26 @@ export class Face extends React.Component<void, Props, void> {
   }
 
   componentWillUpdate(){
-    console.log('^^^',this.props.value)
     this.props.actions.entry(this.props.match.params.id)
 
   }
 
-
   render() {
-    console.log()
-
-    console.log('window width: ',window.innerWidth);
-    console.log('screen width: ',screen.width,screen.height);
-    console.log('client width: ',document.documentElement.clientWidth);
-
-    const styles = styleOn(screen.width);
-
     console.log('^^^',this.props)
 
+    const styles = styleOn(screen.width);
+    const sw =
+      window.location.href=='tamakoo.com'?
+        <button onClick={e=>{
+          locations.href='tamakoo.com'
+        }}>prod</button>
+      :
+        <button onClick={e=>{
+          locations.href='dev.tamakoo.com'
+        }}>dev</button>
+          
     return (
       <div style={this.styles.toot}>
-        fksmlfm
         <input style={this.styles.textarea} type='text' ref='note'
           placeholder='toot to open tamaKoo'/>
         <img draggable='false' style={this.styles.button}

@@ -8,3 +8,6 @@ __pycache__/
 db/
 cron.log
 crontab
+dump_toots/
+echo_models/
+note.txt

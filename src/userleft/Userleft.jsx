@@ -19,7 +19,7 @@ export class Userleft extends React.Component<void, Props, void> {
 
   componentWillMount(){
     this.styles = styleOn(screen.width);
-    this.props.actions.askAcc(this.props.match.params.id)
+    this.props.actions.getAccount(this.props.match.params.alias)
     console.log(this.props.match.params.id);
     console.log(this.props);
   }
@@ -38,9 +38,5 @@ export class Userleft extends React.Component<void, Props, void> {
         <Tool actions={this.props.actions} match={this.props.match} value={this.props.value} />
       </div>
     )
-  }
-
-  componentDidUpdate() {
-    location.hash='crown';
   }
 }

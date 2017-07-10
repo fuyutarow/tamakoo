@@ -7,6 +7,16 @@ import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-
 import { history } from './Index';
 
 const styles = (windowWidth) => { return {
+  gif: {
+    width: '100vw',
+    height: '60vh',
+    position: 'fixed',
+    left: '0',
+    top: '20vh',
+    overflow: 'hidden',
+    //margin: 'auto 0 auto 0',
+    zIndex: '999',
+  },
   bar: {
     color: 'rgba(0, 0, 0, 0.87)',
     backgroundColor: 'rgb(0, 188, 212)',
@@ -54,19 +64,14 @@ const styles = (windowWidth) => { return {
 export default class Tool extends React.Component<Props,{}> {
   componentWillMount(){
     this.styles = styles(screen.width);
-
-  //  console.log(this.props)
-  //  if(this.props.match.path!='/'){
-  //  }
   }
 
   render() {
-  
-    console.log('>>>',this.props.value)
-   const accountList = this.props.value.loginUser.hasAcc
+    console.log('>>>',this.props)
+    const accountList = this.props.value.loginUser.hasAcc
       .map( account =>
-        <MenuItem value={account.id} primaryText={'@'+account.alias}
-          containerElement={<Link to={'/entry/'+account.id}/>}/>
+        <MenuItem value={account.alias} primaryText={'@'+account.alias}
+          containerElement={<Link to={'/entry/'+account.alias}/>}/>
         )
 
     const newTabBtn =
@@ -89,11 +94,23 @@ export default class Tool extends React.Component<Props,{}> {
       :
         <MenuItem primaryText='sign in' containerElement={<Link to='/mailentry/signin'/>}/>
 
+    const gif = 
+      this.props.value.isLoading?
+        <img style={this.styles.gif} src='https://cdn.dribbble.com/users/63485/screenshots/1379948/mortphing-shape-gif-preloader.gif'/>
+      :null      
+    console.log(gif)    
+
+    const test =
+            this.props.value.isLoading? 
+<div style={this.styles.gif}><strong>NOW LOADING</strong></div> :
+<div style={this.styles.gif}><strong>hello</strong></div> 
+    
 
     return (
       <Toolbar style={this.styles.bar}>
+        { gif } 
         <ToolbarGroup style={this.styles.login} containerStyle={{padding:'0'}} firstChild={true}>
-          <DropDownMenu containerStyle={{width:'20vw'}} value={this.props.value.signinAcc.id} onChange={(event, index, value) => {
+          <DropDownMenu containerStyle={{width:'20vw'}} value={this.props.value.signinAcc.alias} onChange={(event, index, value) => {
             this.props.actions.login(value);
           }}>
             { preference }
@@ -104,7 +121,6 @@ export default class Tool extends React.Component<Props,{}> {
           </DropDownMenu>
           { newTabBtn }
         </ToolbarGroup>
-
       </Toolbar>
     );
   }

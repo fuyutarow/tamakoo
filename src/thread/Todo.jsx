@@ -19,9 +19,14 @@ export default class Todo extends React.Component<Props, void> {
     const note = (ReactDOM.findDOMNode(this.refs.note)).value;
     if( note=='' ) return;
     console.log('anchor',note)
-    this.props.actions.anchor(this.props.value.signinAcc.id, this.props.task.card.id, this.props.order, note);
-    history.push('/thread');
+    this.props.actions.anchor(this.props.value.signinAcc.alias, this.props.task.card.id, this.props.order, note);
+    //history.push('/thread');
     (ReactDOM.findDOMNode(this.refs.note)).value = '';
+  }
+
+  callCard(){
+    this.props.actions.callCard(this.props.task.card.id);
+    history.push('/card/'+this.props.task.card.id) 
   }
 
   componentWillMount(){
@@ -35,15 +40,35 @@ export default class Todo extends React.Component<Props, void> {
 
     const userLeft =
       this.props.task.mode=='winded'|| this.props.task.mode=='drawn'?
-        <Link style={styles.userleft} to={'/account/'+this.props.task.account.id}>
+        <Link style={styles.userleft} to={'/account/'+this.props.task.account.alias}>
           <div onClick={e=>{
           }}/>
         </Link>
       :null
 
-    const textln = this.props.task.card.text.split('\n')
-      .map( m => (<p style={styles.ln}>{m}</p>) )
+    const hrefer = (text:string) => {
+      if(text.match(/(http:\/\/[\x21-\x7e]+)/gi) || text.match(/(https:\/\/[\x21-\x7e]+)/gi)){ 
+        text
+          .replace(/(http:\/\/[\x21-\x7e]+)/gi, '$1')
+          .replace(/(https:\/\/[\x21-\x7e]+)/gi,'$1')
+        return <a href={text}>{text}</a> 
+      }
+      return text
+      }   
 
+    const textln = this.props.task.card.text.split('\n')
+      .map( m => (<p style={styles.ln}>{hrefer(m)}</p>) )
+
+    let imgln = null;
+    try{
+      imgln = this.props.task.card.imgs.length?
+      this.props.task.card.imgs.map( m => (
+        <p>
+          <img src={m} style={{width:'100%',height:'auto'}}/>
+        </p>))
+      :null 
+    }catch(err){}
+       
     const responseForm =
       <div style={styles.toot}>
         <input style={styles.textarea} type='text' ref='note'
@@ -56,25 +81,26 @@ export default class Todo extends React.Component<Props, void> {
 
     const cardCenter =
       this.props.task.mode=='tooted'?
-        <p style={styles.cardcenter}>
+        <p style={styles.cardcenter}> 
           { textln }
+          { imgln }
           { responseForm }
         </p>
 
       :this.props.task.mode=='winded' || this.props.task.mode=='block' || this.props.task.mode=='drawn'?
-        <p style={styles.cardcenter} onClick={e=>{
-          this.props.actions.callCard(this.props.task);
-        }}>
+        <p style={styles.cardcenter} onClick={e=>this.callCard()}>
           { textln }
+          { imgln }
         </p>
 
       :this.props.task.mode=='called' ?
         <p style={styles.cardcenter}>
-          <Link to={'/account/'+this.props.task.account.id}>
+          <Link to={'/account/'+this.props.task.account.alias}>
             <h3 onClick={e=>{
             }}>{this.props.task.account.name}</h3>
           </Link>
           { textln }
+          { imgln }
           { responseForm }
         </p>
 

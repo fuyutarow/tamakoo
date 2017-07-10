@@ -23,14 +23,18 @@ export class Thread extends React.Component<void, Props, void> {
     this.styles = styleOn(screen.width);
     if( this.props.match.path=='/echo/:text' ){
       this.props.actions.toot(
-        this.props.value.signinAcc.id, this.props.match.params.text)
+        this.props.value.signinAcc.alias, this.props.match.params.text)
+    }
+    if( this.props.match.path=='/card/:id' ){
+      console.log('##############ok!#################3')
+      this.props.actions.callCard(this.props.match.params.id);
     }
   }
-
+   
   render() {
     return (
       <div ref='ttt' style={this.styles.wall}>
-        <TodoList value={this.props.value} actions={this.props.actions} />
+        <TodoList actions={this.props.actions} match={this.props.match} value={this.props.value} /> 
         <Tool actions={this.props.actions} match={this.props.match} value={this.props.value} />
       </div>
     )

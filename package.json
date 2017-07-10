@@ -3,15 +3,11 @@
   "version": "0.1.0",
   "scripts": {
     "build": "webpack --config ./webpack.config.dev.js",
-    "dev": "webpack --config ./webpack.config.dev.js; node dev-server.js",
     "build:prod": "webpack --config ./webpack.config.prod.js",
     "flow": "flow",
     "flow-typed": "flow-typed install",
     "test:unit": "mocha --compilers js:babel-register ./src/polyfill.js",
-    "test:all": "mocha --compilers js:babel-register ./src/polyfill.js ./polyfill.js **/*.spec.js",
-    "start": "webpack-dev-server --inline --hot --colors --port 3341 ./webpack.config.dev.js",
-    "server": "python dev-server.py",
-    "server:prod": "python server.py"
+    "test:all": "mocha --compilers js:babel-register ./src/polyfill.js ./polyfill.js **/*.spec.js"
   },
   "license": "MIT",
   "dependencies": {
