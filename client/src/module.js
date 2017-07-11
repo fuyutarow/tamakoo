@@ -1,13 +1,7 @@
 // @flow
 
-export type Task = {
-  card_id: number;
-  text: string;
-  url: string;
-}
-
-const ADD_TASK = 'counter/add_task';
-const INSERT_TASK = 'counter/insert_task';
+const ADD_CARD = 'counter/add_card';
+const INSERT_CARD = 'counter/insert_card';
 const TOOT = 'counter/toot';
 const FETCH_REQUEST_START = 'counter/fetch_request_start'
 const FETCH_REQUEST_FINISH = 'counter/fetch_request_finish'
@@ -23,7 +17,7 @@ const SET_PHASE = 'counter/set_phase';
 const SET_STATE = 'counter/set_state';
 export interface CounterState {
   isLoggedin : boolean;
-  tasks: Task[];
+  cards: any;
   isLoading: boolean;
   whoisAcc: any;
   signinAcc: any;
@@ -34,7 +28,7 @@ export interface CounterState {
 
 export const initialState:CounterState = {
   isLoggedin: false,
-  tasks: [],
+  cards: [],
   isLoading: false,
   whoisAcc: {
     id:null,
@@ -91,18 +85,19 @@ export default function reducer (
     }
 
     case TOOT:
-      const nextTasks = action.cards
-        .map( a => { return {
-          account:a.account,
-          toot:a.toot,
-          card:a.card,
-          mode:a.mode
-        }});
+      //const nextCards = action.cards
+      //  .map( a => { return {
+      //    account: a.account,
+      //    note: a.note,
+      //    when: a.when,
+      //    mode: a.mode
+      //  }});
       return Object.assign({}, state, {
-        tasks:state.tasks.concat(nextTasks)
+        cards: action.cards//nextCards
       });
+        //cards:state.cards.concat(nextCards)
 
-    case ADD_TASK:// css -> css-in-js
+    case ADD_CARD:// css -> css-in-js
       const css2js = (css) => {
         let lis = css.split("-");
         let out = lis[0]
@@ -114,7 +109,7 @@ export default function reducer (
         return out
       }
       return Object.assign({}, state, {
-        tasks: state.tasks.concat( [{
+        cards: state.cards.concat( [{
           card: {
             id: -1,
             text:css2js(action.text),
@@ -124,33 +119,23 @@ export default function reducer (
         }])
       });
 
-    case INSERT_TASK:
-      let insertedTasks = state.tasks
+    case INSERT_CARD:
+      let insertedCards = state.cards
         .map( a => {
           if(a['mode']=='tooted'){
             a['mode'] = 'block';
           }
           return a;
         })
-      insertedTasks.splice(action.order+1,0, {
-        account: {
-          alias: action.account_alias,
-        },
-        card: {
-          id: -1,
-          text: action.toot_text,
-          url: 'Noen',
-        },
-        mode:'tooted',
-      })
-      return Object.assign({}, state, { tasks: insertedTasks });
+      insertedCards.splice(action.order+1,0, action.card)
+      return Object.assign({}, state, { cards: insertedCards });
 
     case CALL:
       return Object.assign({}, state, {
-        tasks: [{
-          account:action.task.account,
-          toot:action.task.toot,
-          card:action.task.card,
+        cards: [{
+          account:action.card.account,
+          toot:action.card.toot,
+          card:action.card.card,
           mode:'called',
         }]
       });
@@ -159,12 +144,12 @@ export default function reducer (
       return Object.assign({}, state, { whoisAcc: action.account });
 
     case CLEAR_CARDS:
-      return Object.assign({}, state, { tasks: [] });
+      return Object.assign({}, state, { cards: [] });
 
     case ONLY_CARD:
-      let calledCard = state.tasks[action.order]
+      let calledCard = state.cards[action.order]
       calledCard['mode'] = 'called'
-      return Object.assign({}, state, { tasks:[calledCard] });
+      return Object.assign({}, state, { cards:[calledCard] });
 
     case LOGIN:
       return Object.assign({}, state, { signinAcc:action.account });
@@ -186,7 +171,6 @@ export default function reducer (
       return state
   }
 }
-
 
 export class ActionDispatcher {
   dispatch: Dispatch<ReduxAction>
@@ -229,13 +213,12 @@ export class ActionDispatcher {
     }
   }
 
-  async anchor( account_alias:string, card_id:number, order:number, toot_text:string ): Promise<void> {
-    this.dispatch({ type:INSERT_TASK, order:order, account_alias:account_alias, toot_text:toot_text })
+  async anchor( account_alias:string, note_id:number, order:number, note_text:string ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
     const url = '/api/anchor/'+encodeURI(JSON.stringify({
       account_alias: account_alias,
-      card_id: card_id,
-      toot_text: toot_text,
+      note_id: note_id,
+      note_text: note_text,
     }))
     try {
       const response:Response = await fetch(url, {
@@ -243,7 +226,8 @@ export class ActionDispatcher {
         headers: this.myHeaders,
       })
       if (response.status === 200) { //2xx
-
+        const json: {card:any} = await response.json();
+        this.dispatch({ type:INSERT_CARD, order:order, card:json.card })
       } else {
         throw new Error(`illegal status code: ${response.status}`)
       }
@@ -276,9 +260,9 @@ export class ActionDispatcher {
     }
   }
 
-  async callCard( card_id:number ): Promise<void> {
+  async callCard( note_id:number ): Promise<void> {
     this.dispatch({ type:FETCH_REQUEST_START });
-    const url = '/api/card/'+card_id+'/amount/'+100;
+    const url = '/api/card/'+note_id+'/amount/'+100;
     try {
       const response:Response = await fetch(url, {
         method: 'GET',
@@ -393,11 +377,11 @@ export class ActionDispatcher {
 
   async toot( account_alias:number, text:string ): Promise<void> {
     this.dispatch({ type:INIT_STATE })
-    this.dispatch({ type:ADD_TASK, text:text })
+    this.dispatch({ type:ADD_CARD, text:text })
     this.dispatch({ type:FETCH_REQUEST_START });
     const url = '/api/echo/'+encodeURI(JSON.stringify({
       account_alias: account_alias,
-      toot_text: text,
+      note_text: text,
       amount: 100,
     }))
     try {
@@ -407,7 +391,7 @@ export class ActionDispatcher {
       })
       console.log()
       if (response.status === 200) { //2xx
-        const json: {amount:number} = await response.json();
+        const json: {cards:any} = await response.json();
         this.dispatch({ type:TOOT, cards:json.cards });
       } else {
         throw new Error(`illegal status code: ${response.status}`)

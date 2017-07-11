@@ -26,16 +26,25 @@ import gensim
 from gensim.models import doc2vec
 from sklearn.metrics.pairwise import cosine_similarity
 
-wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
-print('without mecab')
+import MeCab
+mecab = MeCab.Tagger('-Owakati -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/')
+wakati = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), min_len=1)
+print('using mecab')
 
 from datetime import datetime
 
 import get
 import toot
 import echo
+import dump
 
 api = Flask(__name__, static_folder='dist')
+import jinja2
+my_loader = jinja2.ChoiceLoader([
+    api.jinja_loader,
+    jinja2.FileSystemLoader(os.path.join(api.root_path, '../dist')),
+])
+api.jinja_loader = my_loader
 
 @api.route('/', defaults={'path': ''})
 @api.route('/<path:path>')
@@ -230,19 +239,19 @@ def load_toots():
     while True:
         df = pd.read_csv(toots_fname)
         df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-        toots = df[:100]
+        toots = df[:10000]
         text_vecs = [ model.infer_vector(wakati(line)) for line in list(toots['card_text']) ]
+        dump.docs()
         time.sleep(100)
 
 if __name__ == '__main__':
-    model_name = 'echo_models/tamakoo.running.doc2vec.model'
-    #toots_fname = 'dump_toots/tamakoo.test.dump.csv'
-    toots_fname = 'dump_toots/tamakoo.test.dump.csv'
+    model_name = os.path.join(api.root_path, '../echo_models/tamakoo.running.doc2vec.model')
+    toots_fname  = os.path.join(api.root_path, '../docs/tamakoo.test.dump.csv')
 
     model = gensim.models.Doc2Vec.load(model_name)
     df = pd.read_csv(toots_fname)
     df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-    toots = df[:100]
+    toots = df[:10000]
     text_vecs = [ model.infer_vector(wakati(line)) for line in list(toots['card_text']) ]
 
     pool = ThreadPoolExecutor(4)

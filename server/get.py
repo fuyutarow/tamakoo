@@ -33,130 +33,122 @@ def account(id_or_alias):
     return account
 
 def hiscards(account_alias, amount):
-    lines = []
+    cards = []
     for line in gdb.query('''
-        MATCH p=(a:Account)-[r:Toot]->(b:Card) WHERE a.alias="{}"
+        MATCH p=(a:Account)-[r:Toot]->(b:Note) WHERE a.alias="{}"
         RETURN ID(a), a.name, r.when, ID(b), b.text, b.url LIMIT {}
         '''.format( account_alias, amount )):
-        lines.append({
+        cards.append({
             'account': {
                 'id': line[0],
                 'name': line[1],
-            },
-            'toot': {
-                'when': line[2],
-            },
-            'card': {
+                },
+            'note': {
                 'id': line[3],
                 'text': line[4],
                 'url':'None' if line[5]==None else line[5],
-            },
+                },
+            'when': line[2],
             'mode': 'drawn',
-        })
-    return lines
+            })
+    return cards
 
-def card(card_id):
+def get_card(note_id):
     line = gdb.query('''
-        MATCH p=(a)<-[t:Toot]-(c) WHERE ID(a)={}
+        MATCH p=(a:Note)<-[t:Toot]-(c:Account) WHERE ID(a)={}
         RETURN ID(c), c.alias, t.when, ID(a), a.text, a.url, a.imgs
-        '''.format(card_id))[0]
-    line = {
+        '''.format(note_id))[0]
+    card = {
         'account': {
             'id': line[0],
             'alias': line[1],
-        },
-        'toot': {
-            'when': line[2],
-        },
-        'card': {
+            },
+        'note': {
             'id': line[3],
             'text': line[4],
             'url':'None' if line[5]==None else line[5],
             'imgs': line[6],
-        },
+            },
+        'when': line[2],
         'mode': 'called',
-    }
-    return line
+        }
+    return card
 
-def anchoring_card(card_id):
+def anchoring_card(note_id):
     line = gdb.query('\
-        MATCH p=(a:Card)-[r:Anchor]->(b:Card)<-[t:Toot]-(c:Account) WHERE ID(a)={}\
+        MATCH p=(a:Note)-[r:Anchor]->(b:Note)<-[t:Toot]-(c:Account) WHERE ID(a)={}\
         RETURN ID(c), c.name, t.when, ID(b), b.text, b.url, b.imgs\
-        '.format(card_id))[0]
-    line = {
+        '.format(note_id))[0]
+    card = {
         'account': {
             'id': line[0],
             'alias': line[1],
-        },
-        'toot': {
-            'when': line[2],
-        },
+            },
+        'note': {
+            'id': line[3],
+            'text': line[4],
+            'url':'None' if line[5]==None else line[5],
+            'imgs': line[6],
+            },
+        'when': line[2],
+        'mode': 'winded',
+        }
+    return line
+
+def anchored_card(note_id):
+    line = gdb.query('\
+        MATCH p=(a:Note)<-[r:Anchor]-(b:Note)<-[t:Toot]-(c:Account) WHERE ID(a)={}\
+        RETURN ID(c), c.name, t.when, ID(b), b.text, b.url, b.imgs\
+        '.format(note_id))[0]
+    card = {
+        'account': {
+            'id': line[0],
+            'alias': line[1],
+            },
         'card': {
             'id': line[3],
             'text': line[4],
             'url':'None' if line[5]==None else line[5],
             'imgs': line[6],
-        },
+            },
+        'when': line[2],
         'mode': 'winded',
-    }
-    return line
+        }
+    return card
 
-def anchored_card(card_id):
-    line = gdb.query('\
-        MATCH p=(a:Card)<-[r:Anchor]-(b:Card)<-[t:Toot]-(c:Account) WHERE ID(a)={}\
-        RETURN ID(c), c.name, t.when, ID(b), b.text, b.url, b.imgs\
-        '.format(card_id))[0]
-    line = {
-        'account': {
-            'id': line[0],
-            'alias': line[1],
-        },
-        'toot': {
-            'when': line[2],
-        },
-        'card': {
-            'id': line[3],
-            'text': line[4],
-            'url':'None' if line[5]==None else line[5],
-            'imgs': line[6],
-        },
-        'mode': 'winded',
-    }
-    return line
-
-def wind_card(card_id, amount):
+def wind_card(note_id, amount):
     cnt_cards = 0
 
-    now_line = card(card_id)
-    now_line['mode'] = 'called'
+    now_card = get_card(note_id)
+    now_card['mode'] = 'called'
     cnt_cards+=1
 
-    pre_id = card_id
-    pre_lines = []
+    pre_id = note_id
+    pre_cards = []
     for i in range(100):
         try:
-            line = anchoring_card(pre_id)
-            line['mode'] = 'winded'
-            pre_lines.append(line)
-            pre_id = line['card']['id']
+            card = anchoring_card(pre_id)
+            card['mode'] = 'winded'
+            pre_cards.append(card)
+            pre_id = card['note']['id']
             cnt_cards+=1
         except:
             break
 
-    next_id = card_id
-    next_lines = []
+    next_id = note_id
+    next_cards = []
     for i in range(100):
         try:
-            line = anchored_card(next_id)
-            line['mode'] = 'winded'
-            next_lines.append(line)
-            next_id = line['card']['id']
+            card = anchored_card(next_id)
+            card['mode'] = 'winded'
+            next_cards.append(card)
+            next_id = line['note']['id']
             cnt_cards+=1
         except:
             break
 
-    lines = pre_lines[::-1] + [now_line] + next_lines
-    return lines
+    cards = pre_cards[::-1] + [now_card] + next_cards
+    return cards
 
 def user(user_id):
     line =  gdb.query('\

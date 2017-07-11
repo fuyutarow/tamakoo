@@ -29,32 +29,31 @@ args = parser.parse_args()
 
 import get
 
-def echo(text, model, cards, text_vecs, amount = 100):
+def echo(text, model, notes, text_vecs, amount = 100):
     vec = model.infer_vector(wakati(text))
     sims = cosine_similarity([vec], text_vecs)
     index = np.argsort(sims[0])[::-1]
-    lines = []
+    cards = []
     for i in range(amount):
-        card_id = cards.ix[index[i]]['card_id']
-        line = get.card(card_id)
-        line['mode'] = 'drawn'
-        lines.append(line)
-    return lines
+        note_id = notes.ix[index[i]]['note_id']
+        card = get.get_card(note_id)
+        card['mode'] = 'drawn'
+        cards.append(card)
+    return cards
 
 if __name__ == '__main__':
-    model_name = 'echo_models/tamakoo.running.doc2vec.model'
-    docs_fname = 'docs/tamakoo.test.dump.csv'
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    model_name = os.path.join(current_dir, '../echo_models/tamakoo.running.doc2vec.model')
+    notes_fname  = os.path.join(current_dir, '../docs/tamakoo.test.dump.csv')
 
     model = gensim.models.Doc2Vec.load(model_name)
-    df = pd.read_csv(docs_fname).dropna()
+    df = pd.read_csv(notes_fname)
     df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-    cards = df[:100]
-    start = time.time()
-    text_vecs = [ model.infer_vector(wakati(line)) for line in list(cards['card_text']) ]
-    print('texts to vecs in {}[sec]'.format(time.time()-start))
+    notes = df[:100]
+    text_vecs = [ model.infer_vector(wakati(line)) for line in list(notes['note_text']) ]
 
     sentence = input('>')
     while sentence:
-        lines = echo(sentence, model, cards, text_vecs, args.number)
+        lines = echo(sentence, model, notes, text_vecs, args.number)
         print(lines) 
         sentence = input('>')

@@ -1,13 +1,11 @@
-.module-cache/
-node_modules/
+client/node_modules/
 dist/
 secure.py
 nohup.out
 __pycache__/
 .ipynb_checkpoints/
 db/
-cron.log
-crontab
 dump_toots/
 echo_models/
 note.txt
+server/secure.py

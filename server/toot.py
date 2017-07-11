@@ -16,37 +16,37 @@ parser.add_argument('--dev','-d',default=False,
                     help=':Dev')
 args = parser.parse_args()
 
-def anchor(text, alias, card_id):
+def anchor(text, alias, note_id):
     if args.dev:
-        card_id = gdb.query('''
-            MATCH (a:Account),(b:Card) WHERE a.alias="%s" AND ID(b)=%s
+        note_id = gdb.query('''
+            MATCH (a:Account),(b:Note) WHERE a.alias="%s" AND ID(b)=%s
             CREATE (a)-[:Toot {when:"%s"}]->
-            (c:Card:Dev {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)
+            (c:Note:Dev {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)
             RETURN ID(c)
-            '''%( alias, card_id, now(), text, now(), now() ), data_contents=True)[0][0]
+            '''%( alias, note_id, now(), text, now(), now() ), data_contents=True)[0][0]
     else:
-        card_id = gdb.query('''
-            MATCH (a:Account),(b:Card) WHERE a.alias="%s" AND ID(b)=%s
+        note_id = gdb.query('''
+            MATCH (a:Account),(b:Note) WHERE a.alias="%s" AND ID(b)=%s
             CREATE (a)-[:Toot {when:"%s"}]->
-            (c:Card:Prod {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)
+            (c:Note:Prod {text:"%s",when:"%s"})-[:Anchor {when:"%s"}]->(b)
             RETURN ID(c)
-            '''%( alias, card_id, now(), text, now(), now() ), data_contents=True)[0][0]
-    return card_id
+            '''%( alias, note_id, now(), text, now(), now() ), data_contents=True)[0][0]
+    return note_id
 
 def toot(text, alias='tamako',access='public'):
     if args.dev:
-        card_id = gdb.query('''
+        note_id = gdb.query('''
             MATCH (a:Account) WHERE a.alias="%s"
-            CREATE (a)-[:Toot {when:"%s"}]->(b:Card:Dev {text:"%s",since:"%s",access:"%s"})
+            CREATE (a)-[:Toot {when:"%s"}]->(b:Note:Dev {text:"%s",since:"%s",access:"%s"})
             RETURN ID(b)
             '''%(alias,now(),text,now(),access), data_contents=True)[0][0]
     else:
-        card_id = gdb.query('''
+        note_id = gdb.query('''
             MATCH (a:Account) WHERE a.alias="%s"
-            CREATE (a)-[:Toot {when:"%s"}]->(b:Card:Prod {text:"%s",since:"%s",access:"%s"})
+            CREATE (a)-[:Toot {when:"%s"}]->(b:Note:Prod {text:"%s",since:"%s",access:"%s"})
             RETURN ID(b)
             '''%(alias,now(),text,now(),access), data_contents=True)[0][0]
-    return card_id
+    return note_id
 
 if __name__ == '__main__':
     alias = input('alias>')
@@ -55,6 +55,6 @@ if __name__ == '__main__':
     print('alias',alias)
     text = input('text>')
     while text:
-        card_id = toot(text,alias) 
-        print('{} toot {} at card.id={}'.format(alias, text, card_id)) 
+        note_id = toot(text,alias) 
+        print('{} toot {} at card.id={}'.format(alias, text, note_id)) 
         text = input('text>')

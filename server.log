@@ -1,0 +1,112 @@
+ * Running on http://0.0.0.0:3343/ (Press CTRL+C to quit)
+127.0.0.1 - - [11/Jul/2017 10:28:59] "GET /echo/%E3%81%A9%E3%82%93%E3%81%AA%E6%BC%A2%E5%AD%97%E3%81%8B%E3%81%AA%E3%81%82 HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:29:06] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E3%81%A9%E3%82%93%E3%81%AA%E6%BC%A2%E5%AD%97%E3%81%8B%E3%81%AA%E3%81%82%22,%22amount%22:100%7D HTTP/1.0" 200 -
+[2017-07-11 10:29:23,103] ERROR in app: Exception on /api/anchor/{"account_alias":"tamako","card_id":-1,"toot_text":"けっこう良さげとちゃいますの"} [GET]
+Traceback (most recent call last):
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1982, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1614, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1517, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/_compat.py", line 33, in reraise
+    raise value
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1612, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1598, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "server/server.py", line 93, in api_anchor
+    toot.anchor(toot_text, account_alias, card_id)
+  File "/home/tamakoo/server/toot.py", line 33, in anchor
+    '''%( alias, card_id, now(), text, now(), now() ), data_contents=True)[0][0]
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/neo4jrestclient/query.py", line 351, in __getitem__
+    return self.elements[key]
+IndexError: list index out of range
+127.0.0.1 - - [11/Jul/2017 10:29:23] "GET /api/anchor/%7B%22account_alias%22:%22tamako%22,%22card_id%22:-1,%22toot_text%22:%22%E3%81%91%E3%81%A3%E3%81%93%E3%81%86%E8%89%AF%E3%81%95%E3%81%92%E3%81%A8%E3%81%A1%E3%82%83%E3%81%84%E3%81%BE%E3%81%99%E3%81%AE%22%7D HTTP/1.0" 500 -
+127.0.0.1 - - [11/Jul/2017 10:29:47] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E5%89%B2%E3%82%8A%E3%81%A8%E3%82%AA%E3%82%BA%E3%81%8C%E5%A4%9A%E3%81%84%E3%81%8B%EF%BC%9F%22,%22amount%22:100%7D HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:30:10] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E3%81%AF%E3%81%BE%E3%81%A1%E3%82%83%E3%82%93%E3%81%AE%E8%A8%98%E4%BA%8B%E3%81%8C%E8%A6%B3%E3%81%9F%E3%81%8B%E3%81%A3%E3%81%9F%E3%82%93%E3%81%A0%E3%81%8C%22,%22amount%22:100%7D HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:34:48] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:34:48] "GET /tamakoo.png HTTP/1.0" 404 -
+127.0.0.1 - - [11/Jul/2017 10:34:50] "GET /apple-touch-icon-120x120-precomposed.png HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:34:50] "GET /apple-touch-icon-120x120.png HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:34:50] "GET /apple-touch-icon.png HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:34:50] "GET /apple-touch-icon.png HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:35:06] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E3%81%BB%E3%82%89%E3%82%93%E9%AB%98%E5%8E%9F%22,%22amount%22:100%7D HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:35:16] "GET /api/card/1001/amount/100 HTTP/1.0" 200 -
+[2017-07-11 10:53:46,613] ERROR in app: Exception on /api/anchor/{"account_alias":"tamako","card_id":-1,"toot_text":"これはバグですね"} [GET]
+Traceback (most recent call last):
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1982, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1614, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1517, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/_compat.py", line 33, in reraise
+    raise value
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1612, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1598, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "server/server.py", line 93, in api_anchor
+    toot.anchor(toot_text, account_alias, card_id)
+  File "/home/tamakoo/server/toot.py", line 33, in anchor
+    '''%( alias, card_id, now(), text, now(), now() ), data_contents=True)[0][0]
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/neo4jrestclient/query.py", line 351, in __getitem__
+    return self.elements[key]
+IndexError: list index out of range
+127.0.0.1 - - [11/Jul/2017 10:53:46] "GET /api/anchor/%7B%22account_alias%22:%22tamako%22,%22card_id%22:-1,%22toot_text%22:%22%E3%81%93%E3%82%8C%E3%81%AF%E3%83%90%E3%82%B0%E3%81%A7%E3%81%99%E3%81%AD%22%7D HTTP/1.0" 500 -
+127.0.0.1 - - [11/Jul/2017 10:55:00] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:56:20] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E3%81%A9%E3%82%93%E3%81%A8%E3%81%93%E3%81%84%22,%22amount%22:100%7D HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:56:32] "GET /api/card/34164/amount/100 HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:56:35] "GET / HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:56:36] "GET /tamakoo.png HTTP/1.0" 404 -
+127.0.0.1 - - [11/Jul/2017 10:56:39] "GET /favicon.ico HTTP/1.0" 404 -
+127.0.0.1 - - [11/Jul/2017 10:56:48] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E3%81%8B%E3%81%AA%E3%81%97%E3%82%84%E3%81%8B%E3%82%93%E3%81%97%E3%82%84%22,%22amount%22:100%7D HTTP/1.0" 200 -
+[2017-07-11 10:56:59,617] ERROR in app: Exception on /api/anchor/{"account_alias":"tamako","card_id":-1,"toot_text":"これでもか"} [GET]
+Traceback (most recent call last):
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1982, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1614, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1517, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/_compat.py", line 33, in reraise
+    raise value
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1612, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1598, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "server/server.py", line 93, in api_anchor
+    toot.anchor(toot_text, account_alias, card_id)
+  File "/home/tamakoo/server/toot.py", line 33, in anchor
+    '''%( alias, card_id, now(), text, now(), now() ), data_contents=True)[0][0]
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/neo4jrestclient/query.py", line 351, in __getitem__
+    return self.elements[key]
+IndexError: list index out of range
+127.0.0.1 - - [11/Jul/2017 10:56:59] "GET /api/anchor/%7B%22account_alias%22:%22tamako%22,%22card_id%22:-1,%22toot_text%22:%22%E3%81%93%E3%82%8C%E3%81%A7%E3%82%82%E3%81%8B%22%7D HTTP/1.0" 500 -
+127.0.0.1 - - [11/Jul/2017 10:57:54] "GET /echo/%E3%81%8B%E3%81%AA%E3%81%97%E3%82%84%E3%81%8B%E3%82%93%E3%81%97%E3%82%84 HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:57:55] "GET /tamakoo.png HTTP/1.0" 404 -
+127.0.0.1 - - [11/Jul/2017 10:58:04] "GET /api/echo/%7B%22account_alias%22:%22tamako%22,%22toot_text%22:%22%E3%81%8B%E3%81%AA%E3%81%97%E3%82%84%E3%81%8B%E3%82%93%E3%81%97%E3%82%84%22,%22amount%22:100%7D HTTP/1.0" 200 -
+127.0.0.1 - - [11/Jul/2017 10:58:04] "GET /favicon.ico HTTP/1.0" 404 -
+[2017-07-11 10:58:13,961] ERROR in app: Exception on /api/anchor/{"account_alias":"tamako","card_id":-1,"toot_text":"よかよか"} [GET]
+Traceback (most recent call last):
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1982, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1614, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1517, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/_compat.py", line 33, in reraise
+    raise value
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1612, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/flask/app.py", line 1598, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "server/server.py", line 93, in api_anchor
+    toot.anchor(toot_text, account_alias, card_id)
+  File "/home/tamakoo/server/toot.py", line 33, in anchor
+    '''%( alias, card_id, now(), text, now(), now() ), data_contents=True)[0][0]
+  File "/home/ytro/anaconda3/lib/python3.6/site-packages/neo4jrestclient/query.py", line 351, in __getitem__
+    return self.elements[key]
+IndexError: list index out of range
+127.0.0.1 - - [11/Jul/2017 10:58:13] "GET /api/anchor/%7B%22account_alias%22:%22tamako%22,%22card_id%22:-1,%22toot_text%22:%22%E3%82%88%E3%81%8B%E3%82%88%E3%81%8B%22%7D HTTP/1.0" 500 -
