@@ -16,11 +16,11 @@ export default class TodoList extends React.Component<Props,{}> {
   }
 
   render() {
-    const tasks = this.props.value.tasks
+    const cards = this.props.value.cards
       .map( (a,idx) =>
         <div>
           <Todo
-            task={a}
+            card={a}
             order={idx}
             actions={this.props.actions}
             match={this.props.match}
@@ -31,7 +31,7 @@ export default class TodoList extends React.Component<Props,{}> {
         )
     return (
       <div style={this.styles.timeline}>
-        {tasks}
+        { cards }
       </div>
     );
   }

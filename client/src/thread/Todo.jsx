@@ -18,7 +18,7 @@ export default class Todo extends React.Component<Props, void> {
   anchor() {
     const voice = (ReactDOM.findDOMNode(this.refs.voice)).value;
     if( voice=='' ) return;
-    this.props.actions.anchor(this.props.value.signinAcc.alias, this.props.card.note.id, this.props.order, form);
+    this.props.actions.anchor(this.props.value.signinAcc.alias, this.props.card.note.id, this.props.order, voice);
     (ReactDOM.findDOMNode(this.refs.voice)).value = '';
   }
 
@@ -69,7 +69,7 @@ export default class Todo extends React.Component<Props, void> {
        
     const responseForm =
       <div style={styles.toot}>
-        <input style={styles.textarea} type='text' ref='note'
+        <input style={styles.textarea} type='text' ref='voice'
           placeholder='>> response'/>
         <img draggable='false' style={styles.button}
           alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
@@ -80,7 +80,6 @@ export default class Todo extends React.Component<Props, void> {
     const cardCenter =
       this.props.card.mode=='tooted'?
         <p style={styles.cardcenter}> 
-          { this.props.card.note.id }
           { textln }
           { imgln }
           { responseForm }
@@ -88,7 +87,6 @@ export default class Todo extends React.Component<Props, void> {
 
       :this.props.card.mode=='winded' || this.props.card.mode=='block' || this.props.card.mode=='drawn'?
         <p style={styles.cardcenter} onClick={e=>this.callCard()}>
-          { this.props.card.note.id }
           { textln }
           { imgln }
         </p>
@@ -99,7 +97,6 @@ export default class Todo extends React.Component<Props, void> {
             <h3 onClick={e=>{
             }}>{this.props.card.account.name}</h3>
           </Link>
-          { this.props.card.note.id }
           { textln }
           { imgln }
           { responseForm }

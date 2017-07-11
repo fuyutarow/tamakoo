@@ -38,7 +38,7 @@ import toot
 import echo
 import dump
 
-api = Flask(__name__, static_folder='dist')
+api = Flask(__name__, static_folder='../dist')
 import jinja2
 my_loader = jinja2.ChoiceLoader([
     api.jinja_loader,
@@ -57,15 +57,15 @@ def bundle():
 
 @api.route('/dist/bundle.js.map')
 def bundle_map():
-    return send_from_directory(os.path.join(api.root_path, 'dist'),'bundle.js.map')
+    return send_from_directory(os.path.join(api.root_path, '../dist'),'bundle.js.map')
 
 @api.route('/tamakoo.png')
 def face():
-    return send_from_directory(os.path.join(api.root_path, 'dist'),'tamakoo.png')
+    return send_from_directory(os.path.join(api.root_path, '../dist'),'tamakoo.png')
 
 @api.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(api.root_path, 'dist'),'favicon.ico')
+    return send_from_directory(os.path.join(api.root_path, '../dist'),'favicon.ico')
 
 @api.route('/api/addAcc/<string:state>', methods=['GET'])
 def api_addAcc(state):
@@ -80,7 +80,7 @@ def api_addAcc(state):
         CREATE (a)-[:Have]->(:Account {handle:"%s",alias:"%s",since:"%s",color:"%s"})'\
         %( user_id, handle, alias, now, randcolor() ), data_contents=True)
     result = {
-        'user': get_user(user_id)
+        'user': get.user(user_id)
         }
     return make_response(jsonify(result))
 
@@ -88,10 +88,13 @@ def api_addAcc(state):
 def api_anchor(state):
     state = json.loads(state)
     account_alias = state['account_alias']
-    card_id = state['card_id']
-    toot_text = state['toot_text']
-    toot.anchor(toot_text, account_alias, card_id) 
+    note_id = state['note_id']
+    note_text = state['note_text']
+    note_id = toot.anchor(note_text, account_alias, note_id)
+    card = get.get_card(note_id)
+    card['mode'] = 'tooted'
     result = {
+        'card': card
         }
     return make_response(jsonify(result))
 
@@ -111,22 +114,22 @@ def api_get_toot(account_alias,amount):
     }
     return  make_response(jsonify(result))
 
-@api.route('/api/card/<int:card_id>', methods=['GET'])
-def api_get_card(card_id):
-    line = get.card(card_id)
-    line['mode'] = 'called'
+@api.route('/api/card/<int:note_id>', methods=['GET'])
+def api_get_card(note_id):
+    card = get.get_card(note_id)
+    card['mode'] = 'called'
     result = {
-        'card': line 
+        'card': card
         }
     return make_response(jsonify(result))
 
-@api.route('/api/card/<int:card_id>/amount/<int:amount>', methods=['GET'])
-def api_call_card(card_id,amount):
+@api.route('/api/card/<int:note_id>/amount/<int:amount>', methods=['GET'])
+def api_call_card(note_id,amount):
     amount = 100 if not amount or amount < 0 or amount > 1000 else amount
-    cards = get.wind_card(card_id, amount)
+    cards = get.wind_card(note_id, amount)
     if len(cards) < amount:
-        text = get.card(card_id)['card']['text']
-        cards += echo.echo(text, model, toots, text_vecs, amount-len(cards))
+        text = get.get_card(note_id)['note']['text']
+        cards += echo.echo(text, model, notes, text_vecs, amount-len(cards))
     result = {
         'cards': cards
         }
@@ -217,15 +220,17 @@ def api_signup(user):
 def api_echo(state):
     state = json.loads(state)
     account_alias = state['account_alias']
-    toot_text = state['toot_text']
+    note_text = state['note_text']
     amount = 100 if not 'amount' in state or state['amount'] < 0 or state['amount'] > 1000 else\
         state['amount']
 
     access = 'public'
-    toot.toot(toot_text, account_alias, access)
+    note_id = toot.toot(note_text, account_alias, access)
+    card = get.get_card(note_id)
+    card['mode'] = 'tooted'
 
     result = {
-        'cards': echo.echo(toot_text, model, toots, text_vecs, amount)
+        'cards': [card] + echo.echo(note_text, model, notes, text_vecs, amount)
         }
     return make_response(jsonify(result))
 
@@ -233,28 +238,28 @@ def api_echo(state):
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
-def load_toots():
-    global toots
+def load_notes():
+    global notes
     global text_vecs
     while True:
-        df = pd.read_csv(toots_fname)
+        df = pd.read_csv(notes_fname)
         df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-        toots = df[:10000]
-        text_vecs = [ model.infer_vector(wakati(line)) for line in list(toots['card_text']) ]
+        notes = df[:10000]
+        text_vecs = [ model.infer_vector(wakati(line)) for line in list(notes['card_text']) ]
         dump.docs()
         time.sleep(100)
 
 if __name__ == '__main__':
     model_name = os.path.join(api.root_path, '../echo_models/tamakoo.running.doc2vec.model')
-    toots_fname  = os.path.join(api.root_path, '../docs/tamakoo.test.dump.csv')
+    notes_fname  = os.path.join(api.root_path, '../docs/tamakoo.running.dump.csv')
 
     model = gensim.models.Doc2Vec.load(model_name)
-    df = pd.read_csv(toots_fname)
+    df = pd.read_csv(notes_fname)
     df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-    toots = df[:10000]
-    text_vecs = [ model.infer_vector(wakati(line)) for line in list(toots['card_text']) ]
+    notes = df[:10000]
+    text_vecs = [ model.infer_vector(wakati(line)) for line in list(notes['note_text']) ]
 
     pool = ThreadPoolExecutor(4)
-    pool.submit(load_toots)
+    pool.submit(load_notes)
 
     api.run(host='0.0.0.0', port=3343)

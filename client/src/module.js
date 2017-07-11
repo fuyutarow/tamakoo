@@ -85,17 +85,9 @@ export default function reducer (
     }
 
     case TOOT:
-      //const nextCards = action.cards
-      //  .map( a => { return {
-      //    account: a.account,
-      //    note: a.note,
-      //    when: a.when,
-      //    mode: a.mode
-      //  }});
       return Object.assign({}, state, {
-        cards: action.cards//nextCards
+        cards: action.cards
       });
-        //cards:state.cards.concat(nextCards)
 
     case ADD_CARD:// css -> css-in-js
       const css2js = (css) => {
@@ -376,9 +368,9 @@ export class ActionDispatcher {
   }
 
   async toot( account_alias:number, text:string ): Promise<void> {
+    this.dispatch({ type:FETCH_REQUEST_START });
     this.dispatch({ type:INIT_STATE })
     this.dispatch({ type:ADD_CARD, text:text })
-    this.dispatch({ type:FETCH_REQUEST_START });
     const url = '/api/echo/'+encodeURI(JSON.stringify({
       account_alias: account_alias,
       note_text: text,

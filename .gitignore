@@ -1,3 +1,4 @@
+server.log
 client/node_modules/
 dist/
 secure.py
