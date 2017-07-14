@@ -150,7 +150,6 @@ export default function reducer (
       return Object.assign({}, state, { phase:action.phase });
 
     case SET_STATE:
-      console.log(action.state)
       return Object.assign({}, state, action.state );
 
     case ENTRY:
@@ -179,6 +178,10 @@ export class ActionDispatcher {
 
   initState(){
     this.dispatch({ type:INIT_STATE })
+  }
+
+  setState( state:any ){
+    this.dispatch({ type:SET_STATE, state:state })
   }
 
   async addAcc( user_id:number, handle:string ): Promise<void> {
@@ -275,32 +278,32 @@ export class ActionDispatcher {
   }
 
   async entry( account_alias:string ): Promise<void> {
-    const date = new Date()
-    this.dispatch({ type:FETCH_REQUEST_START });
-    const url = '/api/entry/'+account_alias;
-    try {
-      console.log(url)
-      const response:Response = await fetch(url, {
-        method: 'GET',
-        headers: this.myHeaders,
-      })
-      if (response.status === 200) { //2xx
-        const d = new Date()
-        const json: {amount:number} = await response.json();
-        this.dispatch({ type:LOGIN })
-        this.dispatch({ type:ENTRY,
-          signinAcc:json.user.hasAcc
-            .filter( a => a['id']==account_id )[0],
-          loginUser:json.user
-        })
-      } else {
-        throw new Error(`illegal status code: ${response.status}`)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      this.dispatch({ type:FETCH_REQUEST_FINISH });
-    }
+//    const date = new Date()
+//    this.dispatch({ type:FETCH_REQUEST_START });
+//    const url = '/api/entry/'+account_alias;
+//    try {
+//      console.log(url)
+//      const response:Response = await fetch(url, {
+//        method: 'GET',
+//        headers: this.myHeaders,
+//      })
+//      if (response.status === 200) { //2xx
+//        const d = new Date()
+//        const json: {amount:number} = await response.json();
+//        this.dispatch({ type:LOGIN })
+//        this.dispatch({ type:ENTRY,
+//          signinAcc:json.user.hasAcc
+//            .filter( a => a['id']==account_id )[0],
+//          loginUser:json.user
+//        })
+//      } else {
+//        throw new Error(`illegal status code: ${response.status}`)
+//      }
+//    } catch (err) {
+//      console.error(err)
+//    } finally {
+//      this.dispatch({ type:FETCH_REQUEST_FINISH });
+//    }
   }
 
   async login( account_id:number ): Promise<void> {
@@ -355,7 +358,6 @@ export class ActionDispatcher {
       })
       if (response.status === 200) { //2xx
         const json: {amount:number} = await response.json();
-        console.log(json)
         this.dispatch({ type:SET_STATE, state:{ user4signup: json.user }})
       } else {
         throw new Error(`illegal status code: ${response.status}`)
@@ -381,7 +383,6 @@ export class ActionDispatcher {
         method: 'GET',
         headers: this.myHeaders,
       })
-      console.log()
       if (response.status === 200) { //2xx
         const json: {cards:any} = await response.json();
         this.dispatch({ type:TOOT, cards:json.cards });

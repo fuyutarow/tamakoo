@@ -11,7 +11,7 @@ export const styleOn = (windowWidth) =>  {
         position: 'relative',
         display: 'block',
         background: 'none',
-        textAlign: 'center',
+        //textAlign: 'center',
         margin: '30vh 10% 0% 10%',
       },
       textarea: {
@@ -25,6 +25,7 @@ export const styleOn = (windowWidth) =>  {
         marginTop: '0em',
         margin: '0px',
         borderStyle: 'none',
+        backgroundColor:'#fff',
       },
       button: {
         width: '40px',

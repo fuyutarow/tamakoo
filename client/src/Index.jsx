@@ -30,7 +30,7 @@ ReactDOM.render(
     <Router history={history}>
     <Switch>
       <Route exact path='/' component={Face} />
-      <Route exact path='/entry/:id' component={Face} />
+      <Route exact path='/entry/:alias' component={Face} />
       <Route exact path='/echo/:text' component={Thread} />
       <Route exact path='/card/:id' component={Thread} />
       <Route exact path='/account/:alias' component={Userleft} />

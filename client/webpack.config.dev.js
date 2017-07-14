@@ -1,7 +1,7 @@
 module.exports = {
   entry: './src/Index.jsx',
   output: {
-    filename: '../dist/bundle.js'
+    filename: '../dist/bundle.dev.js'
   },
   devtool: "source-map",
   resolve: {

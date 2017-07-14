@@ -20,10 +20,12 @@ export class Thread extends React.Component<void, Props, void> {
   componentWillMount(){
     this.styles = styleOn(screen.width);
     if( this.props.match.path=='/echo/:text' ){
+      this.props.actions.setState({ isLoading: true })
       this.props.actions.toot(
         this.props.value.signinAcc.alias, this.props.match.params.text)
     }
     if( this.props.match.path=='/card/:id' ){
+      this.props.actions.setState({ isLoading: true })
       this.props.actions.callCard(this.props.match.params.id);
     }
   }

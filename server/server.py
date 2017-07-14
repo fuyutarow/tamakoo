@@ -26,17 +26,20 @@ import gensim
 from gensim.models import doc2vec
 from sklearn.metrics.pairwise import cosine_similarity
 
-import MeCab
-mecab = MeCab.Tagger('-Owakati -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/')
-wakati = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), min_len=1)
-print('using mecab')
-
 from datetime import datetime
 
 import get
 import toot
 import echo
 import dump
+
+import argparse
+parser = argparse.ArgumentParser(description='tamakoo server')
+parser.add_argument('--dev', '-d', action='store_true',
+                    help=':Dev')
+parser.add_argument('--port','-p', type=int, default=3000,
+                    help='port')
+args = parser.parse_args()
 
 api = Flask(__name__, static_folder='../dist')
 import jinja2
@@ -46,18 +49,32 @@ my_loader = jinja2.ChoiceLoader([
 ])
 api.jinja_loader = my_loader
 
-@api.route('/', defaults={'path': ''})
-@api.route('/<path:path>')
-def index(path):
-    return render_template('index.html')
+if args.dev:
+    @api.route('/', defaults={'path': ''})
+    @api.route('/<path:path>')
+    def index(path):
+        return render_template('index.dev.html')
 
-@api.route('/dist/bundle.js')
-def bundle():
-    return open('dist/bundle.js', encoding='utf-8').read()
+    @api.route('/dist/bundle.dev.js')
+    def bundle():
+        return open('dist/bundle.dev.js', encoding='utf-8').read()
 
-@api.route('/dist/bundle.js.map')
-def bundle_map():
-    return send_from_directory(os.path.join(api.root_path, '../dist'),'bundle.js.map')
+    @api.route('/dist/bundle.dev.js.map')
+    def bundle_map():
+        return send_from_directory(os.path.join(api.root_path, '../dist'),'bundle.dev.js.map')
+else:
+    @api.route('/', defaults={'path': ''})
+    @api.route('/<path:path>')
+    def index(path):
+        return render_template('index.html')
+
+    @api.route('/dist/bundle.js')
+    def bundle():
+        return open('dist/bundle.js', encoding='utf-8').read()
+
+    @api.route('/dist/bundle.js.map')
+    def bundle_map():
+        return send_from_directory(os.path.join(api.root_path, '../dist'),'bundle.js.map')
 
 @api.route('/tamakoo.png')
 def face():
@@ -90,11 +107,11 @@ def api_anchor(state):
     account_alias = state['account_alias']
     note_id = state['note_id']
     note_text = state['note_text']
-    note_id = toot.anchor(note_text, account_alias, note_id)
-    card = get.get_card(note_id)
+    note_id = toot.anchor(note_text, account_alias, note_id) 
+    card = get.get_card(note_id) 
     card['mode'] = 'tooted'
     result = {
-        'card': card
+        'card': card 
         }
     return make_response(jsonify(result))
 
@@ -119,14 +136,14 @@ def api_get_card(note_id):
     card = get.get_card(note_id)
     card['mode'] = 'called'
     result = {
-        'card': card
+        'card': card 
         }
     return make_response(jsonify(result))
 
 @api.route('/api/card/<int:note_id>/amount/<int:amount>', methods=['GET'])
 def api_call_card(note_id,amount):
     amount = 100 if not amount or amount < 0 or amount > 1000 else amount
-    cards = get.wind_card(note_id, amount)
+    cards = get.wind_cards(note_id, amount)
     if len(cards) < amount:
         text = get.get_card(note_id)['note']['text']
         cards += echo.echo(text, model, notes, text_vecs, amount-len(cards))
@@ -244,22 +261,36 @@ def load_notes():
     while True:
         df = pd.read_csv(notes_fname)
         df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-        notes = df[:10000]
+        notes = df[:100] if args.dev else df[:10000]
         text_vecs = [ model.infer_vector(wakati(line)) for line in list(notes['card_text']) ]
         dump.docs()
         time.sleep(100)
 
 if __name__ == '__main__':
-    model_name = os.path.join(api.root_path, '../echo_models/tamakoo.running.doc2vec.model')
-    notes_fname  = os.path.join(api.root_path, '../docs/tamakoo.running.dump.csv')
+    if args.dev:
+        print('DEV server')
+        wakati = lambda sentence: gensim.utils.simple_preprocess(sentence, min_len=1)
+        print('without mecab')
+
+        model_name = os.path.join(api.root_path, '../echo_models/tamakoo.running.doc2vec.model')
+        notes_fname  = os.path.join(api.root_path, '../docs/tamakoo.test.dump.csv')
+    else: 
+        print('PROD server')
+        import MeCab
+        mecab = MeCab.Tagger('-Owakati -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/')
+        wakati = lambda text: gensim.utils.simple_preprocess(mecab.parse(text), min_len=1)
+        print('using mecab')
+
+        model_name = os.path.join(api.root_path, '../echo_models/tamakoo.running.doc2vec.model')
+        notes_fname  = os.path.join(api.root_path, '../docs/tamakoo.running.dump.csv')
 
     model = gensim.models.Doc2Vec.load(model_name)
-    df = pd.read_csv(notes_fname)
+    df = pd.read_csv(notes_fname).dropna()
     df = df.reindex(np.random.permutation(df.index)).reset_index(drop=True)
-    notes = df[:10000]
+    notes = df[:100] if args.dev else df[:10000]
     text_vecs = [ model.infer_vector(wakati(line)) for line in list(notes['note_text']) ]
 
     pool = ThreadPoolExecutor(4)
     pool.submit(load_notes)
 
-    api.run(host='0.0.0.0', port=3343)
+    api.run(host='0.0.0.0', port=args.port)

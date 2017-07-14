@@ -19,14 +19,6 @@ import MeCab
 mecab = MeCab.Tagger('-Owakati -d /usr/local/lib/mecab/dic/mecab-ipadic-neologd/')
 wakati = lambda sentence: gensim.utils.simple_preprocess(mecab.parse(sentence), min_len=1)
 
-import argparse
-parser = argparse.ArgumentParser(description='tamakoo echo')
-#parser.add_argument('--sentence','-s', required=True, type=str,
-#                    help='input sentense')
-parser.add_argument('--number','-n',default=100, type=int,
-                    help='numberof output sentense')
-args = parser.parse_args()
-
 import get
 
 def echo(text, model, notes, text_vecs, amount = 100):
@@ -52,8 +44,9 @@ if __name__ == '__main__':
     notes = df[:100]
     text_vecs = [ model.infer_vector(wakati(line)) for line in list(notes['note_text']) ]
 
+    amount = input('amount>')
     sentence = input('>')
     while sentence:
-        lines = echo(sentence, model, notes, text_vecs, args.number)
+        lines = echo(sentence, model, notes, text_vecs, amount) 
         print(lines) 
         sentence = input('>')

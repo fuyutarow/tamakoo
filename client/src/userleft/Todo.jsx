@@ -54,19 +54,19 @@ export default class Todo extends React.Component<Props, void> {
       return text
       }   
 
-    const textln = this.props.card.note.text.split('\n')
+    const textln = this.props.card.note.text.split('\n').filter( a => a!='')
       .map( m => (<p style={styles.ln}>{hrefer(m)}</p>) )
 
     let imgln = null;
     try{
       imgln = this.props.card.note.imgs.length?
-      this.props.card.note.imgs.map( m => (
-        <p>
-          <img src={m} style={{width:'100%',height:'auto'}}/>
-        </p>))
-      :null 
+        this.props.card.note.imgs.map( m => (
+          <p>
+            <img src={m} style={{width:'100%',height:'auto'}}/>
+          </p>))
+        :null 
     }catch(err){}
-       
+     
     const responseForm =
       <div style={styles.toot}>
         <input style={styles.textarea} type='text' ref='voice'
@@ -76,38 +76,50 @@ export default class Todo extends React.Component<Props, void> {
           onClick={e=>this.anchor()}
         />
       </div>
+    
+    const cardHead = 
+       <div styles={{fotSize:'8px'}}>
+          { this.props.card.note.depth1 }
+       </div>
 
     const cardCenter =
       this.props.card.mode=='tooted'?
-        <p style={styles.cardcenter}> 
+        <div style={styles.cardcenter}> 
+          { cardHead } 
           { textln }
           { imgln }
           { responseForm }
-        </p>
-
-      :this.props.card.mode=='winded' || this.props.card.mode=='block' || this.props.card.mode=='drawn'?
-        <p style={styles.cardcenter} onClick={e=>this.callCard()}>
-          { textln }
-          { imgln }
-        </p>
+        </div>
 
       :this.props.card.mode=='called' ?
-        <p style={styles.cardcenter}>
+        <div style={styles.cardcenter}>
           <Link to={'/account/'+this.props.card.account.alias}>
             <h3 onClick={e=>{
             }}>{this.props.card.account.name}</h3>
           </Link>
+          { cardHead } 
           { textln }
           { imgln }
           { responseForm }
-        </p>
+        </div>
+      
+      :this.props.card.mode=='winded' || this.props.card.mode=='drawn' ?
+        <div style={styles.cardcenter} onClick={e=>this.callCard()}>
+          { cardHead } 
+          { textln }
+          { imgln }
+        </div>
 
       :null
 
-    const copyRight = this.props.card.note.url=='None'?
-       <p style={styles.linkOff}></p>
-       :
-       <p style={styles.linkOn}></p>
+    let copyRight = <p style={styles.linkOff}></p>;
+    try{
+      const copyRight = this.props.card.note.url=='None'?
+        <p style={styles.linkOff}></p>
+      :
+        <p style={styles.linkOn}></p>;
+    }catch(err){}
+       
 
 
    const cardStyle =
@@ -119,9 +131,9 @@ export default class Todo extends React.Component<Props, void> {
 
     return (
       <div style={cardStyle} ref='card'>
-        {userLeft}
-        {cardCenter}
-        {copyRight}
+        { userLeft }
+        { cardCenter }
+        { copyRight }
       </div>
     );
   }
@@ -134,11 +146,9 @@ export default class Todo extends React.Component<Props, void> {
       if( this.linkDisabled ){
         setTimeout(() => {this.linkDisabled = false }, 500);
       }
-
     }
 
     componentDidUpdate() {
       location.hash='flash';
     }
-
 }

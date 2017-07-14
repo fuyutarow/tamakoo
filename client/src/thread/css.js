@@ -25,7 +25,7 @@ export const styleOn = (windowWidth) =>  {
       userleft: {
         width: '9%',
         listStyle: 'none',
-        margin: '16px 0px 16px 0px',
+        margin: '0',
         backgroundColor: '#'+Math.floor(Math.random()*parseInt('ffffff',16)).toString(16),
       },
       cardcenter: {

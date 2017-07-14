@@ -10,3 +10,5 @@ dump_toots/
 echo_models/
 note.txt
 server/secure.py
+*.log
+docs/

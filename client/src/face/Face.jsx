@@ -3,9 +3,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import Image from 'react-image-resizer';
-import { history } from '../Index';
 
+import { history } from '../Index';
 import { CounterState, ActionDispatcher } from '../module';
+import { TootEditor } from './TootEditor';
 import Tool from '../Tool';
 import { styleOn } from './css';
 interface Props {
@@ -20,26 +21,28 @@ if( ('webkitSpeechRecognition' in window) ){
 }
 
 export class Face extends React.Component<void, Props, void> {
+
   componentWillMount(){
     console.log('window width: ',window.innerWidth);
     console.log('screen width: ',screen.width,screen.height);
     console.log('client width: ',document.documentElement.clientWidth);
     this.styles = styleOn(screen.width);
-    if( this.props.match.path=='/entry/:id' ){
-      this.props.actions.entry(this.props.match.params.id)
+    if( this.props.match.path=='/entry/:alias' ){
+      this.props.actions.entry(this.props.match.params.alias)
     }
   }
 
   toot() {
-    const note = (ReactDOM.findDOMNode(this.refs.note));
-    if( note.value=='' ) return;
-    history.push('/echo/'+note.value)
+    const editor = (ReactDOM.findDOMNode(this.refs.editor));
+    console.log(editor)
+    if( editor.value=='' ) return;
+    this.props.actions.setState({ isLoading: true })
+    history.push('/echo/'+editor.value)
     note.value = '';
   }
 
   componentWillUpdate(){
     this.props.actions.entry(this.props.match.params.id)
-
   }
 
   render() {
@@ -56,20 +59,49 @@ export class Face extends React.Component<void, Props, void> {
           locations.href='dev.tamakoo.com'
         }}>dev</button>
           
+//    const textForm = 
+//      <div
+//        style={{
+//          fontSize: '16px',
+//          height: '40px',
+//          width: '85%',
+//          paddingLeft: '0',
+//          position: 'relative',
+//          background: 'none',
+//          display: 'block',
+//          marginTop: '0em',
+//          margin: '0px',
+//          borderStyle: 'none',
+//          backgroundColor:'#fff',
+//        }}
+//        ref="editor"
+//      >
+//      <Editor
+//        editorState={this.state.editorState}
+//        onChange={this.onChange.bind(this)}
+//      />
+//      </div>
+
+    console.log(this)
     return (
       <div style={this.styles.toot}>
-        <input style={this.styles.textarea} type='text' ref='note'
-          placeholder='toot to open tamaKoo'/>
-        <img draggable='false' style={this.styles.button}
-          alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
-          onClick={e=>this.toot()}
-        />
+        <TootEditor actions={this.props.actions} match={this.props.match} value={this.props.value} />
         <Tool actions={this.props.actions} match={this.props.match} value={this.props.value} />
       </div>
     )
   }
+//        <img draggable='false' style={this.styles.button}
+//          alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
+//          onClick={e=>this.toot()}
+//        />
 
   componentDidMount() {
+    window.addEventListener('keypress', e => {
+      if( e.keyCode==13 && e.shiftKey ){
+        this.toot();
+      }
+    })
+
     if( ('webkitSpeechRecognition' in window) ){
       speech.start();
       speech.onresult = e => {
