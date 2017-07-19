@@ -37,8 +37,16 @@ export default class Todo extends React.Component<Props, void> {
     const styles = styleOn(screen.width);
 
     const userLeft =
-      this.props.card.mode=='winded'|| this.props.card.mode=='drawn'?
-        <Link style={styles.userleft} to={'/account/'+this.props.card.account.alias}>
+      this.props.card.mode=='winded'|| this.props.card.mode=='drawn' || this.props.card.mode=='block'?
+        <Link style={{
+          gridColumn: '1/2',  
+          listStyle: 'none',
+          margin: '5px 5px 5px 10px',
+          width: '6vw',
+          height: '6vw',
+          borderRadius: '3vw',
+          backgroundColor: '#'+Math.floor(Math.random()*parseInt('ffffff',16)).toString(16),
+        }} to={'/account/'+this.props.card.account.alias}>
           <div onClick={e=>{
           }}/>
         </Link>
@@ -55,59 +63,72 @@ export default class Todo extends React.Component<Props, void> {
       }   
 
     const textln = this.props.card.note.text.split('\n').filter( a => a!='')
-      .map( m => (<p style={styles.ln}>{hrefer(m)}</p>) )
+      .map( m => (<p style={{
+        padding: '5px',
+        margin: '0px',
+        wordWrap: 'break-word',
+      }}>{hrefer(m)}</p>) )
 
-    let imgln = null;
+    let imgdiv = null;
     try{
-      imgln = this.props.card.note.imgs.length?
+     imgdiv = this.props.card.note.imgs.length?
         this.props.card.note.imgs.map( m => (
-          <p>
-            <img src={m} style={{width:'100%',height:'auto'}}/>
-          </p>))
-        :null 
+          <img src={m} style={{
+            gridColumn: '1/4',  
+            margin: '2px 0 2px 0',
+            width: '100%',
+            height: 'auto',
+            borderRadius: '10px',
+          }}/>
+         ))
+     :null
     }catch(err){}
-     
-    const responseForm =
-      <div style={styles.toot}>
-        <input style={styles.textarea} type='text' ref='voice'
-          placeholder='>> response'/>
-        <img draggable='false' style={styles.button}
-          alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
-          onClick={e=>this.anchor()}
-        />
-      </div>
-    
-    const cardHead = 
-       <div styles={{fotSize:'8px'}}>
-          { this.props.card.note.depth1 }
+ 
+    const cardFooter = 
+       <div styles={{ fontSize:'8px' }}>
+          {
+            !this.props.card.note.depth1? null:
+            <div styles={{ padding:'0 10 0 10' }}>{ this.props.card.note.depth1 }</div>
+          }
+          {
+            this.props.card.note.url=='None'? null:
+            <a href={this.props.card.note.url}>[Link]</a>
+          }
        </div>
 
     const cardCenter =
-      this.props.card.mode=='tooted'?
-        <div style={styles.cardcenter}> 
-          { cardHead } 
+      this.props.card.mode=='tooted' || this.props.card.mode=='block'?
+        <div style={{
+          gridColumn: '2/3',
+          listStyle: 'none',
+          padding: '0 0 0 10px',
+        }}> 
           { textln }
-          { imgln }
-          { responseForm }
+          { cardFooter }
         </div>
 
       :this.props.card.mode=='called' ?
-        <div style={styles.cardcenter}>
+        <div style={{
+          gridColumn: '2/3',
+          listStyle: 'none',
+          padding: '0 0 0 10px',
+        }}> 
           <Link to={'/account/'+this.props.card.account.alias}>
             <h3 onClick={e=>{
-            }}>{this.props.card.account.name}</h3>
+            }}>{this.props.card.account.handle}@{this.props.card.account.alias}</h3>
           </Link>
-          { cardHead } 
           { textln }
-          { imgln }
-          { responseForm }
+          { cardFooter }
         </div>
       
       :this.props.card.mode=='winded' || this.props.card.mode=='drawn' ?
-        <div style={styles.cardcenter} onClick={e=>this.callCard()}>
-          { cardHead } 
+        <div style={{
+          gridColumn: '2/3',
+          listStyle: 'none',
+          padding: '0 0 0 10px',
+        }} onClick={e=>this.callCard()}>
           { textln }
-          { imgln }
+          { cardFooter }
         </div>
 
       :null
@@ -115,13 +136,19 @@ export default class Todo extends React.Component<Props, void> {
     let copyRight = <p style={styles.linkOff}></p>;
     try{
       const copyRight = this.props.card.note.url=='None'?
-        <p style={styles.linkOff}></p>
+        <p style={{
+          gridColumn: '3/4',
+          backgroundColor: '#fff',
+          listStyle: 'none',
+        }}></p>
       :
-        <p style={styles.linkOn}></p>;
+        <p style={{
+          gridColumn: '3/4',
+          backgroundColor: '#fff',
+          listStyle: 'none',
+        }}></p>;
     }catch(err){}
        
-
-
    const cardStyle =
     this.props.card.mode=='tooted' || this.props.card.mode=='block' || this.props.card.mode=='called' ?
       styles.nowToot
@@ -130,10 +157,25 @@ export default class Todo extends React.Component<Props, void> {
     :null;
 
     return (
-      <div style={cardStyle} ref='card'>
+      <div style={{
+        margin: '10px 0 10px 0',
+        padding: '10px 0 10px 0',
+        color: 'rgba(0, 0, 0, 0.87)',
+        backgroundColor: 'white',
+        transition: 'all 450ms cubicBezier(0.23, 1, 0.32, 1) 0ms',
+        boxSizing: 'borderBox',
+        fontFamily: 'Roboto, sansSerif',
+        WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
+        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+        borderRadius: '2px',
+        zIndex: '1',
+        display: 'grid',
+        gridTemplateColumns: '8% 90% 2%',
+      }} ref='card'>
         { userLeft }
         { cardCenter }
         { copyRight }
+        { imgdiv }
       </div>
     );
   }

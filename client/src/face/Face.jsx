@@ -20,13 +20,60 @@ if( ('webkitSpeechRecognition' in window) ){
   speech.continuous = true;
 }
 
+const styles = (windowWidth) =>  { return {
+      wallpaper: {
+        height: '100vh',
+        width: '100vw',
+      },
+      toot: {
+        color: 'rgba(0, 0, 0, 0.87)',
+        position: 'relative',
+        display: 'block',
+        background: 'none',
+        margin: '30vh 2vw 0 2vw',
+      },
+      textarea: {
+        fontSize: '16px',
+        height: '40px',
+        width: '85%',
+        paddingLeft: '0',
+        position: 'relative',
+        background: 'none',
+        display: 'block',
+        marginTop: '0em',
+        margin: '0px',
+        borderStyle: 'none',
+        backgroundColor:'#fff',
+      },
+      button: {
+        width: '40px',
+        height: '40px',
+        fontSize: '16px',
+        fontWeight: 'bold',
+        background: 'none',
+        //backgroundColor:'#ffdb58',
+        color: '#fff',
+        display: 'flex',
+        borderRadius: '0',
+        padding: '0',
+        margin: '3px 0px 0px 0px',
+        position: 'absolute',
+        right: '0',
+        top: '0',
+        },
+      emoji: {
+        width:'100%',
+        height:'100%',
+      },
+}}
+
 export class Face extends React.Component<void, Props, void> {
 
   componentWillMount(){
     console.log('window width: ',window.innerWidth);
     console.log('screen width: ',screen.width,screen.height);
     console.log('client width: ',document.documentElement.clientWidth);
-    this.styles = styleOn(screen.width);
+    this.styles = styles(screen.width);
     if( this.props.match.path=='/entry/:alias' ){
       this.props.actions.entry(this.props.match.params.alias)
     }
@@ -59,33 +106,10 @@ export class Face extends React.Component<void, Props, void> {
           locations.href='dev.tamakoo.com'
         }}>dev</button>
           
-//    const textForm = 
-//      <div
-//        style={{
-//          fontSize: '16px',
-//          height: '40px',
-//          width: '85%',
-//          paddingLeft: '0',
-//          position: 'relative',
-//          background: 'none',
-//          display: 'block',
-//          marginTop: '0em',
-//          margin: '0px',
-//          borderStyle: 'none',
-//          backgroundColor:'#fff',
-//        }}
-//        ref="editor"
-//      >
-//      <Editor
-//        editorState={this.state.editorState}
-//        onChange={this.onChange.bind(this)}
-//      />
-//      </div>
-
     console.log(this)
     return (
       <div style={this.styles.toot}>
-        <TootEditor actions={this.props.actions} match={this.props.match} value={this.props.value} />
+        <TootEditor style={{ margin:'30vh 10vw 0 10vw'}} actions={this.props.actions} match={this.props.match} value={this.props.value} />
         <Tool actions={this.props.actions} match={this.props.match} value={this.props.value} />
       </div>
     )

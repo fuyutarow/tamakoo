@@ -3,7 +3,7 @@ export const styleOn = (windowWidth) =>  {
   //if( windowWidth < 720 ){
     return {
       wall: {
-        backgroundColor: '#fffff9',
+        backgroundColor: 'rgb(0,0,0,0)',
         color: 'rgba(0, 0, 0, 0.87)',
       },
       nowToot: {

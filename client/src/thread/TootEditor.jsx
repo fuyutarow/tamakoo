@@ -43,11 +43,11 @@ export class TootEditor extends React.Component<void, Props, void> {
     this.setState({editorState})
   }
 
-  toot() {
+  anchor() {
     const noteText = this.state.editorState.getCurrentContent().getPlainText();
     if( ! noteText ) return;
     this.props.actions.setState({ isLoading: true })
-    history.push('/echo/'+noteText)
+    this.props.actions.anchor(this.props.value.signinAcc.alias, this.props.card.note.id, this.props.order, noteText);
   }
 
   render() {
@@ -90,17 +90,17 @@ export class TootEditor extends React.Component<void, Props, void> {
         //top: '0',
       }}
         alt='🗨' src='https://twemoji.maxcdn.com/2/72x72/1f5e8.png'
-        onClick={e=>this.toot()}
+        onClick={e=>this.anchor()}
       />
 
     return (
       <div style={{
+        gridColumn: '1/4',  
+        margin: '10px 2vw 0 2vw',
         color: 'rgba(0, 0, 0, 0.87)',
-        //position: 'relative',
         display: 'grid',
         gridTemplateColumns: '1fr 40px',
         background: 'none',
-        //margin: '0 10vw 0 10vw',
       }}>
         { textForm }
         { tootBtn }
@@ -111,7 +111,7 @@ export class TootEditor extends React.Component<void, Props, void> {
   componentDidMount() {
     window.addEventListener('keypress', e => {
       if( e.keyCode==13 && e.shiftKey ){
-        this.toot();
+        this.anchor();
       }
     })
   }

@@ -1,4 +1,4 @@
-#( -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, jsonify, abort, make_response, send_from_directory, redirect
 import os
 import json
@@ -145,7 +145,8 @@ def wind_cards(note_id, amount=100):
     tail_cards = anchored_cards(note_id, amount)
     head_cards = anchoring_cards(note_id, amount - len(tail_cards))
     
-    cards = head_cards[::-1] + [now_card] + tail_cards
+    #cards = head_cards + [now_card] + tail_cards[::-1]
+    cards = [now_card] + head_cards + tail_cards[::-1]
     return cards
 
 def user(user_id):
